@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 Seed Colors -->
+    
+    <!-- Purple Theme Colors -->
+    <color name="purple_light_primary">#6750A4</color>
+    <color name="purple_light_onPrimary">#FFFFFF</color>
+    <color name="purple_light_primaryContainer">#EADDFF</color>
+    <color name="purple_light_onPrimaryContainer">#21005D</color>
+    <color name="purple_light_secondary">#625B71</color>
+    <color name="purple_light_onSecondary">#FFFFFF</color>
+    <color name="purple_light_secondaryContainer">#E8DEF8</color>
+    <color name="purple_light_onSecondaryContainer">#1D192B</color>
+    <color name="purple_light_tertiary">#7D5260</color>
+    <color name="purple_light_onTertiary">#FFFFFF</color>
+    <color name="purple_light_tertiaryContainer">#FFD8E4</color>
+    <color name="purple_light_onTertiaryContainer">#31111D</color>
+    <color name="purple_light_background">#FFFBFE</color>
+    <color name="purple_light_onBackground">#1C1B1F</color>
+    <color name="purple_light_surface">#FFFBFE</color>
+    <color name="purple_light_onSurface">#1C1B1F</color>
+    <color name="purple_light_surfaceVariant">#E7E0EC</color>
+    <color name="purple_light_onSurfaceVariant">#49454F</color>
+    <color name="purple_light_outline">#79747E</color>
+    <color name="purple_light_outlineVariant">#CAC4D0</color>
+    <color name="purple_light_surfaceContainerHigh">#ECE6F0</color>
+
+    <color name="purple_dark_primary">#D0BCFF</color>
+    <color name="purple_dark_onPrimary">#381E72</color>
+    <color name="purple_dark_primaryContainer">#4F378B</color>
+    <color name="purple_dark_onPrimaryContainer">#EADDFF</color>
+    <color name="purple_dark_secondary">#CCC2DC</color>
+    <color name="purple_dark_onSecondary">#332D41</color>
+    <color name="purple_dark_secondaryContainer">#4A4458</color>
+    <color name="purple_dark_onSecondaryContainer">#E8DEF8</color>
+    <color name="purple_dark_tertiary">#EFB8C8</color>
+    <color name="purple_dark_onTertiary">#492532</color>
+    <color name="purple_dark_tertiaryContainer">#633B48</color>
+    <color name="purple_dark_onTertiaryContainer">#FFD8E4</color>
+    <color name="purple_dark_background">#1C1B1F</color>
+    <color name="purple_dark_onBackground">#E6E1E5</color>
+    <color name="purple_dark_surface">#1C1B1F</color>
+    <color name="purple_dark_onSurface">#E6E1E5</color>
+    <color name="purple_dark_surfaceVariant">#49454F</color>
+    <color name="purple_dark_onSurfaceVariant">#CAC4D0</color>
+    <color name="purple_dark_outline">#938F99</color>
+    <color name="purple_dark_outlineVariant">#49454F</color>
+    <color name="purple_dark_surfaceContainerHigh">#2B2930</color>
+
+    <!-- Blue Theme Colors -->
+    <color name="blue_light_primary">#005FAF</color>
+    <color name="blue_light_onPrimary">#FFFFFF</color>
+    <color name="blue_light_primaryContainer">#D4E3FF</color>
+    <color name="blue_light_onPrimaryContainer">#001C3A</color>
+    <color name="blue_light_secondary">#535F70</color>
+    <color name="blue_light_onSecondary">#FFFFFF</color>
+    <color name="blue_light_secondaryContainer">#D7E3F7</color>
+    <color name="blue_light_onSecondaryContainer">#101C2B</color>
+    <color name="blue_light_background">#FDFDFF</color>
+    <color name="blue_light_onBackground">#1A1C1E</color>
+    <color name="blue_light_surface">#FDFDFF</color>
+    <color name="blue_light_onSurface">#1A1C1E</color>
+    <color name="blue_light_surfaceVariant">#DFE2EB</color>
+    <color name="blue_light_onSurfaceVariant">#43474E</color>
+    <color name="blue_light_outline">#73777F</color>
+    <color name="blue_light_outlineVariant">#C3C6CF</color>
+    <color name="blue_light_surfaceContainerHigh">#E2E2E6</color>
+
+    <color name="blue_dark_primary">#A5C8FF</color>
+    <color name="blue_dark_onPrimary">#00315F</color>
+    <color name="blue_dark_primaryContainer">#004786</color>
+    <color name="blue_dark_onPrimaryContainer">#D4E3FF</color>
+    <color name="blue_dark_secondary">#BBC7DB</color>
+    <color name="blue_dark_onSecondary">#253140</color>
+    <color name="blue_dark_secondaryContainer">#3B4858</color>
+    <color name="blue_dark_onSecondaryContainer">#D7E3F7</color>
+    <color name="blue_dark_background">#1A1C1E</color>
+    <color name="blue_dark_onBackground">#E2E2E6</color>
+    <color name="blue_dark_surface">#1A1C1E</color>
+    <color name="blue_dark_onSurface">#E2E2E6</color>
+    <color name="blue_dark_surfaceVariant">#43474E</color>
+    <color name="blue_dark_onSurfaceVariant">#C3C6CF</color>
+    <color name="blue_dark_outline">#8D9199</color>
+    <color name="blue_dark_outlineVariant">#43474E</color>
+    <color name="blue_dark_surfaceContainerHigh">#25272A</color>
+
+    <!-- Green Theme Colors -->
+    <color name="green_light_primary">#006E3C</color>
+    <color name="green_light_onPrimary">#FFFFFF</color>
+    <color name="green_light_primaryContainer">#95F9B1</color>
+    <color name="green_light_onPrimaryContainer">#00210E</color>
+    <color name="green_light_secondary">#516353</color>
+    <color name="green_light_onSecondary">#FFFFFF</color>
+    <color name="green_light_secondaryContainer">#D4E8D4</color>
+    <color name="green_light_onSecondaryContainer">#0F1F12</color>
+    <color name="green_light_background">#FCFDF7</color>
+    <color name="green_light_onBackground">#1A1C19</color>
+    <color name="green_light_surface">#FCFDF7</color>
+    <color name="green_light_onSurface">#1A1C19</color>
+    <color name="green_light_surfaceVariant">#DEE5DC</color>
+    <color name="green_light_onSurfaceVariant">#424942</color>
+    <color name="green_light_outline">#727972</color>
+    <color name="green_light_outlineVariant">#C2C9C0</color>
+    <color name="green_light_surfaceContainerHigh">#E1E4DE</color>
+
+    <color name="green_dark_primary">#78DC96</color>
+    <color name="green_dark_onPrimary">#00391C</color>
+    <color name="green_dark_primaryContainer">#00522B</color>
+    <color name="green_dark_onPrimaryContainer">#95F9B1</color>
+    <color name="green_dark_secondary">#B8CCB8</color>
+    <color name="green_dark_onSecondary">#233426</color>
+    <color name="green_dark_secondaryContainer">#3A4B3C</color>
+    <color name="green_dark_onSecondaryContainer">#D4E8D4</color>
+    <color name="green_dark_background">#1A1C19</color>
+    <color name="green_dark_onBackground">#E1E4DE</color>
+    <color name="green_dark_surface">#1A1C19</color>
+    <color name="green_dark_onSurface">#E1E4DE</color>
+    <color name="green_dark_surfaceVariant">#424942</color>
+    <color name="green_dark_onSurfaceVariant">#C2C9C0</color>
+    <color name="green_dark_outline">#8C938C</color>
+    <color name="green_dark_outlineVariant">#424942</color>
+    <color name="green_dark_surfaceContainerHigh">#242624</color>
+
+    <!-- Orange Theme Colors -->
+    <color name="orange_light_primary">#A93E00</color>
+    <color name="orange_light_onPrimary">#FFFFFF</color>
+    <color name="orange_light_primaryContainer">#FFDBCE</color>
+    <color name="orange_light_onPrimaryContainer">#370F00</color>
+    <color name="orange_light_secondary">#77574E</color>
+    <color name="orange_light_onSecondary">#FFFFFF</color>
+    <color name="orange_light_secondaryContainer">#FFDAD2</color>
+    <color name="orange_light_onSecondaryContainer">#2C150F</color>
+    <color name="orange_light_background">#FFFBF9</color>
+    <color name="orange_light_onBackground">#201A18</color>
+    <color name="orange_light_surface">#FFFBF9</color>
+    <color name="orange_light_onSurface">#201A18</color>
+    <color name="orange_light_surfaceVariant">#F5DED9</color>
+    <color name="orange_light_onSurfaceVariant">#53433F</color>
+    <color name="orange_light_outline">#85736E</color>
+    <color name="orange_light_outlineVariant">#D8C2BC</color>
+    <color name="orange_light_surfaceContainerHigh">#E6DFDC</color>
+
+    <color name="orange_dark_primary">#FFB596</color>
+    <color name="orange_dark_onPrimary">#5B1D00</color>
+    <color name="orange_dark_primaryContainer">#812D00</color>
+    <color name="orange_dark_onPrimaryContainer">#FFDBCE</color>
+    <color name="orange_dark_secondary">#E6BEB5</color>
+    <color name="orange_dark_onSecondary">#442A22</color>
+    <color name="orange_dark_secondaryContainer">#5D3F37</color>
+    <color name="orange_dark_onSecondaryContainer">#FFDAD2</color>
+    <color name="orange_dark_background">#201A18</color>
+    <color name="orange_dark_onBackground">#EDE0DC</color>
+    <color name="orange_dark_surface">#201A18</color>
+    <color name="orange_dark_onSurface">#EDE0DC</color>
+    <color name="orange_dark_surfaceVariant">#53433F</color>
+    <color name="orange_dark_onSurfaceVariant">#D8C2BC</color>
+    <color name="orange_dark_outline">#A08C87</color>
+    <color name="orange_dark_outlineVariant">#53433F</color>
+    <color name="orange_dark_surfaceContainerHigh">#2D2422</color>
+
+    <!-- Grey Theme Colors -->
+    <color name="grey_light_primary">#5A626A</color>
+    <color name="grey_light_onPrimary">#FFFFFF</color>
+    <color name="grey_light_primaryContainer">#E2E6EB</color>
+    <color name="grey_light_onPrimaryContainer">#171C22</color>
+    <color name="grey_light_secondary">#5D6065</color>
+    <color name="grey_light_onSecondary">#FFFFFF</color>
+    <color name="grey_light_secondaryContainer">#E2E2E7</color>
+    <color name="grey_light_onSecondaryContainer">#1A1C1E</color>
+    <color name="grey_light_background">#F8F9FA</color>
+    <color name="grey_light_onBackground">#1A1C1E</color>
+    <color name="grey_light_surface">#F8F9FA</color>
+    <color name="grey_light_onSurface">#1A1C1E</color>
+    <color name="grey_light_surfaceVariant">#E0E2E5</color>
+    <color name="grey_light_onSurfaceVariant">#43474B</color>
+    <color name="grey_light_outline">#74777F</color>
+    <color name="grey_light_outlineVariant">#C3C7CB</color>
+    <color name="grey_light_surfaceContainerHigh">#EBECEE</color>
+
+    <color name="grey_dark_primary">#C1C7CE</color>
+    <color name="grey_dark_onPrimary">#2C3136</color>
+    <color name="grey_dark_primaryContainer">#42494E</color>
+    <color name="grey_dark_onPrimaryContainer">#DCE2E9</color>
+    <color name="grey_dark_secondary">#C5C6CB</color>
+    <color name="grey_dark_onSecondary">#2E3035</color>
+    <color name="grey_dark_secondaryContainer">#45474B</color>
+    <color name="grey_dark_onSecondaryContainer">#E2E2E7</color>
+    <color name="grey_dark_background">#1A1C1E</color>
+    <color name="grey_dark_onBackground">#E2E2E6</color>
+    <color name="grey_dark_surface">#1A1C1E</color>
+    <color name="grey_dark_onSurface">#E2E2E6</color>
+    <color name="grey_dark_surfaceVariant">#43474B</color>
+    <color name="grey_dark_onSurfaceVariant">#C3C7CB</color>
+    <color name="grey_dark_outline">#8D9196</color>
+    <color name="grey_dark_outlineVariant">#43474B</color>
+    <color name="grey_dark_surfaceContainerHigh">#25272A</color>
+
+    <!-- Pink Logo Color -->
+    <color name="pink_logo">#FF00D6</color>
+
+    <!-- Pitch Black Colors -->
+    <color name="black_dark_background">#000000</color>
+    <color name="black_dark_surface">#000000</color>
+    <color name="black_dark_surfaceContainerHigh">#101010</color>
+    <color name="black_dark_surfaceVariant">#1A1A1A</color>
+    <color name="black_dark_outline">#333333</color>
+    <color name="black_dark_outlineVariant">#222222</color>
+</resources>
