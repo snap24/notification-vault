@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.NotiVault" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Purple Theme (Default) -->
+    <style name="Theme.NotiVault.Purple" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/purple_light_primary</item>
+        <item name="colorOnPrimary">@color/purple_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/purple_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/purple_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/purple_light_secondary</item>
+        <item name="colorOnSecondary">@color/purple_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/purple_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/purple_light_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/purple_light_background</item>
+        <item name="colorOnBackground">@color/purple_light_onBackground</item>
+        <item name="colorSurface">@color/purple_light_surface</item>
+        <item name="colorOnSurface">@color/purple_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/purple_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/purple_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/purple_light_outline</item>
+        <item name="colorOutlineVariant">@color/purple_light_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/purple_light_surfaceContainerHigh</item>
+    </style>
+
+    <!-- Blue Theme -->
+    <style name="Theme.NotiVault.Blue" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/blue_light_primary</item>
+        <item name="colorOnPrimary">@color/blue_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/blue_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/blue_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/blue_light_secondary</item>
+        <item name="colorOnSecondary">@color/blue_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/blue_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/blue_light_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/blue_light_background</item>
+        <item name="colorOnBackground">@color/blue_light_onBackground</item>
+        <item name="colorSurface">@color/blue_light_surface</item>
+        <item name="colorOnSurface">@color/blue_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/blue_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/blue_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/blue_light_outline</item>
+        <item name="colorOutlineVariant">@color/blue_light_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/blue_light_surfaceContainerHigh</item>
+    </style>
+
+    <!-- Green Theme -->
+    <style name="Theme.NotiVault.Green" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/green_light_primary</item>
+        <item name="colorOnPrimary">@color/green_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/green_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/green_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/green_light_secondary</item>
+        <item name="colorOnSecondary">@color/green_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/green_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/green_light_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/green_light_background</item>
+        <item name="colorOnBackground">@color/green_light_onBackground</item>
+        <item name="colorSurface">@color/green_light_surface</item>
+        <item name="colorOnSurface">@color/green_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/green_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/green_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/green_light_outline</item>
+        <item name="colorOutlineVariant">@color/green_light_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/green_light_surfaceContainerHigh</item>
+    </style>
+
+    <!-- Orange Theme -->
+    <style name="Theme.NotiVault.Orange" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/orange_light_primary</item>
+        <item name="colorOnPrimary">@color/orange_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/orange_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/orange_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/orange_light_secondary</item>
+        <item name="colorOnSecondary">@color/orange_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/orange_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/orange_light_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/orange_light_background</item>
+        <item name="colorOnBackground">@color/orange_light_onBackground</item>
+        <item name="colorSurface">@color/orange_light_surface</item>
+        <item name="colorOnSurface">@color/orange_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/orange_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/orange_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/orange_light_outline</item>
+        <item name="colorOutlineVariant">@color/orange_light_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/orange_light_surfaceContainerHigh</item>
+    </style>
+
+    <!-- Black Theme (Fallback light settings, will act dark anyway if triggered) -->
+    <style name="Theme.NotiVault.Black" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/purple_dark_primary</item>
+        <item name="colorOnPrimary">@color/purple_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/purple_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/purple_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/purple_dark_secondary</item>
+        <item name="colorOnSecondary">@color/purple_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/purple_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/purple_dark_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/black_dark_background</item>
+        <item name="colorOnBackground">#FFFFFF</item>
+        <item name="colorSurface">@color/black_dark_surface</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSurfaceVariant">@color/black_dark_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">#CCCCCC</item>
+        <item name="colorOutline">@color/black_dark_outline</item>
+        <item name="colorOutlineVariant">@color/black_dark_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/black_dark_surfaceContainerHigh</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+    <!-- Grey Theme -->
+    <style name="Theme.NotiVault.Grey" parent="Theme.NotiVault">
+        <item name="colorPrimary">@color/grey_light_primary</item>
+        <item name="colorOnPrimary">@color/grey_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/grey_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/grey_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/grey_light_secondary</item>
+        <item name="colorOnSecondary">@color/grey_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/grey_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/grey_light_onSecondaryContainer</item>
+        <item name="android:colorBackground">@color/grey_light_background</item>
+        <item name="colorOnBackground">@color/grey_light_onBackground</item>
+        <item name="colorSurface">@color/grey_light_surface</item>
+        <item name="colorOnSurface">@color/grey_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/grey_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/grey_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/grey_light_outline</item>
+        <item name="colorOutlineVariant">@color/grey_light_outlineVariant</item>
+        <item name="colorSurfaceContainerHigh">@color/grey_light_surfaceContainerHigh</item>
+    </style>
+</resources>
