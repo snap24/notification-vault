@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notification Vault</string>
+    <string name="service_label">Notification Vault Notification Listener</string>
+
+    <!-- Navigation -->
+    <string name="nav_history">History</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- History Fragment -->
+    <string name="search_hint">Search notifications…</string>
+    <string name="clear_all">Clear All</string>
+    <string name="clear_all_title">Clear All Notifications</string>
+    <string name="clear_all_message">This will permanently delete all saved notification history. This action cannot be undone.</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="close">Close</string>
+    <string name="copy">Copy</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="notification_deleted">Notification deleted</string>
+    <string name="undo">Undo</string>
+
+    <!-- Empty States -->
+    <string name="empty_history_title">No notifications yet</string>
+    <string name="empty_history_subtitle">Notifications from your apps will appear here once you grant notification access.</string>
+    <string name="empty_apps_title">No apps tracked</string>
+    <string name="empty_apps_subtitle">Apps that send notifications will appear here.</string>
+
+    <!-- Permissions -->
+    <string name="permission_required_title">Notification Access Required</string>
+    <string name="permission_required_message">Notification Vault needs Notification Listener access to capture and store your notification history. No data leaves your device.</string>
+    <string name="grant_access">Grant Access</string>
+    <string name="not_now">Not Now</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="pref_notification_access_title">Notification Access</string>
+    <string name="pref_notification_access_summary">Tap to manage notification listener permission</string>
+    <string name="pref_capture_enabled_title">Enable Capture</string>
+    <string name="pref_capture_enabled_summary">Capture incoming notifications</string>
+    <string name="pref_auto_delete_title">Auto-Delete History</string>
+    <string name="pref_auto_delete_summary">Automatically delete old notifications</string>
+    <string name="pref_about_title">About Notification Vault</string>
+    <string name="pref_about_summary">Version 1.0.0 · Open Source · No ads · No tracking</string>
+    <string name="pref_category_general">General</string>
+    <string name="pref_theme_color_title">Theme Color</string>
+    <string name="pref_theme_color_summary">Choose application base theme color</string>
+    <string name="pref_pitch_black_title">Pitch Black</string>
+    <string name="pref_pitch_black_summary">Pure black background in dark mode</string>
+    <string name="pref_biometric_lock_title">Biometric App Lock</string>
+    <string name="pref_biometric_lock_summary">Require biometric authentication to open app</string>
+    <string name="pref_export_backup_title">Export Backup</string>
+    <string name="pref_export_backup_summary">Save notification history to a JSON file</string>
+    <string name="pref_import_backup_title">Import Backup</string>
+    <string name="pref_import_backup_summary">Load notification history from a JSON file</string>
+    <string name="pref_category_storage">Storage</string>
+    <string name="pref_category_about">About</string>
+    <string name="backup_export_success">Backup exported successfully</string>
+    <string name="backup_export_failed">Backup export failed: %s</string>
+    <string name="backup_import_success">Backup imported successfully</string>
+    <string name="backup_import_failed">Backup import failed: %s</string>
+    <string name="pref_favorites_title">Starred Notifications</string>
+    <string name="pref_favorites_summary">View all starred/favorite notifications</string>
+</resources>
