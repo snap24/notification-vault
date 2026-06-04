@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="auto_delete_entries">
+        <item>Never</item>
+        <item>After 7 days</item>
+        <item>After 30 days</item>
+        <item>After 90 days</item>
+    </string-array>
+    <string-array name="auto_delete_values">
+        <item>0</item>
+        <item>7</item>
+        <item>30</item>
+        <item>90</item>
+    </string-array>
+
+    <string-array name="theme_color_entries">
+        <item>Grey (Default)</item>
+        <item>Purple</item>
+        <item>Blue</item>
+        <item>Green</item>
+        <item>Orange</item>
+    </string-array>
+    <string-array name="theme_color_values">
+        <item>grey</item>
+        <item>purple</item>
+        <item>blue</item>
+        <item>green</item>
+        <item>orange</item>
+    </string-array>
+</resources>
