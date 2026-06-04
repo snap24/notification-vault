@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_history">
+
+    <fragment
+        android:id="@+id/navigation_history"
+        android:name="com.zygisk_enc.notivault.fragment.HistoryFragment"
+        android:label="@string/nav_history" />
+
+    <fragment
+        android:id="@+id/navigation_apps"
+        android:name="com.zygisk_enc.notivault.fragment.AppsFragment"
+        android:label="@string/nav_apps" />
+
+    <fragment
+        android:id="@+id/navigation_stats"
+        android:name="com.zygisk_enc.notivault.fragment.StatsFragment"
+        android:label="Stats" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.zygisk_enc.notivault.fragment.SettingsFragment"
+        android:label="@string/nav_settings" />
+
+</navigation>
