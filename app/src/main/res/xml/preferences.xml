@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/pref_category_general">
+
+        <Preference
+            app:key="notification_access"
+            app:title="@string/pref_notification_access_title"
+            app:summary="@string/pref_notification_access_summary"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="capture_enabled"
+            app:title="@string/pref_capture_enabled_title"
+            app:summary="@string/pref_capture_enabled_summary"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="theme_color"
+            app:title="@string/pref_theme_color_title"
+            app:summary="@string/pref_theme_color_summary"
+            app:entries="@array/theme_color_entries"
+            app:entryValues="@array/theme_color_values"
+            app:defaultValue="grey"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="pitch_black"
+            app:title="@string/pref_pitch_black_title"
+            app:summary="@string/pref_pitch_black_summary"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="biometric_lock"
+            app:title="@string/pref_biometric_lock_title"
+            app:summary="@string/pref_biometric_lock_summary"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="favorites_list"
+            app:title="@string/pref_favorites_title"
+            app:summary="@string/pref_favorites_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/pref_category_storage">
+
+        <ListPreference
+            app:key="auto_delete_days"
+            app:title="@string/pref_auto_delete_title"
+            app:summary="@string/pref_auto_delete_summary"
+            app:entries="@array/auto_delete_entries"
+            app:entryValues="@array/auto_delete_values"
+            app:defaultValue="0"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="export_backup"
+            app:title="@string/pref_export_backup_title"
+            app:summary="@string/pref_export_backup_summary"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="import_backup"
+            app:title="@string/pref_import_backup_title"
+            app:summary="@string/pref_import_backup_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/pref_category_about">
+
+        <Preference
+            app:key="about"
+            app:title="@string/pref_about_title"
+            app:summary="@string/pref_about_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
