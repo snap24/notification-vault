@@ -1,0 +1,4 @@
+- Initial stable release.
+- Added Material 3 dynamic theming.
+- Added Biometric Security lock.
+- Added high-performance Room Database logging.
