@@ -1,0 +1,15 @@
+<svg width="512" height="512" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle -->
+    <circle cx="54" cy="54" r="54" fill="#FFFFFF" />
+    <!-- Foreground Group -->
+    <g transform="translate(54, 54) scale(0.55) translate(-54, -54)">
+        <!-- Top Cap Dome -->
+        <path fill="#000000" d="M54,18 c2.8,0 5,-2.2 5,-5 s-2.2,-5 -5,-5 s-5,2.2 -5,5 s2.2,5 5,5 z" />
+        <!-- Bell Main Body -->
+        <path fill="#000000" d="M54,16 C41.3,16 31,25.8 31,38 V52 C31,62.6 24.3,66.3 16,73 V78 H92 V73 C83.7,66.3 77,62.6 77,52 V38 C77,25.8 66.7,16 54,16 Z" />
+        <!-- Clapper -->
+        <path fill="#000000" d="M43,84 H65 C65,90.1 60.1,95 54,95 C47.9,95 43,90.1 43,84 Z" />
+        <!-- Recorder Dot -->
+        <path fill="#FF0000" d="M88,12 a8,8 0 1,1 0,16 a8,8 0 1,1 0,-16 z M88,14 a6,6 0 1,0 0,12 a6,6 0 1,0 0,-12 z M88,16.5 a3.5,3.5 0 1,1 0,7 a3.5,3.5 0 1,1 0,-7 z" />
+    </g>
+</svg>
