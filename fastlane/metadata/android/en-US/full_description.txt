@@ -1,0 +1,8 @@
+Notification Vault is a resilient, open-source notification logger designed for high security and 100% offline privacy. It seamlessly intercepts, records, and categorizes your device's notifications using a robust local database, guaranteeing that your personal data never leaves your device.
+
+Key Features:
+- Complete Privacy: Operates entirely offline with zero internet permissions.
+- Biometric Lock: Enterprise-grade security enforcing fingerprint or face unlock before the app can be accessed.
+- Search & Filter: Instantly locate past notifications with powerful text search and package-based filtering.
+- Dynamic Theming: Supports multiple color schemes (Grey, Blue, Green, Orange, Purple) and a bespoke Pitch Black AMOLED mode.
+- Material 3 Design: Clean, modern interface with beautiful animations and a pristine user onboarding experience.
