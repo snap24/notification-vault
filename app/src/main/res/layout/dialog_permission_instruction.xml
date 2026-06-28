@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="To record notifications, please follow these steps:\n\n1. Find 'Notification Vault' in the list and turn on 'Allow notification access'."
+            android:text="To record notifications, please follow these steps:\n\n1. If you see the 'App was denied access' or 'Restricted setting' warning, follow these instructions to enable it."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2. Tap 'Allow' in the confirmation popup."
+            android:text="2. Go to your home screen or app drawer, long-press the 'Notification Vault' app icon, and tap 'App info'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="3. Finally, ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent)."
+            android:text="3. On the App info screen, tap the three-dots menu in the top-right corner and select 'Allow restricted settings'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -53,6 +53,38 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:src="@drawable/instruction_step3"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitCenter"
+            android:clipToOutline="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4. Authenticate using your fingerprint, face, or PIN to confirm."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/instruction_step4"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitCenter"
+            android:clipToOutline="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5. Finally, return to the app to enable Notification Access, and ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent)."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/instruction_step5"
             android:layout_marginBottom="8dp"
             android:scaleType="fitCenter"
             android:clipToOutline="true"/>
