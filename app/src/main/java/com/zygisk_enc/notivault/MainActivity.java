@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Bind Custom View Source Button Click
         binding.btnViewSource.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/com.zygisk_enc.fingerprintreset"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
             startActivity(intent);
         });
 
