@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="To record notifications, please follow these steps:\n\n1. If you see the 'App was denied access' or 'Restricted setting' warning, follow these instructions to enable it."
+            android:text="To record notifications, please follow these steps:\n\n1. Find 'Notification Vault' in the list and tap the switch next to 'Allow notification access'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2. Go to your home screen or app drawer, long-press the 'Notification Vault' app icon, and tap 'App info'."
+            android:text="2. If you see the 'App was denied access' or 'Restricted setting' warning, tap 'OK'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="3. On the App info screen, tap the three-dots menu in the top-right corner and select 'Allow restricted settings'."
+            android:text="3. Go to your home screen or app drawer, long-press the 'Notification Vault' app icon, and tap 'App info'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -60,7 +60,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="4. Authenticate using your fingerprint, face, or PIN to confirm."
+            android:text="4. On the App info screen, tap the three-dots menu in the top-right corner and select 'Allow restricted settings'."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -76,7 +76,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="5. Finally, return to the app to enable Notification Access, and ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent)."
+            android:text="5. Authenticate using your fingerprint, face, or PIN to confirm."
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="8dp"/>
 
@@ -85,9 +85,41 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:src="@drawable/instruction_step5"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitCenter"
+            android:clipToOutline="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="6. Return to settings, turn on the 'Allow notification access' switch again, and tap 'Allow' on the confirmation popup."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/instruction_step6"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitCenter"
+            android:clipToOutline="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="7. Finally, ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent)."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/instruction_step7"
             android:layout_marginBottom="8dp"
             android:scaleType="fitCenter"
             android:clipToOutline="true"/>
 
-    </LinearLayout>
+     </LinearLayout>
 </ScrollView>
