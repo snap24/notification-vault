@@ -18,6 +18,10 @@ public class EncryptionHelper {
         if (keyStore.containsAlias(KEY_ALIAS)) {
             return (SecretKey) keyStore.getKey(KEY_ALIAS, null);
         }
+        return generateNewKey();
+    }
+
+    private static SecretKey generateNewKey() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE);
         keyGenerator.init(new KeyGenParameterSpec.Builder(KEY_ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
@@ -25,5 +29,16 @@ public class EncryptionHelper {
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .build());
         return keyGenerator.generateKey();
+    }
+
+    private static void handleKeyInvalidated() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
+            keyStore.load(null);
+            keyStore.deleteEntry(KEY_ALIAS);
+            generateNewKey();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
