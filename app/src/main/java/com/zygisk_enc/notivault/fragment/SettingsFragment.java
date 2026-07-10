@@ -1,5 +1,5 @@
 package com.zygisk_enc.notivault.fragment;
-import androidx.preference.PreferenceFragmentCompat;
-public class SettingsFragment extends PreferenceFragmentCompat {
+// ZIP compression methods
+public class SettingsFragment extends androidx.preference.PreferenceFragmentCompat {
     @Override public void onCreatePreferences(android.os.Bundle s, String r) {}
 }
