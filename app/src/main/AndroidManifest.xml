@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +27,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ToastHistoryActivity"
+            android:exported="false"
+            android:label="Toast Logs" />
+
         <service
             android:name=".service.NotiVaultService"
             android:exported="false"
@@ -35,6 +43,24 @@
             <meta-data
                 android:name="android.service.notification.default_filter_types"
                 android:value="ongoing|silent" />
+        </service>
+
+        <service
+            android:name=".service.BackupService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <service
+            android:name=".service.ToastRecorderService"
+            android:label="NotiVault Toast Recorder"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
         </service>
 
     </application>
