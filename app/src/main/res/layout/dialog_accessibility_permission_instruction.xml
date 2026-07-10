@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="To record background toasts, please follow these steps:\n\n1. Find 'NotiVault Toast Recorder' in the accessibility service list and turn it on."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Note: If the setting is greyed out with a 'Restricted setting' warning:\n\n• Go to your phone\'s Home screen, long-press the 'Notification Vault' app icon, and tap 'App info'.\n• Tap the three-dots menu in the top-right and select 'Allow restricted settings'.\n• Return here or go to accessibility settings and enable 'NotiVault Toast Recorder'."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorError"
+            android:layout_marginBottom="8dp"/>
+
+    </LinearLayout>
+</ScrollView>
