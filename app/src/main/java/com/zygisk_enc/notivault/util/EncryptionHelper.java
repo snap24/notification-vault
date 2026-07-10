@@ -1,5 +1,8 @@
 package com.zygisk_enc.notivault.util;
 
-// TODO: Implement AES-256-GCM secure encryption utility
+import javax.crypto.Cipher;
+
 public class EncryptionHelper {
+    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final String KEY_ALIAS = "notivault_secure_key";
 }
