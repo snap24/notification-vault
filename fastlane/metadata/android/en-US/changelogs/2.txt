@@ -1,0 +1,6 @@
+- Added full on-device AES-256-GCM database encryption.
+- Added accessibility-based system Toast message recording.
+- Added notification image logging with RAM-only decryption.
+- Added per-app rules with block/allow keyword filters.
+- Added detailed Statistics dashboard & hourly charts.
+- Added password-protected ZIP backup export/import.
