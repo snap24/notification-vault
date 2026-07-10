@@ -73,6 +73,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/pref_category_rules">
+
+        <Preference
+            app:key="app_rules"
+            app:title="@string/pref_app_rules_title"
+            app:summary="@string/pref_app_rules_summary"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/pref_category_about">
 
         <Preference

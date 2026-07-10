@@ -98,6 +98,15 @@
                     app:tint="?attr/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_app_rules"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/app_rules"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    app:icon="@drawable/ic_apps" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clear_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -105,6 +114,26 @@
                     android:text="@string/clear_all"
                     style="@style/Widget.Material3.Button.TextButton"
                     app:icon="@drawable/ic_delete_sweep" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_toasts_history"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Toasts"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    app:icon="@drawable/ic_toast_bread" />
+
+                <TextView
+                    android:id="@+id/tv_load_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="Loading... 45%" />
 
             </LinearLayout>
 

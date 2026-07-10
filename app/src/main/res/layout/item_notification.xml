@@ -53,6 +53,16 @@
                     android:ellipsize="end" />
 
                 <TextView
+                    android:id="@+id/tv_duplicate_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textColor="?attr/colorError"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/tv_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -81,6 +91,18 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:layout_marginTop="2dp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_notification_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:adjustViewBounds="true"
+                android:maxHeight="160dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:importantForAccessibility="no"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
         </LinearLayout>
 

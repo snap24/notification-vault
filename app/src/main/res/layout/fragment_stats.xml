@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:overScrollMode="never"
     android:background="?android:attr/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
-        <!-- Title -->
+        <!-- Title / Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,7 +22,8 @@
             android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Count Cards Row -->
         <LinearLayout
@@ -36,12 +38,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -54,7 +56,8 @@
                         android:layout_height="wrap_content"
                         android:text="Today"
                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_count_today"
@@ -66,6 +69,14 @@
                         android:textStyle="bold"
                         android:layout_marginTop="8dp" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="captured today"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="4dp" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -75,12 +86,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="6dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -93,7 +104,8 @@
                         android:layout_height="wrap_content"
                         android:text="Yesterday"
                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_count_yesterday"
@@ -104,6 +116,14 @@
                         android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold"
                         android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="logged yesterday"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
@@ -120,7 +140,7 @@
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -134,8 +154,15 @@
                     android:text="Top Loudest Apps"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Apps responsible for most notification alerts"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="16dp" />
 
                 <LinearLayout
                     android:id="@+id/layout_top_apps_container"
@@ -167,7 +194,7 @@
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -178,11 +205,18 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Daily Time Distribution"
+                    android:text="Time of Day Distribution"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp" />
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notification frequency over the last 7 days"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="20dp" />
 
                 <!-- Morning Row -->
                 <LinearLayout
@@ -190,27 +224,32 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="16dp">
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:text="Morning"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progress_morning"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp" />
+                        app:trackThickness="10dp"
+                        app:indicatorColor="#FFC107"
+                        app:trackColor="?attr/colorSurfaceVariant" />
                     <TextView
                         android:id="@+id/tv_count_morning"
-                        android:layout_width="40dp"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
                 <!-- Afternoon Row -->
@@ -219,27 +258,32 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="16dp">
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:text="Afternoon"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progress_afternoon"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp" />
+                        app:trackThickness="10dp"
+                        app:indicatorColor="#FF5722"
+                        app:trackColor="?attr/colorSurfaceVariant" />
                     <TextView
                         android:id="@+id/tv_count_afternoon"
-                        android:layout_width="40dp"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
                 <!-- Evening Row -->
@@ -248,27 +292,32 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="16dp">
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:text="Evening"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progress_evening"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp" />
+                        app:trackThickness="10dp"
+                        app:indicatorColor="#9C27B0"
+                        app:trackColor="?attr/colorSurfaceVariant" />
                     <TextView
                         android:id="@+id/tv_count_evening"
-                        android:layout_width="40dp"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
                 <!-- Night Row -->
@@ -281,22 +330,27 @@
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:text="Night"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progress_night"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="8dp" />
+                        app:trackThickness="10dp"
+                        app:indicatorColor="#3F51B5"
+                        app:trackColor="?attr/colorSurfaceVariant" />
                     <TextView
                         android:id="@+id/tv_count_night"
-                        android:layout_width="40dp"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
 
             </LinearLayout>
