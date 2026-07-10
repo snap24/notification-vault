@@ -25,6 +25,8 @@ import androidx.preference.PreferenceManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.zygisk_enc.notivault.databinding.ActivityMainBinding;
 import com.zygisk_enc.notivault.service.NotiVaultService;
+import com.zygisk_enc.notivault.util.PreferenceUtil;
+import com.zygisk_enc.notivault.database.AppDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            isAuthenticated = savedInstanceState.getBoolean("is_authenticated", false);
+        }
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -116,9 +121,28 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Check notification listener permission
-        if (!isNotificationServiceEnabled()) {
-            showPermissionDialog();
+        // Check permissions in sequence
+        checkPermissionsSequence();
+
+        // Request post notification permission for Android 13+ (API 33+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) 
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this, 
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
+        // Trigger auto-delete cleanup on startup
+        runAutoDeleteCleanup();
+    }
+
+    private void runAutoDeleteCleanup() {
+        int days = PreferenceUtil.getAutoDeleteDays(this);
+        if (days > 0) {
+            long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
+            com.zygisk_enc.notivault.util.AppExecutor.execute(() -> AppDatabase.getInstance(MainActivity.this)
+                    .notificationDao().deleteOlderThan(cutoff));
         }
     }
 
@@ -173,12 +197,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkBiometricLock();
+        checkPermissionsSequence();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        isAuthenticated = false;
+        if (!isChangingConfigurations()) {
+            isAuthenticated = false;
+        }
     }
 
     private boolean isNotificationServiceEnabled() {
@@ -195,19 +222,63 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private androidx.appcompat.app.AlertDialog activePermissionDialog = null;
+
+    private boolean isAccessibilityServiceEnabled() {
+        String expectedPackage = getPackageName();
+        String expectedClass = com.zygisk_enc.notivault.service.ToastRecorderService.class.getName();
+        
+        String enabledServicesSetting = Settings.Secure.getString(
+                getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (enabledServicesSetting == null) return false;
+        
+        TextUtils.SimpleStringSplitter colonSplitter = new TextUtils.SimpleStringSplitter(':');
+        colonSplitter.setString(enabledServicesSetting);
+        while (colonSplitter.hasNext()) {
+            String componentNameString = colonSplitter.next();
+            ComponentName cn = ComponentName.unflattenFromString(componentNameString);
+            if (cn != null && cn.getPackageName().equals(expectedPackage) 
+                    && cn.getClassName().equals(expectedClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void checkPermissionsSequence() {
+        if (activePermissionDialog != null && activePermissionDialog.isShowing()) {
+            return;
+        }
+
+        boolean prompted = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("accessibility_prompted", false);
+
+        if (!isNotificationServiceEnabled()) {
+            showPermissionDialog();
+        } else if (!isAccessibilityServiceEnabled() && !prompted) {
+            showAccessibilityPermissionDialog();
+        }
+    }
+
     private void showPermissionDialog() {
         android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_permission_instruction, null);
-        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+        activePermissionDialog = new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.permission_required_title)
                 .setView(dialogView)
                 .setCancelable(false)
-                .setPositiveButton(R.string.grant_access, (d, which) ->
-                        startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)))
-                .setNegativeButton(R.string.not_now, null)
+                .setPositiveButton(R.string.grant_access, (d, which) -> {
+                    activePermissionDialog = null;
+                    startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                })
+                .setNegativeButton(R.string.not_now, (d, which) -> {
+                    activePermissionDialog = null;
+                    // Proceed to check next permission in sequence
+                    checkPermissionsSequence();
+                })
                 .create();
 
-        dialog.setOnShowListener(d -> {
-            android.widget.Button positiveButton = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+        activePermissionDialog.setOnShowListener(d -> {
+            android.widget.Button positiveButton = activePermissionDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
             positiveButton.setEnabled(false);
             new android.os.CountDownTimer(8000, 1000) {
                 @Override
@@ -223,7 +294,34 @@ public class MainActivity extends AppCompatActivity {
             }.start();
         });
         
-        dialog.show();
+        activePermissionDialog.show();
+    }
+
+    private void showAccessibilityPermissionDialog() {
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putBoolean("accessibility_prompted", true).apply();
+
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_accessibility_permission_instruction, null);
+        activePermissionDialog = new MaterialAlertDialogBuilder(this)
+                .setTitle("Accessibility Access Required")
+                .setView(dialogView)
+                .setCancelable(false)
+                .setPositiveButton(R.string.grant_access, (d, which) -> {
+                    activePermissionDialog = null;
+                    startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                })
+                .setNegativeButton(R.string.not_now, (d, which) -> {
+                    activePermissionDialog = null;
+                })
+                .create();
+
+        activePermissionDialog.show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("is_authenticated", isAuthenticated);
     }
 
     @Override
