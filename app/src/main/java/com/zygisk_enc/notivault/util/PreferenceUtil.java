@@ -8,6 +8,7 @@ public class PreferenceUtil {
 
     private static final String KEY_AUTO_DELETE_DAYS = "auto_delete_days";
     private static final String KEY_CAPTURE_ENABLED = "capture_enabled";
+    private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
 
     public static int getAutoDeleteDays(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -17,5 +18,15 @@ public class PreferenceUtil {
     public static boolean isCaptureEnabled(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(KEY_CAPTURE_ENABLED, true);
+    }
+
+    public static long getLastAutoDeleteTime(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getLong(KEY_LAST_AUTO_DELETE, 0L);
+    }
+
+    public static void setLastAutoDeleteTime(Context context, long timestamp) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putLong(KEY_LAST_AUTO_DELETE, timestamp).apply();
     }
 }
