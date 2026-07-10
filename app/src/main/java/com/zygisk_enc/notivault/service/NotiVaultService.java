@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.service;
-// Allow keywords implementation
+// Case insensitive matching logic
 public class NotiVaultService extends android.service.notification.NotificationListenerService {}
