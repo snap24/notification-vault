@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.service;
-import android.service.notification.NotificationListenerService;
-public class NotiVaultService extends NotificationListenerService {}
+// Block keywords implementation
+public class NotiVaultService extends android.service.notification.NotificationListenerService {}
