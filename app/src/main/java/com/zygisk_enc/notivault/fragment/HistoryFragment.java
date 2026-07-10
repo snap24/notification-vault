@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.fragment;
-// MediaScanner registrations
+// Perf load optimizations
 public class HistoryFragment extends androidx.fragment.app.Fragment {}
