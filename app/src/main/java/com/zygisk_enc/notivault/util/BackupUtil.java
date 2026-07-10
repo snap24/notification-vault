@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.util;
-// JSON serialization implementation
+// JSON deserialization implementation
 public class BackupUtil {}
