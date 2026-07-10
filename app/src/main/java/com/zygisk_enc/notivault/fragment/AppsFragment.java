@@ -43,6 +43,17 @@ public class AppsFragment extends Fragment {
             Navigation.findNavController(view).navigate(R.id.navigation_history);
         });
 
+        binding.etSearchApps.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.filter(s != null ? s.toString() : "");
+            }
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
         viewModel.getAppSummaries().observe(getViewLifecycleOwner(), summaries -> {
             if (summaries == null || summaries.isEmpty()) {
                 binding.emptyState.setVisibility(View.VISIBLE);
