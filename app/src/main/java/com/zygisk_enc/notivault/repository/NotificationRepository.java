@@ -6,6 +6,8 @@ import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.AppSummary;
 import com.zygisk_enc.notivault.database.NotificationDao;
 import com.zygisk_enc.notivault.database.NotificationEntity;
+import com.zygisk_enc.notivault.database.AppRuleDao;
+import com.zygisk_enc.notivault.database.AppRuleEntity;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,11 +15,13 @@ import java.util.concurrent.Executors;
 public class NotificationRepository {
 
     private final NotificationDao dao;
+    private final AppRuleDao ruleDao;
     private final ExecutorService executor;
 
     public NotificationRepository(Application application) {
         AppDatabase db = AppDatabase.getInstance(application);
         dao = db.notificationDao();
+        ruleDao = db.appRuleDao();
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -26,19 +30,57 @@ public class NotificationRepository {
     }
 
     public void delete(NotificationEntity entity) {
-        executor.execute(() -> dao.delete(entity));
+        executor.execute(() -> {
+            deleteNotificationImage(entity.imagePath);
+            dao.delete(entity);
+        });
     }
 
     public void deleteById(long id) {
-        executor.execute(() -> dao.deleteById(id));
+        executor.execute(() -> {
+            NotificationEntity entity = dao.getNotificationByIdSync(id);
+            if (entity != null) {
+                deleteNotificationImage(entity.imagePath);
+                dao.delete(entity);
+            }
+        });
     }
 
     public void deleteAll() {
-        executor.execute(dao::deleteAll);
+        executor.execute(() -> {
+            List<NotificationEntity> list = dao.getAllNotificationsSync();
+            if (list != null) {
+                for (NotificationEntity entity : list) {
+                    deleteNotificationImage(entity.imagePath);
+                }
+            }
+            dao.deleteAll();
+        });
     }
 
     public void deleteOlderThan(long timestamp) {
-        executor.execute(() -> dao.deleteOlderThan(timestamp));
+        executor.execute(() -> {
+            List<NotificationEntity> list = dao.getNotificationsOlderThanSync(timestamp);
+            if (list != null) {
+                for (NotificationEntity entity : list) {
+                    deleteNotificationImage(entity.imagePath);
+                }
+            }
+            dao.deleteOlderThan(timestamp);
+        });
+    }
+
+    private void deleteNotificationImage(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            try {
+                java.io.File file = new java.io.File(imagePath);
+                if (file.exists()) {
+                    file.delete();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void markAsRead(long id) {
@@ -87,5 +129,26 @@ public class NotificationRepository {
 
     public LiveData<Long> getOldestTimestamp() {
         return dao.getOldestTimestamp();
+    }
+
+    // App Rules Operations
+    public void insertRule(AppRuleEntity rule) {
+        executor.execute(() -> ruleDao.insert(rule));
+    }
+
+    public void deleteRule(AppRuleEntity rule) {
+        executor.execute(() -> ruleDao.delete(rule));
+    }
+
+    public void deleteRuleByPackage(String packageName) {
+        executor.execute(() -> ruleDao.deleteByPackage(packageName));
+    }
+
+    public LiveData<AppRuleEntity> getRule(String packageName) {
+        return ruleDao.getRule(packageName);
+    }
+
+    public LiveData<List<AppRuleEntity>> getAllRules() {
+        return ruleDao.getAllRules();
     }
 }
