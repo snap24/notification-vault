@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.util;
-// JSON deserialization implementation
+// Password Key Derivation implementation
 public class BackupUtil {}
