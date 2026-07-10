@@ -1,6 +1,5 @@
 package com.zygisk_enc.notivault.util;
 
-// Added security configurations
+// Cleaned up keystore provider specs
 public class EncryptionHelper {
-    // test secure setup
 }
