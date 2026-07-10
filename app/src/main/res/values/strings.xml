@@ -42,7 +42,7 @@
     <string name="pref_auto_delete_title">Auto-Delete History</string>
     <string name="pref_auto_delete_summary">Automatically delete old notifications</string>
     <string name="pref_about_title">About Notification Vault</string>
-    <string name="pref_about_summary">Version 1.0.0 · Open Source · No ads · No tracking</string>
+    <string name="pref_about_summary">Version 2.0.0 · Open Source · No ads · No tracking</string>
     <string name="pref_category_general">General</string>
     <string name="pref_theme_color_title">Theme Color</string>
     <string name="pref_theme_color_summary">Choose application base theme color</string>
@@ -51,9 +51,9 @@
     <string name="pref_biometric_lock_title">Biometric App Lock</string>
     <string name="pref_biometric_lock_summary">Require biometric authentication to open app</string>
     <string name="pref_export_backup_title">Export Backup</string>
-    <string name="pref_export_backup_summary">Save notification history to a JSON file</string>
+    <string name="pref_export_backup_summary">Save notification history to an encrypted file</string>
     <string name="pref_import_backup_title">Import Backup</string>
-    <string name="pref_import_backup_summary">Load notification history from a JSON file</string>
+    <string name="pref_import_backup_summary">Load notification history from an encrypted file</string>
     <string name="pref_category_storage">Storage</string>
     <string name="pref_category_about">About</string>
     <string name="backup_export_success">Backup exported successfully</string>
@@ -62,4 +62,28 @@
     <string name="backup_import_failed">Backup import failed: %s</string>
     <string name="pref_favorites_title">Starred Notifications</string>
     <string name="pref_favorites_summary">View all starred/favorite notifications</string>
+
+    <!-- App Rules & Keyword Filters -->
+    <string name="dialog_app_action_title">App Options</string>
+    <string name="dialog_app_action_history">View Notification History</string>
+    <string name="dialog_app_action_rules">Configure Logging Rules</string>
+    <string name="dialog_rule_title">Rules: %s</string>
+    <string name="dialog_rule_block_all">Enable Keyword Filtering</string>
+    <string name="dialog_rule_block_keywords">Ignore notifications containing (comma-separated):</string>
+    <string name="dialog_rule_block_keywords_hint">e.g. OTP, verification, code</string>
+    <string name="dialog_rule_allow_keywords">Only record notifications containing (comma-separated):</string>
+    <string name="dialog_rule_allow_keywords_hint">e.g. important, urgent</string>
+    <string name="dialog_rule_save">Save</string>
+    <string name="dialog_rule_delete">Delete Rule</string>
+    <string name="pref_category_rules">Rules &amp; Exclusions</string>
+    <string name="pref_app_rules_title">App Capture Rules</string>
+    <string name="pref_app_rules_summary">Block apps or filter by keywords</string>
+    <string name="dialog_rules_list_title">App Capture Rules</string>
+    <string name="dialog_no_rules">No capture rules configured yet.</string>
+    <string name="dialog_add_rule">Add Custom Rule</string>
+    <string name="dialog_select_app_title">Select App</string>
+    <string name="rule_saved">Rule saved successfully</string>
+    <string name="rule_deleted">Rule deleted successfully</string>
+    <string name="app_rules">App Rules</string>
+    <string name="toast_accessibility_description">Allows NotiVault to record Toast notifications displayed on the screen.</string>
 </resources>
