@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.fragment;
-// Dialog details view
+// Background decryption details
 public class HistoryFragment extends androidx.fragment.app.Fragment {}
