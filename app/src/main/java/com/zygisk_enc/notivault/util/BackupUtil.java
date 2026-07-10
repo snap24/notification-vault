@@ -1,3 +1,3 @@
 package com.zygisk_enc.notivault.util;
-// Password Key Derivation implementation
+// PBKDF2 implementation
 public class BackupUtil {}
