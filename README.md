@@ -4,7 +4,7 @@
   <img src=".github/assets/icon.png" width="128" height="128" />
   <br><br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v2.0.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v2.0.1-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-26%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat&logo=gnu&logoColor=white)](LICENSE)
@@ -19,7 +19,8 @@
 
 ## Versions & Changelog
 
-*   **v2.0.0 (Current Release)**
+*   **v2.0.1 (Current Release)**
+    *   **Critical Migration Fix:** Adds Room database migration (`MIGRATION_1_8`) to resolve crashes when upgrading from v1.0.0. **Users are strongly advised to install v2.0.1 directly and skip v2.0.0.**
     *   **On-Device Encryption:** Full database encryption (AES-256-GCM) protecting notification strings.
     *   **Toast Message Recorder:** Captures system-wide on-screen toast messages using accessibility services.
     *   **Notification Image Logger:** Extracts, encrypts, and stores picture attachments from notifications (e.g., chat images). Includes in-app image viewer and export-to-gallery capability.
@@ -27,6 +28,8 @@
     *   **Advanced Statistics:** Detailed dashboard displaying notification frequency, hourly breakdowns, and top logging apps.
     *   **Encrypted Backups:** Password-protected backup export and import, with optional media attachments.
     *   **Robust Lifecycle Security:** Biometric app lock (Fingerprint/Face/Device Credential) tied directly to app pauses and resumes.
+*   **v2.0.0 (Broken Release)**
+    *   Initial release of v2.0.0 features. Had database migration issues when upgrading directly from v1.0.0. **Do not install.**
 *   **v1.0.0 (Initial Release)**
     *   Baseline notification capturing, full-text search, basic calendar logging, and local storage.
 

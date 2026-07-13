@@ -1,0 +1,3 @@
+- Added critical database migration fix to resolve crashes when upgrading from v1.0.0.
+- Users are strongly advised to upgrade directly to v2.0.1 and skip v2.0.0.
+- Restored standard database stability.

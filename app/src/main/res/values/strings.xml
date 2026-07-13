@@ -42,7 +42,7 @@
     <string name="pref_auto_delete_title">Auto-Delete History</string>
     <string name="pref_auto_delete_summary">Automatically delete old notifications</string>
     <string name="pref_about_title">About Notification Vault</string>
-    <string name="pref_about_summary">Version 2.0.0 · Open Source · No ads · No tracking</string>
+    <string name="pref_about_summary">Version 2.0.1 · Open Source · No ads · No tracking</string>
     <string name="pref_category_general">General</string>
     <string name="pref_theme_color_title">Theme Color</string>
     <string name="pref_theme_color_summary">Choose application base theme color</string>
