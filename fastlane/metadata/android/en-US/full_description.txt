@@ -4,6 +4,8 @@ Key Features:
 - Complete Privacy: Operates entirely offline with zero internet permissions. No ads, no tracking.
 - On-Device AES-256-GCM Encryption: Secures notification strings and media attachments at rest.
 - Biometric App Lock: Enforces fingerprint, face unlock, or device credentials directly on app pauses and resumes.
+- Easy Cloud Sync: Perform automated scheduled or manual encrypted backups to your preferred cloud providers (Google Drive, Nextcloud, etc.).
+- Quick Settings (QS) Tile: Quickly toggle notification recording on/off directly from your phone's notification panel.
 - Toast Message Recorder: Records system-wide toast notifications using accessibility services.
 - Notification Image Capture: Automatically logs, encrypts, and previews image attachments from chats and alerts.
 - App Rules & Keyword Filters: Block specific apps or filter records using allow/block keyword lists.
