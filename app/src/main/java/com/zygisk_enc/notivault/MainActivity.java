@@ -108,10 +108,27 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Hide bottom navigation when keyboard is open to prevent UI layout constraints overlapping search
+        // Make the bottom navigation card translucent glass-like
+        int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
+        int glassBgColor = androidx.core.graphics.ColorUtils.setAlphaComponent(surfaceColor, 216); // 85% opacity
+        binding.bottomNavigationCard.setCardBackgroundColor(glassBgColor);
+
+        int outlineColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorOutline, android.graphics.Color.GRAY);
+        int glassBorderColor = androidx.core.graphics.ColorUtils.setAlphaComponent(outlineColor, 64); // 25% opacity
+        binding.bottomNavigationCard.setStrokeColor(android.content.res.ColorStateList.valueOf(glassBorderColor));
+
+        // Hide bottom navigation card when keyboard is open to prevent UI layout constraints overlapping search
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-            binding.bottomNavigation.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
+            binding.bottomNavigationCard.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
+            
+            // Adjust bottom margin dynamically to account for system navigation bar gesture line / curved screen vertices
+            int bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp = 
+                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.bottomNavigationCard.getLayoutParams();
+            lp.bottomMargin = bottomInset + (int)(16 * getResources().getDisplayMetrics().density);
+            binding.bottomNavigationCard.setLayoutParams(lp);
+            
             return insets;
         });
 

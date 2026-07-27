@@ -63,6 +63,18 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <service
+            android:name=".service.NotiVaultTileService"
+            android:label="NotiVault Recording"
+            android:icon="@drawable/ic_lock"
+            android:exported="true"
+            android:enabled="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
