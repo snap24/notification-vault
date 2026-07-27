@@ -15,6 +15,10 @@
 **Notification Vault** securely logs and manages your device's notification history entirely locally. Engineered for privacy and convenience, it ensures you never miss a notification or toast message, even if they are cleared or dismissed.
 
 ---
+
+**Notification Vault** securely logs and manages your device's notification history entirely locally. Engineered for privacy and convenience, it ensures you never miss a notification or toast message, even if they are cleared or dismissed.
+
+---
 <h3>Notification Vault securely captures and stores all your notifications locally.</h3>
 
 ## Versions & Changelog
