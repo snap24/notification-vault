@@ -15,6 +15,15 @@
             app:title="@string/pref_capture_enabled_title"
             app:summary="@string/pref_capture_enabled_summary"
             app:defaultValue="true"
+            app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="qs_tile_enabled"
+            app:title="Show Quick Settings Tile"
+            app:summary="Add a quick toggle to pause/resume recording from your phone's notifications panel."
+            app:defaultValue="true"
+            app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
         <ListPreference
@@ -31,6 +40,7 @@
             app:title="@string/pref_pitch_black_title"
             app:summary="@string/pref_pitch_black_summary"
             app:defaultValue="false"
+            app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
@@ -38,6 +48,7 @@
             app:title="@string/pref_biometric_lock_title"
             app:summary="@string/pref_biometric_lock_summary"
             app:defaultValue="false"
+            app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
         <Preference
