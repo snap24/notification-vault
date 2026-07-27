@@ -54,11 +54,11 @@ public class RuleDialogHelper {
                     tilAllowKeywords.setEnabled(existingRule.isRuleEnabled);
                     tietAllowKeywords.setEnabled(existingRule.isRuleEnabled);
                 } else {
-                    switchBlockAll.setChecked(true);
-                    tilBlockKeywords.setEnabled(true);
-                    tietBlockKeywords.setEnabled(true);
-                    tilAllowKeywords.setEnabled(true);
-                    tietAllowKeywords.setEnabled(true);
+                    switchBlockAll.setChecked(false);
+                    tilBlockKeywords.setEnabled(false);
+                    tietBlockKeywords.setEnabled(false);
+                    tilAllowKeywords.setEnabled(false);
+                    tietAllowKeywords.setEnabled(false);
                 }
 
                 switchBlockAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -294,6 +294,34 @@ public class RuleDialogHelper {
             holder.ivIcon.setImageDrawable(item.icon);
             holder.tvName.setText(item.appName);
             
+            // Determine status text and background color dynamically
+            int statusColorAttr;
+            int cardColorAttr;
+            String statusText;
+
+            if (!item.isCaptureEnabled) {
+                statusText = "Recording Disabled";
+                statusColorAttr = com.google.android.material.R.attr.colorError;
+                cardColorAttr = com.google.android.material.R.attr.colorErrorContainer;
+            } else if (item.rule != null && item.rule.isRuleEnabled && 
+                       ((item.rule.blockKeywords != null && !item.rule.blockKeywords.isEmpty()) || 
+                        (item.rule.allowKeywords != null && !item.rule.allowKeywords.isEmpty()))) {
+                statusText = "Custom Filters Active";
+                statusColorAttr = com.google.android.material.R.attr.colorPrimary;
+                cardColorAttr = com.google.android.material.R.attr.colorSecondaryContainer;
+            } else {
+                statusText = "Recording Active";
+                statusColorAttr = com.google.android.material.R.attr.colorOnSurfaceVariant;
+                cardColorAttr = com.google.android.material.R.attr.colorSurfaceContainerLow;
+            }
+
+            int textColor = com.google.android.material.color.MaterialColors.getColor(context, statusColorAttr, android.graphics.Color.GRAY);
+            int cardColor = com.google.android.material.color.MaterialColors.getColor(context, cardColorAttr, android.graphics.Color.WHITE);
+
+            holder.tvStatus.setText(statusText);
+            holder.tvStatus.setTextColor(textColor);
+            holder.card.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(cardColor));
+
             holder.switchCapture.setOnCheckedChangeListener(null);
             holder.switchCapture.setChecked(item.isCaptureEnabled);
             
@@ -320,6 +348,7 @@ public class RuleDialogHelper {
                         db.appRuleDao().insert(item.rule);
                     }
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        notifyItemChanged(holder.getAdapterPosition());
                         if (onStateChanged != null) {
                             onStateChanged.run();
                         }
@@ -349,6 +378,8 @@ public class RuleDialogHelper {
             TextView tvName;
             ImageButton btnSettings;
             MaterialSwitch switchCapture;
+            com.google.android.material.card.MaterialCardView card;
+            TextView tvStatus;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -356,6 +387,8 @@ public class RuleDialogHelper {
                 tvName = itemView.findViewById(R.id.tv_app_name);
                 btnSettings = itemView.findViewById(R.id.btn_rule_settings);
                 switchCapture = itemView.findViewById(R.id.switch_capture);
+                card = itemView.findViewById(R.id.card_app_rule);
+                tvStatus = itemView.findViewById(R.id.tv_rule_status);
             }
         }
     }

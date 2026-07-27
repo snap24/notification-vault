@@ -1,7 +1,9 @@
 package com.zygisk_enc.notivault.util;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import androidx.preference.PreferenceManager;
 
 public class PreferenceUtil {
@@ -20,6 +22,20 @@ public class PreferenceUtil {
         return prefs.getBoolean(KEY_CAPTURE_ENABLED, true);
     }
 
+    public static void setCaptureEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putBoolean(KEY_CAPTURE_ENABLED, enabled).apply();
+    }
+
+    public static void setTileServiceEnabled(Context context, boolean enabled) {
+        ComponentName componentName = new ComponentName(context, "com.zygisk_enc.notivault.service.NotiVaultTileService");
+        context.getPackageManager().setComponentEnabledSetting(
+            componentName,
+            enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP
+        );
+    }
+
     public static long getLastAutoDeleteTime(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getLong(KEY_LAST_AUTO_DELETE, 0L);
@@ -28,5 +44,53 @@ public class PreferenceUtil {
     public static void setLastAutoDeleteTime(Context context, long timestamp) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().putLong(KEY_LAST_AUTO_DELETE, timestamp).apply();
+    }
+
+    // ── Cloud Backup Preferences ────────────────────────────────────────────
+
+    public static String getCloudBackupUri(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("cloud_backup_uri", null);
+    }
+
+    public static void setCloudBackupUri(Context context, String uriString) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putString("cloud_backup_uri", uriString).apply();
+    }
+
+    public static String getCloudBackupPassword(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("cloud_backup_password", null);
+    }
+
+    public static void setCloudBackupPassword(Context context, String password) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putString("cloud_backup_password", password).apply();
+    }
+
+    /** Returns schedule interval in hours, or 0 if disabled. */
+    public static int getCloudBackupIntervalHours(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt("cloud_backup_interval_hours", 0);
+    }
+
+    public static void setCloudBackupIntervalHours(Context context, int hours) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putInt("cloud_backup_interval_hours", hours).apply();
+    }
+
+    public static long getCloudBackupLastRun(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong("cloud_backup_last_run", 0L);
+    }
+
+    public static boolean getCloudBackupIncludeMedia(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("cloud_backup_include_media", false);
+    }
+
+    public static void setCloudBackupIncludeMedia(Context context, boolean include) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean("cloud_backup_include_media", include).apply();
     }
 }
