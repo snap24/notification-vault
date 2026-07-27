@@ -36,10 +36,13 @@ public class NotificationViewModel extends AndroidViewModel {
             this.bigText = bigText;
         }
     }
-    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(500);
+    private static final java.util.concurrent.ConcurrentHashMap<Long, DecryptedText> decryptedCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
     private final java.util.concurrent.ExecutorService decryptionExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
+    private long currentRunToken = 0;
+    private List<NotificationEntity> lastRawList = null;
+    private final MutableLiveData<Integer> filterLimit = new MutableLiveData<>(500);
 
     public LiveData<Integer> getLoadProgress() {
         return loadProgress;
@@ -51,11 +54,16 @@ public class NotificationViewModel extends AndroidViewModel {
         appSummaries = repository.getAppSummaries();
         unreadCount = repository.getUnreadCount();
 
-        notifications.addSource(searchQuery, query -> updateSource());
-        notifications.addSource(filterPackage, pkg -> updateSource());
-        notifications.addSource(filterFavorites, favs -> updateSource());
-        notifications.addSource(filterDateStart, date -> updateSource());
-        notifications.addSource(filterDateEnd, date -> updateSource());
+        notifications.addSource(searchQuery, query -> { resetLimit(); updateSource(); });
+        notifications.addSource(filterPackage, pkg -> { resetLimit(); updateSource(); });
+        notifications.addSource(filterFavorites, favs -> { resetLimit(); updateSource(); });
+        notifications.addSource(filterDateStart, date -> { resetLimit(); updateSource(); });
+        notifications.addSource(filterDateEnd, date -> { resetLimit(); updateSource(); });
+        notifications.addSource(filterLimit, limit -> updateSource());
+    }
+
+    private void resetLimit() {
+        filterLimit.setValue(500);
     }
 
     private void updateSource() {
@@ -63,36 +71,56 @@ public class NotificationViewModel extends AndroidViewModel {
             notifications.removeSource(currentSource);
         }
 
+        final long runToken = ++currentRunToken;
+        lastRawList = null;
+
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        Long dateStart = filterDateStart.getValue();
+        Long dateEnd = filterDateEnd.getValue();
+
         Boolean favs = filterFavorites.getValue();
         if (favs != null && favs) {
-            currentSource = repository.getFavorites();
+            currentSource = repository.getFavorites(limit, dateStart, dateEnd);
         } else {
             String pkg = filterPackage.getValue();
             if (pkg != null && !pkg.isEmpty()) {
-                currentSource = repository.getNotificationsByPackage(pkg);
+                currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
             } else {
-                currentSource = repository.getAllNotifications();
+                currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
             }
         }
 
         notifications.addSource(currentSource, list -> {
             if (list == null) {
                 notifications.setValue(null);
+                lastRawList = null;
                 return;
             }
 
+            if (runToken != currentRunToken) return;
+
+            if (isListIdentical(list, lastRawList)) {
+                return;
+            }
+            lastRawList = list;
+
             decryptionExecutor.execute(() -> {
                 try {
+                    if (runToken != currentRunToken) return;
+
                     int total = list.size();
                     if (total == 0) {
-                        loadProgress.postValue(-1);
-                        notifications.postValue(new java.util.ArrayList<>());
+                        if (runToken == currentRunToken) {
+                            loadProgress.postValue(-1);
+                            notifications.postValue(new java.util.ArrayList<>());
+                        }
                         return;
                     }
 
                     // Count how many items actually need decryption (not in cache)
                     int itemsToDecrypt = 0;
                     for (NotificationEntity entity : list) {
+                        if (runToken != currentRunToken) return;
                         if (decryptedCache.get(entity.id) == null) {
                             itemsToDecrypt++;
                         }
@@ -100,11 +128,11 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     final boolean showProgress = itemsToDecrypt > 0;
                     if (showProgress) {
-                        loadProgress.postValue(0);
+                        if (runToken == currentRunToken) {
+                            loadProgress.postValue(0);
+                        }
                     }
 
-                    Long dateStart = filterDateStart.getValue();
-                    Long dateEnd = filterDateEnd.getValue();
                     String query = searchQuery.getValue();
                     String lowerQuery = query != null ? query.toLowerCase().trim() : "";
 
@@ -115,6 +143,8 @@ public class NotificationViewModel extends AndroidViewModel {
                     boolean posted30 = false;
                     
                     for (int i = 0; i < total; i++) {
+                        if (runToken != currentRunToken) return;
+
                         NotificationEntity entity = list.get(i);
                         
                         // Check static cache first
@@ -140,15 +170,12 @@ public class NotificationViewModel extends AndroidViewModel {
                         // Report progress if we are displaying it
                         int progress = ((i + 1) * 100) / total;
                         if (showProgress) {
-                            loadProgress.postValue(progress);
-                        }
-
-                        // 1. Filter by date
-                        if (dateStart != null && dateEnd != null) {
-                            if (entity.timestamp < dateStart || entity.timestamp > dateEnd) {
-                                continue;
+                            if (runToken == currentRunToken) {
+                                loadProgress.postValue(progress);
                             }
                         }
+
+
 
                         // 2. Filter by search query (case-insensitive on pre-decrypted fields)
                         if (!lowerQuery.isEmpty()) {
@@ -164,35 +191,56 @@ public class NotificationViewModel extends AndroidViewModel {
 
                         filtered.add(entity);
 
-                        // Progressive rendering: post intermediate snapshots to UI
-                        if (progress >= 5 && !posted5) {
-                            posted5 = true;
-                            notifications.postValue(new java.util.ArrayList<>(filtered));
-                        } else if (progress >= 10 && !posted10) {
-                            posted10 = true;
-                            notifications.postValue(new java.util.ArrayList<>(filtered));
-                        } else if (progress >= 20 && !posted20) {
-                            posted20 = true;
-                            notifications.postValue(new java.util.ArrayList<>(filtered));
-                        } else if (progress >= 30 && !posted30) {
-                            posted30 = true;
-                            notifications.postValue(new java.util.ArrayList<>(filtered));
+                        // Progressive rendering: post intermediate snapshots to UI only on initial load
+                        boolean isInitialLoad = (limit <= 500);
+                        if (isInitialLoad) {
+                            if (progress >= 5 && !posted5) {
+                                posted5 = true;
+                                if (runToken == currentRunToken) {
+                                    notifications.postValue(new java.util.ArrayList<>(filtered));
+                                }
+                            } else if (progress >= 10 && !posted10) {
+                                posted10 = true;
+                                if (runToken == currentRunToken) {
+                                    notifications.postValue(new java.util.ArrayList<>(filtered));
+                                }
+                            } else if (progress >= 20 && !posted20) {
+                                posted20 = true;
+                                if (runToken == currentRunToken) {
+                                    notifications.postValue(new java.util.ArrayList<>(filtered));
+                                }
+                            } else if (progress >= 30 && !posted30) {
+                                posted30 = true;
+                                if (runToken == currentRunToken) {
+                                    notifications.postValue(new java.util.ArrayList<>(filtered));
+                                }
+                            }
                         }
+                    }
+
+                    if (runToken == currentRunToken) {
+                        notifications.postValue(filtered);
                     }
 
                     // Pre-decryption & filtering complete!
                     if (showProgress) {
-                        loadProgress.postValue(100);
+                        if (runToken == currentRunToken) {
+                            loadProgress.postValue(100);
+                        }
                         try { Thread.sleep(400); } catch (InterruptedException ignored) {}
-                        loadProgress.postValue(-1);
+                        if (runToken == currentRunToken) {
+                            loadProgress.postValue(-1);
+                        }
                     } else {
-                        loadProgress.postValue(-1);
+                        if (runToken == currentRunToken) {
+                            loadProgress.postValue(-1);
+                        }
                     }
-
-                    notifications.postValue(filtered);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    loadProgress.postValue(-1);
+                    if (runToken == currentRunToken) {
+                        loadProgress.postValue(-1);
+                    }
                 }
             });
         });
@@ -202,11 +250,26 @@ public class NotificationViewModel extends AndroidViewModel {
         return notifications;
     }
 
+    public LiveData<Integer> getFilterLimit() {
+        return filterLimit;
+    }
+
+    public void loadNextPage() {
+        Integer current = filterLimit.getValue();
+        if (current != null) {
+            filterLimit.setValue(current + 500);
+        }
+    }
+
     public LiveData<Boolean> getFilterFavorites() {
         return filterFavorites;
     }
 
     public void setFilterFavorites(boolean favoritesOnly) {
+        Boolean current = filterFavorites.getValue();
+        if (current != null && current == favoritesOnly) {
+            return;
+        }
         filterFavorites.setValue(favoritesOnly);
     }
 
@@ -219,10 +282,21 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void setSearchQuery(String query) {
+        String current = searchQuery.getValue();
+        if ((query == null && current == null) || (query != null && query.equals(current))) {
+            return;
+        }
         searchQuery.setValue(query);
     }
 
     public void setDateFilter(Long start, Long end) {
+        Long currentStart = filterDateStart.getValue();
+        Long currentEnd = filterDateEnd.getValue();
+        boolean startSame = (start == null && currentStart == null) || (start != null && start.equals(currentStart));
+        boolean endSame = (end == null && currentEnd == null) || (end != null && end.equals(currentEnd));
+        if (startSame && endSame) {
+            return;
+        }
         filterDateStart.setValue(start);
         filterDateEnd.setValue(end);
     }
@@ -232,6 +306,10 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void setFilterPackage(String packageName) {
+        String current = filterPackage.getValue();
+        if ((packageName == null && current == null) || (packageName != null && packageName.equals(current))) {
+            return;
+        }
         filterPackage.setValue(packageName);
     }
 
@@ -280,7 +358,10 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<NotificationEntity>> getFavorites() {
-        return repository.getFavorites();
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        Long dateStart = filterDateStart.getValue();
+        Long dateEnd = filterDateEnd.getValue();
+        return repository.getFavorites(limit, dateStart, dateEnd);
     }
 
     public NotificationRepository getRepository() {
@@ -313,6 +394,29 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public LiveData<List<AppRuleEntity>> getAllRules() {
         return repository.getAllRules();
+    }
+
+    private boolean isListIdentical(List<NotificationEntity> list1, List<NotificationEntity> list2) {
+        if (list1 == list2) return true;
+        if (list1 == null || list2 == null) return false;
+        if (list1.size() != list2.size()) return false;
+        for (int i = 0; i < list1.size(); i++) {
+            NotificationEntity e1 = list1.get(i);
+            NotificationEntity e2 = list2.get(i);
+            if (e1.id != e2.id ||
+                e1.isRead != e2.isRead ||
+                e1.isFavorite != e2.isFavorite ||
+                e1.duplicateCount != e2.duplicateCount ||
+                e1.timestamp != e2.timestamp ||
+                !equalsNullable(e1.imagePath, e2.imagePath)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean equalsNullable(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
     }
 
     @Override

@@ -41,11 +41,20 @@ public class ToastViewModel extends AndroidViewModel {
         filterDateEnd.setValue(end);
     }
 
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
+
+    public LiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
+
     private void filterAndDecrypt(List<ToastEntity> list) {
         if (list == null) {
             toasts.setValue(null);
+            isLoading.setValue(false);
             return;
         }
+
+        isLoading.setValue(true);
 
         decryptionExecutor.execute(() -> {
             try {
@@ -70,8 +79,10 @@ public class ToastViewModel extends AndroidViewModel {
                 }
 
                 toasts.postValue(filtered);
+                isLoading.postValue(false);
             } catch (Exception e) {
                 e.printStackTrace();
+                isLoading.postValue(false);
             }
         });
     }
