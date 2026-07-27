@@ -114,22 +114,67 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         return;
                     }
 
-                    Toast.makeText(requireContext(), "Importing backup...", Toast.LENGTH_SHORT).show();
+                    // Create programmatic layout for progress
+                    android.widget.LinearLayout progressLayout = new android.widget.LinearLayout(requireContext());
+                    progressLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    progressLayout.setPadding(60, 40, 60, 40);
+                    progressLayout.setGravity(android.view.Gravity.CENTER);
 
-                    BackupUtil.importBackup(requireContext(), uri, password, new BackupUtil.BackupCallback() {
+                    com.google.android.material.progressindicator.LinearProgressIndicator progressIndicator = 
+                            new com.google.android.material.progressindicator.LinearProgressIndicator(requireContext());
+                    progressIndicator.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+                    progressIndicator.setMax(100);
+                    progressIndicator.setProgress(0);
+                    progressLayout.addView(progressIndicator);
+
+                    android.widget.TextView tvProgress = new android.widget.TextView(requireContext());
+                    tvProgress.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+                    tvProgress.setText("0%");
+                    tvProgress.setPadding(0, 16, 0, 0);
+                    tvProgress.setTypeface(null, android.graphics.Typeface.BOLD);
+                    tvProgress.setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                            requireContext(), com.google.android.material.R.attr.colorPrimary, android.graphics.Color.BLUE));
+                    progressLayout.addView(tvProgress);
+
+                    androidx.appcompat.app.AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Importing Backup")
+                            .setMessage("Starting import... This may take a moment to initialize and might appear stuck at 0%. Please wait. Your phone is deriving secure keys by stretching your password thousands of times and encrypting entries using hardware security.")
+                            .setView(progressLayout)
+                            .setCancelable(false)
+                            .show();
+
+                    BackupUtil.importBackup(requireContext(), uri, password, new BackupUtil.BackupProgressListener() {
+                        @Override
+                        public void onProgress(int progress) {
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    progressIndicator.setProgress(progress);
+                                    tvProgress.setText(progress + "%");
+                                });
+                            }
+                        }
+
                         @Override
                         public void onSuccess() {
                             if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> Toast.makeText(requireContext(), 
-                                        R.string.backup_import_success, Toast.LENGTH_SHORT).show());
+                                getActivity().runOnUiThread(() -> {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(requireContext(), 
+                                            R.string.backup_import_success, Toast.LENGTH_SHORT).show();
+                                });
                             }
                         }
 
                         @Override
                         public void onFailure(Exception e) {
                             if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> Toast.makeText(requireContext(), 
-                                        getString(R.string.backup_import_failed, e.getMessage()), Toast.LENGTH_LONG).show());
+                                getActivity().runOnUiThread(() -> {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(requireContext(), 
+                                            getString(R.string.backup_import_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+                                });
                             }
                         }
                     });
@@ -143,7 +188,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         androidx.recyclerview.widget.RecyclerView rv = getListView();
         if (rv != null) {
             rv.setPadding(rv.getPaddingLeft(), rv.getPaddingTop(), rv.getPaddingRight(), 
-                          rv.getPaddingBottom() + (int) (80 * getResources().getDisplayMetrics().density));
+                          rv.getPaddingBottom() + (int) (120 * getResources().getDisplayMetrics().density));
             rv.setClipToPadding(false);
         }
     }
@@ -327,6 +372,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
                 viewModel.deleteOlderThan(cutoff);
             }
+        } else if ("capture_enabled".equals(key)) {
+            // Notify the QS tile to refresh its state from the updated preference
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                android.service.quicksettings.TileService.requestListeningState(
+                    requireContext(),
+                    new android.content.ComponentName(requireContext(), com.zygisk_enc.notivault.service.NotiVaultTileService.class)
+                );
+            }
+        } else if ("qs_tile_enabled".equals(key)) {
+            boolean tileEnabled = sharedPreferences.getBoolean("qs_tile_enabled", true);
+            PreferenceUtil.setTileServiceEnabled(requireContext(), tileEnabled);
         }
     }
 }

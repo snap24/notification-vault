@@ -91,12 +91,12 @@ public class NotificationRepository {
         executor.execute(() -> dao.setFavorite(id, isFavorite));
     }
 
-    public LiveData<List<NotificationEntity>> getAllNotifications() {
-        return dao.getAllNotifications();
+    public LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd) {
+        return dao.getAllNotifications(limit, dateStart, dateEnd);
     }
 
-    public LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName) {
-        return dao.getNotificationsByPackage(packageName);
+    public LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd) {
+        return dao.getNotificationsByPackage(packageName, limit, dateStart, dateEnd);
     }
 
     public LiveData<List<NotificationEntity>> searchNotifications(String query) {
@@ -119,8 +119,8 @@ public class NotificationRepository {
         return dao.getTopAppsSince(startTimestamp, limit);
     }
 
-    public LiveData<List<NotificationEntity>> getFavorites() {
-        return dao.getFavorites();
+    public LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd) {
+        return dao.getFavorites(limit, dateStart, dateEnd);
     }
 
     public LiveData<List<NotificationEntity>> getNotificationsSince(long startTimestamp) {
