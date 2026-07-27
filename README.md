@@ -15,15 +15,15 @@
 **Notification Vault** securely logs and manages your device's notification history entirely locally. Engineered for privacy and convenience, it ensures you never miss a notification or toast message, even if they are cleared or dismissed.
 
 ---
-
-**Notification Vault** securely logs and manages your device's notification history entirely locally. Engineered for privacy and convenience, it ensures you never miss a notification or toast message, even if they are cleared or dismissed.
-
----
 <h3>Notification Vault securely captures and stores all your notifications locally.</h3>
 
 ## Versions & Changelog
 
-*   **v2.0.1 (Current Release)**
+*   **v2.1.0 (Current Release)**
+    *   **Decryption & Logic Fixes:** Fixed decryption loops and rendering/pagination layout logics.
+    *   **Easy Cloud Sync:** Added a clean way to perform automated scheduled and manual encrypted backups to cloud services (Google Drive, Nextcloud, etc.) using persistent System Access Framework (SAF) folders.
+    *   **Quick Settings (QS) Toggle:** Added a Quick Settings tile to pause/resume notification recording directly from the phone's status bar, with a settings toggle to hide/show the tile.
+*   **v2.0.1**
     *   **Critical Migration Fix:** Adds Room database migration (`MIGRATION_1_8`) to resolve crashes when upgrading from v1.0.0. **Users are strongly advised to install v2.0.1 directly and skip v2.0.0.**
     *   **On-Device Encryption:** Full database encryption (AES-256-GCM) protecting notification strings.
     *   **Toast Message Recorder:** Captures system-wide on-screen toast messages using accessibility services.
