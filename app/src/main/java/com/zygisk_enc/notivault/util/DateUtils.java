@@ -1,5 +1,7 @@
 package com.zygisk_enc.notivault.util;
 
+import android.content.Context;
+import android.text.format.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,8 +27,14 @@ public class DateUtils {
         }
     }
 
-    public static String getTimeString(long timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.getDefault());
+    public static String getTimeString(Context context, long timestamp) {
+        boolean is24Hour = DateFormat.is24HourFormat(context);
+        SimpleDateFormat sdf;
+        if (is24Hour) {
+            sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        } else {
+            sdf = new SimpleDateFormat("h:mm:ss a", Locale.getDefault());
+        }
         return sdf.format(new Date(timestamp));
     }
 

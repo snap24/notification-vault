@@ -355,12 +355,25 @@ public class BackupUtil {
                     }
                 }
 
-                // Insert into database
+                // Insert into database with progress reporting
+                int totalOps = notifications.size() + toasts.size();
+                int currentOp = 0;
+                
                 for (NotificationEntity notif : notifications) {
                     AppDatabase.getInstance(context).notificationDao().insert(notif);
+                    currentOp++;
+                    if (callback instanceof BackupProgressListener && totalOps > 0) {
+                        int progress = (currentOp * 100) / totalOps;
+                        ((BackupProgressListener) callback).onProgress(progress);
+                    }
                 }
                 for (com.zygisk_enc.notivault.database.ToastEntity toast : toasts) {
                     AppDatabase.getInstance(context).toastDao().insert(toast);
+                    currentOp++;
+                    if (callback instanceof BackupProgressListener && totalOps > 0) {
+                        int progress = (currentOp * 100) / totalOps;
+                        ((BackupProgressListener) callback).onProgress(progress);
+                    }
                 }
                 callback.onSuccess();
             } catch (Exception e) {
