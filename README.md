@@ -4,7 +4,7 @@
   <img src=".github/assets/icon.png" width="128" height="128" />
   <br><br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v2.0.1-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v2.1.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-26%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat&logo=gnu&logoColor=white)](LICENSE)
