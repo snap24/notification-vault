@@ -88,28 +88,44 @@ public class ToastHistoryActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getToasts().observe(this, toasts -> {
-            if (toasts == null || toasts.isEmpty()) {
-                binding.recyclerView.setVisibility(View.GONE);
-                binding.emptyState.setVisibility(View.VISIBLE);
-                if (isAccessibilityServiceEnabled()) {
-                    binding.tvAccessibilityHint.setText("Toasts will appear here as they are shown on screen.");
-                    binding.btnGrantAccessibility.setVisibility(View.GONE);
-                } else {
-                    binding.tvAccessibilityHint.setText("Turn on Accessibility access to log background toasts.");
-                    binding.btnGrantAccessibility.setVisibility(View.VISIBLE);
-                }
-            } else {
-                binding.recyclerView.setVisibility(View.VISIBLE);
-                binding.emptyState.setVisibility(View.GONE);
-                adapter.submitList(toasts);
-            }
-        });
+        viewModel.getToasts().observe(this, toasts -> updateUI());
+        viewModel.getIsLoading().observe(this, loading -> updateUI());
 
         // Observe oldest toast timestamp for calendar picker constraints
         viewModel.getOldestTimestamp().observe(this, timestamp -> {
             oldestToastTimestamp = timestamp;
         });
+    }
+
+    private void updateUI() {
+        java.util.List<com.zygisk_enc.notivault.database.ToastEntity> toasts = viewModel.getToasts().getValue();
+        Boolean isLoading = viewModel.getIsLoading().getValue();
+        if (isLoading == null) isLoading = false;
+
+        boolean isAccessibilityEnabled = isAccessibilityServiceEnabled();
+
+        if (toasts == null || toasts.isEmpty()) {
+            binding.recyclerView.setVisibility(View.GONE);
+            binding.emptyState.setVisibility(View.VISIBLE);
+            
+            if (!isAccessibilityEnabled) {
+                binding.tvEmptyTitle.setText("No Toasts Recorded");
+                binding.tvAccessibilityHint.setText("Turn on Accessibility access to log background toasts.");
+                binding.btnGrantAccessibility.setVisibility(View.VISIBLE);
+            } else if (isLoading) {
+                binding.tvEmptyTitle.setText("Loading Toasts...");
+                binding.tvAccessibilityHint.setText("Please wait while we decrypt your secure log.");
+                binding.btnGrantAccessibility.setVisibility(View.GONE);
+            } else {
+                binding.tvEmptyTitle.setText("No Toasts Recorded");
+                binding.tvAccessibilityHint.setText("Toasts will appear here as they are shown on screen.");
+                binding.btnGrantAccessibility.setVisibility(View.GONE);
+            }
+        } else {
+            binding.recyclerView.setVisibility(View.VISIBLE);
+            binding.emptyState.setVisibility(View.GONE);
+            adapter.submitList(toasts);
+        }
     }
 
     private void setupRecyclerView() {

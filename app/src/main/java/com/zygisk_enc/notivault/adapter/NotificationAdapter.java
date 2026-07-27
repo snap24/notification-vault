@@ -55,9 +55,33 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    private List<ListItem> items = new ArrayList<>();
+    private final androidx.recyclerview.widget.AsyncListDiffer<ListItem> differ;
     private OnItemClickListener listener;
-    private int lastPosition = -1;
+
+    private static final DiffUtil.ItemCallback<ListItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<ListItem>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull ListItem oldItem, @NonNull ListItem newItem) {
+            if (oldItem.type != newItem.type) return false;
+            if (oldItem.type == ListItem.TYPE_HEADER) {
+                return oldItem.header.equals(newItem.header);
+            }
+            return oldItem.entity.id == newItem.entity.id;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull ListItem oldItem, @NonNull ListItem newItem) {
+            if (oldItem.type == ListItem.TYPE_HEADER) {
+                return oldItem.header.equals(newItem.header);
+            }
+            NotificationEntity o = oldItem.entity;
+            NotificationEntity n = newItem.entity;
+            return o.id == n.id && o.isRead == n.isRead && o.isFavorite == n.isFavorite && o.duplicateCount == n.duplicateCount && o.timestamp == n.timestamp;
+        }
+    };
+
+    public NotificationAdapter() {
+        differ = new androidx.recyclerview.widget.AsyncListDiffer<>(this, DIFF_CALLBACK);
+    }
 
     private static final java.util.Map<String, Drawable> iconCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.concurrent.ExecutorService imageExecutor = java.util.concurrent.Executors.newFixedThreadPool(3);
@@ -78,41 +102,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void submitList(List<ListItem> newItems) {
-        lastPosition = -1;
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override public int getOldListSize() { return items.size(); }
-            @Override public int getNewListSize() { return newItems.size(); }
-
-            @Override
-            public boolean areItemsTheSame(int oldPos, int newPos) {
-                ListItem oldItem = items.get(oldPos);
-                ListItem newItem = newItems.get(newPos);
-                if (oldItem.type != newItem.type) return false;
-                if (oldItem.type == ListItem.TYPE_HEADER) return oldItem.header.equals(newItem.header);
-                return oldItem.entity.id == newItem.entity.id;
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldPos, int newPos) {
-                ListItem oldItem = items.get(oldPos);
-                ListItem newItem = newItems.get(newPos);
-                if (oldItem.type == ListItem.TYPE_HEADER) return oldItem.header.equals(newItem.header);
-                NotificationEntity o = oldItem.entity;
-                NotificationEntity n = newItem.entity;
-                return o.id == n.id && o.isRead == n.isRead && o.isFavorite == n.isFavorite && o.duplicateCount == n.duplicateCount && o.timestamp == n.timestamp;
-            }
-        });
-        items = newItems;
-        result.dispatchUpdatesTo(this);
+        differ.submitList(newItems);
     }
 
     public ListItem getItem(int position) {
-        return items.get(position);
+        return differ.getCurrentList().get(position);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).type == ListItem.TYPE_HEADER ? TYPE_HEADER : TYPE_NOTIFICATION;
+        return differ.getCurrentList().get(position).type == ListItem.TYPE_HEADER ? TYPE_HEADER : TYPE_NOTIFICATION;
     }
 
     @NonNull
@@ -130,51 +129,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ListItem item = items.get(position);
+        ListItem item = differ.getCurrentList().get(position);
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).bind(item.header);
         } else if (holder instanceof NotificationViewHolder) {
             ((NotificationViewHolder) holder).bind(item.entity, listener);
         }
-        setAnimation(holder.itemView, position);
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
-        holder.itemView.clearAnimation();
-        holder.itemView.setTranslationY(0f);
-        holder.itemView.setAlpha(1f);
-    }
-
-    private void setAnimation(View viewToAnimate, int position) {
-        viewToAnimate.animate().cancel();
-        if (position > lastPosition) {
-            viewToAnimate.setTranslationY(60f);
-            viewToAnimate.setAlpha(0f);
-            viewToAnimate.post(() -> {
-                if (viewToAnimate.isAttachedToWindow()) {
-                    viewToAnimate.animate()
-                            .translationY(0f)
-                            .alpha(1f)
-                            .setInterpolator(new android.view.animation.DecelerateInterpolator(1.5f))
-                            .setDuration(350)
-                            .start();
-                } else {
-                    viewToAnimate.setTranslationY(0f);
-                    viewToAnimate.setAlpha(1f);
-                }
-            });
-            lastPosition = position;
-        } else {
-            viewToAnimate.setTranslationY(0f);
-            viewToAnimate.setAlpha(1f);
-        }
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return differ.getCurrentList().size();
     }
 
     // --- ViewHolders ---
@@ -296,7 +261,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 ivNotificationImage.setVisibility(View.GONE);
             }
 
-            tvTime.setText(DateUtils.getTimeString(entity.timestamp));
+            tvTime.setText(DateUtils.getTimeString(context, entity.timestamp));
 
             if (entity.duplicateCount > 1) {
                 tvDuplicateCount.setVisibility(View.VISIBLE);
