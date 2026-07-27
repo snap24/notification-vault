@@ -26,16 +26,21 @@ public interface NotificationDao {
     @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0")
     void deleteOlderThan(long timestamp);
 
-    @Query("SELECT * FROM notifications ORDER BY timestamp DESC")
-    LiveData<List<NotificationEntity>> getAllNotifications();
+    @Query("SELECT * FROM notifications " +
+           "WHERE (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd);
 
-    @Query("SELECT * FROM notifications ORDER BY timestamp DESC")
+    @Query("SELECT * FROM notifications ORDER BY timestamp DESC, id DESC")
     List<NotificationEntity> getAllNotificationsSync();
 
-    @Query("SELECT * FROM notifications WHERE packageName = :packageName ORDER BY timestamp DESC")
-    LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName);
+    @Query("SELECT * FROM notifications " +
+           "WHERE packageName = :packageName " +
+           "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd);
 
-    @Query("SELECT * FROM notifications WHERE (title LIKE '%' || :query || '%' OR text LIKE '%' || :query || '%' OR appName LIKE '%' || :query || '%') ORDER BY timestamp DESC")
+    @Query("SELECT * FROM notifications WHERE (title LIKE '%' || :query || '%' OR text LIKE '%' || :query || '%' OR appName LIKE '%' || :query || '%') ORDER BY timestamp DESC, id DESC")
     LiveData<List<NotificationEntity>> searchNotifications(String query);
 
     @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications GROUP BY packageName ORDER BY count DESC")
@@ -56,10 +61,13 @@ public interface NotificationDao {
     @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications WHERE timestamp >= :startTimestamp GROUP BY packageName ORDER BY count DESC LIMIT :limit")
     LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit);
 
-    @Query("SELECT * FROM notifications WHERE isFavorite = 1 ORDER BY timestamp DESC")
-    LiveData<List<NotificationEntity>> getFavorites();
+    @Query("SELECT * FROM notifications " +
+           "WHERE isFavorite = 1 " +
+           "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd);
 
-    @Query("SELECT * FROM notifications WHERE timestamp >= :startTimestamp ORDER BY timestamp DESC")
+    @Query("SELECT * FROM notifications WHERE timestamp >= :startTimestamp ORDER BY timestamp DESC, id DESC")
     LiveData<List<NotificationEntity>> getNotificationsSince(long startTimestamp);
 
     @Query("SELECT MIN(timestamp) FROM notifications")

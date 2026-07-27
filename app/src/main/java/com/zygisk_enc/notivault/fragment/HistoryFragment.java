@@ -3,12 +3,18 @@ package com.zygisk_enc.notivault.fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import java.util.Calendar;
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -17,6 +23,8 @@ import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.CompositeDateValidator;
 
 import android.view.ViewGroup;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -24,30 +32,58 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.adapter.NotificationAdapter;
+import com.zygisk_enc.notivault.util.BackupUtil;
 import com.zygisk_enc.notivault.util.EncryptionHelper;
+import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.util.RuleDialogHelper;
 import com.zygisk_enc.notivault.database.NotificationEntity;
 import com.zygisk_enc.notivault.databinding.FragmentHistoryBinding;
 import com.zygisk_enc.notivault.util.DateUtils;
 import com.zygisk_enc.notivault.viewmodel.NotificationViewModel;
+import com.zygisk_enc.notivault.worker.DriveBackupWorker;
 import androidx.biometric.BiometricPrompt;
 import androidx.biometric.BiometricManager;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryFragment extends Fragment {
 
+    private static final String CLOUD_BACKUP_WORK_TAG = "cloud_backup_periodic";
+
     private FragmentHistoryBinding binding;
     private NotificationViewModel viewModel;
     private Long oldestNotificationTimestamp = null;
     private NotificationAdapter adapter;
+    private int lockedPosition = -1;
+    private int lockedOffset = 0;
+    private boolean isViewingMessage = false;
+
+    // SAF folder picker for cloud backup destination
+    private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocumentTree(),
+            uri -> {
+                if (uri == null) return;
+                // Take persistent read+write permission so WorkManager can write on schedule
+                requireContext().getContentResolver().takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                );
+                PreferenceUtil.setCloudBackupUri(requireContext(), uri.toString());
+                showCloudBackupConfigDialog();
+            }
+    );
 
     @Nullable
     @Override
@@ -77,6 +113,8 @@ public class HistoryFragment extends Fragment {
             startActivity(intent);
         });
 
+        binding.btnCloudBackup.setOnClickListener(v -> showCloudBackupDialog());
+
         viewModel.getFilterFavorites().observe(getViewLifecycleOwner(), favsOnly -> {
             androidx.appcompat.app.ActionBar actionBar =
                     ((androidx.appcompat.app.AppCompatActivity) requireActivity()).getSupportActionBar();
@@ -85,6 +123,36 @@ public class HistoryFragment extends Fragment {
                     actionBar.setSubtitle(R.string.pref_favorites_title);
                 } else {
                     actionBar.setSubtitle(null);
+                }
+            }
+        });
+
+        binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layout = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layout != null) {
+                    int visibleCount = layout.getChildCount();
+                    int totalCount = layout.getItemCount();
+                    int firstVisiblePos = layout.findFirstVisibleItemPosition();
+
+                    // Prefetch threshold: trigger next page load when 100 items remain
+                    if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
+                        Integer currentLimit = viewModel.getFilterLimit().getValue();
+                        // Guard against concurrent multiple updates until current limit is loaded
+                        if (currentLimit != null && totalCount >= currentLimit) {
+                            // Capture the exact position and offset at trigger time
+                            lockedPosition = firstVisiblePos;
+                            android.view.View firstVisibleView = layout.findViewByPosition(firstVisiblePos);
+                            if (firstVisibleView != null) {
+                                lockedOffset = firstVisibleView.getTop() - recyclerView.getPaddingTop();
+                            } else {
+                                lockedOffset = 0;
+                            }
+                            viewModel.loadNextPage();
+                        }
+                    }
                 }
             }
         });
@@ -112,6 +180,12 @@ public class HistoryFragment extends Fragment {
         adapter = new NotificationAdapter();
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(adapter);
+
+        // Disable change animations to prevent item update animations from shifting scroll position
+        androidx.recyclerview.widget.RecyclerView.ItemAnimator animator = binding.recyclerView.getItemAnimator();
+        if (animator instanceof androidx.recyclerview.widget.SimpleItemAnimator) {
+            ((androidx.recyclerview.widget.SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
 
         adapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
             @Override
@@ -313,18 +387,41 @@ public class HistoryFragment extends Fragment {
                 showRecyclerView(false);
             } else {
                 showRecyclerView(true);
-                adapter.submitList(buildListWithHeaders(notifications));
+                
+                if (isViewingMessage) {
+                    isViewingMessage = false;
+                    
+                    androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
+                            (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                    int firstVisiblePos = -1;
+                    int topOffset = 0;
+                    if (layoutManager != null) {
+                        firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
+                        android.view.View firstVisibleView = layoutManager.findViewByPosition(firstVisiblePos);
+                        if (firstVisibleView != null) {
+                            topOffset = firstVisibleView.getTop() - binding.recyclerView.getPaddingTop();
+                        }
+                    }
+
+                    adapter.submitList(buildListWithHeaders(notifications));
+
+                    if (layoutManager != null && firstVisiblePos >= 0) {
+                        layoutManager.scrollToPositionWithOffset(firstVisiblePos, topOffset);
+                    }
+                } else {
+                    adapter.submitList(buildListWithHeaders(notifications));
+                }
             }
         });
 
         viewModel.getLoadProgress().observe(getViewLifecycleOwner(), progress -> {
             if (progress == null || progress < 0) {
-                binding.tvLoadProgress.setVisibility(View.GONE);
+                binding.tvLoadProgress.setVisibility(View.INVISIBLE);
                 binding.btnToastsHistory.setVisibility(View.VISIBLE);
             } else {
                 binding.tvLoadProgress.setVisibility(View.VISIBLE);
                 binding.tvLoadProgress.setText("Decrypting... " + progress + "%");
-                binding.btnToastsHistory.setVisibility(View.GONE);
+                binding.btnToastsHistory.setVisibility(View.INVISIBLE);
             }
         });
         
@@ -531,6 +628,312 @@ public class HistoryFragment extends Fragment {
 
         biometricPrompt.authenticate(promptInfo);
     }
+
+    // ── Cloud Backup ──────────────────────────────────────────────────────────
+
+    /**
+     * Entry point: if a folder is already configured, go straight to the config
+     * dialog; otherwise open the folder picker first.
+     */
+    private void showCloudBackupDialog() {
+        String existingUri = PreferenceUtil.getCloudBackupUri(requireContext());
+        if (existingUri != null) {
+            showCloudBackupConfigDialog();
+        } else {
+            Context ctx = requireContext();
+
+            // Build dialog view programmatically
+            android.widget.ScrollView scrollView = new android.widget.ScrollView(ctx);
+            android.widget.LinearLayout container = new android.widget.LinearLayout(ctx);
+            container.setOrientation(android.widget.LinearLayout.VERTICAL);
+            int pad = (int) (16 * ctx.getResources().getDisplayMetrics().density);
+            container.setPadding(pad, pad / 2, pad, pad / 2);
+
+            // Instructions text
+            TextView tvInstruction = new TextView(ctx);
+            tvInstruction.setText("Choose a folder where encrypted backups will be saved.\n\n" +
+                    "If you pick a folder inside Google Drive, Nextcloud, or any " +
+                    "cloud app on your phone, the file will be synced automatically — " +
+                    "no account login required.\n\n" +
+                    "Tap the top-left hamburger menu (☰) in the picker and select Google Drive, then choose or create your backup folder:");
+            tvInstruction.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
+            tvInstruction.setPadding(0, 0, 0, (int) (12 * ctx.getResources().getDisplayMetrics().density));
+            container.addView(tvInstruction);
+
+            // Image guide
+            android.widget.ImageView ivGuide = new android.widget.ImageView(ctx);
+            ivGuide.setImageResource(R.drawable.drive_instruction);
+            ivGuide.setAdjustViewBounds(true);
+            android.widget.LinearLayout.LayoutParams imgLp = new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+            ivGuide.setLayoutParams(imgLp);
+            container.addView(ivGuide);
+
+            scrollView.addView(container);
+
+            androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
+                    .setTitle("Cloud / Drive Backup Setup")
+                    .setView(scrollView)
+                    .setPositiveButton("Pick Folder (3s)", null)
+                    .setNegativeButton("Cancel", null)
+                    .setCancelable(false)
+                    .create();
+
+            dialog.setOnShowListener(dialogInterface -> {
+                android.widget.Button btnPositive = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+                btnPositive.setEnabled(false);
+                btnPositive.setOnClickListener(v -> {
+                    folderPickerLauncher.launch(null);
+                    dialog.dismiss();
+                });
+
+                // 3 seconds countdown handler
+                final int[] count = {3};
+                final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!dialog.isShowing() || !isAdded() || getActivity() == null) {
+                            return;
+                        }
+                        if (count[0] > 0) {
+                            btnPositive.setText("Pick Folder (" + count[0] + "s)");
+                            count[0]--;
+                            handler.postDelayed(this, 1000);
+                        } else {
+                            btnPositive.setText("Pick Folder");
+                            btnPositive.setEnabled(true);
+                        }
+                    }
+                };
+                handler.post(runnable);
+            });
+
+            dialog.show();
+        }
+    }
+
+    /**
+     * Main config dialog: shows current folder, password field, schedule
+     * spinner, and buttons for manual backup + change folder.
+     */
+    private void showCloudBackupConfigDialog() {
+        Context ctx = requireContext();
+        String folderUri  = PreferenceUtil.getCloudBackupUri(ctx);
+        String savedPass  = PreferenceUtil.getCloudBackupPassword(ctx);
+        int    savedHours = PreferenceUtil.getCloudBackupIntervalHours(ctx);
+        long   lastRun    = PreferenceUtil.getCloudBackupLastRun(ctx);
+
+        // Build a short human-readable folder label from the URI
+        String folderLabel = folderUri != null
+                ? androidx.documentfile.provider.DocumentFile.fromTreeUri(ctx, Uri.parse(folderUri)) != null
+                    ? "..." + folderUri.substring(Math.max(0, folderUri.lastIndexOf('%') - 0))
+                          .replace("%2F", "/").replace("%3A", ":")
+                    : folderUri
+                : "(none)";
+        // Trim for display
+        if (folderLabel.length() > 45) folderLabel = "..." + folderLabel.substring(folderLabel.length() - 42);
+
+        String lastRunLabel = lastRun == 0 ? "Never" :
+                new java.text.SimpleDateFormat("dd MMM yyyy HH:mm", java.util.Locale.getDefault())
+                        .format(new java.util.Date(lastRun));
+
+        View dialogView = LayoutInflater.from(ctx).inflate(
+                android.R.layout.select_dialog_item, null); // placeholder; we build programmatically
+
+        // ── Build dialog content programmatically ────────────────────────────
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(ctx);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int) (16 * ctx.getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad / 2, pad, 0);
+
+        // Folder info row
+        TextView tvFolder = new TextView(ctx);
+        tvFolder.setText("📁 Folder: " + folderLabel);
+        tvFolder.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
+        layout.addView(tvFolder);
+
+        // Last run row
+        TextView tvLast = new TextView(ctx);
+        tvLast.setText("🕐 Last backup: " + lastRunLabel);
+        tvLast.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
+        android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = (int)(4 * ctx.getResources().getDisplayMetrics().density);
+        tvLast.setLayoutParams(lp);
+        layout.addView(tvLast);
+
+        // Divider
+        View divider = new View(ctx);
+        android.widget.LinearLayout.LayoutParams divLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        divLp.topMargin = pad / 2;
+        divLp.bottomMargin = pad / 2;
+        divider.setLayoutParams(divLp);
+        divider.setBackgroundColor(0x1F888888);
+        layout.addView(divider);
+
+        // Password field
+        com.google.android.material.textfield.TextInputLayout tilPass =
+                new com.google.android.material.textfield.TextInputLayout(ctx);
+        tilPass.setHint("Backup password");
+        tilPass.setEndIconMode(com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE);
+        TextInputEditText etPass = new TextInputEditText(ctx);
+        etPass.setInputType(android.text.InputType.TYPE_CLASS_TEXT |
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        if (savedPass != null) etPass.setText(savedPass);
+        tilPass.addView(etPass);
+        android.widget.LinearLayout.LayoutParams passLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        tilPass.setLayoutParams(passLp);
+        layout.addView(tilPass);
+
+        // Schedule spinner
+        TextView tvScheduleLabel = new TextView(ctx);
+        tvScheduleLabel.setText("Auto-backup schedule");
+        tvScheduleLabel.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium);
+        android.widget.LinearLayout.LayoutParams sLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        sLp.topMargin = (int)(12 * ctx.getResources().getDisplayMetrics().density);
+        tvScheduleLabel.setLayoutParams(sLp);
+        layout.addView(tvScheduleLabel);
+
+        String[] scheduleLabels = {"Off (manual only)", "Daily", "Weekly", "Monthly (30 days)"};
+        int[]    scheduleHours  = {0, 24, 168, 720};
+        Spinner spinner = new Spinner(ctx);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx,
+                android.R.layout.simple_spinner_item, scheduleLabels);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        // Select previously saved value
+        for (int i = 0; i < scheduleHours.length; i++) {
+            if (scheduleHours[i] == savedHours) { spinner.setSelection(i); break; }
+        }
+        layout.addView(spinner);
+
+        // Include media toggle
+        boolean savedIncludeMedia = PreferenceUtil.getCloudBackupIncludeMedia(ctx);
+        com.google.android.material.materialswitch.MaterialSwitch switchMedia =
+                new com.google.android.material.materialswitch.MaterialSwitch(ctx);
+        switchMedia.setText("Include media attachments");
+        switchMedia.setChecked(savedIncludeMedia);
+        android.widget.LinearLayout.LayoutParams mediaLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+        mediaLp.topMargin = (int)(10 * ctx.getResources().getDisplayMetrics().density);
+        mediaLp.bottomMargin = (int)(4 * ctx.getResources().getDisplayMetrics().density);
+        switchMedia.setLayoutParams(mediaLp);
+        layout.addView(switchMedia);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
+                .setTitle("Cloud / Drive Backup")
+                .setView(layout)
+                .setPositiveButton("Save & Backup Now", null) // handled below
+                .setNeutralButton("Change Folder", (d, w) -> folderPickerLauncher.launch(null))
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.setOnShowListener(d -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String password = etPass.getText() != null ? etPass.getText().toString().trim() : "";
+                if (password.isEmpty()) {
+                    Toast.makeText(ctx, "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int selectedIdx = spinner.getSelectedItemPosition();
+                int hours = scheduleHours[selectedIdx];
+                boolean includeMedia = switchMedia.isChecked();
+
+                PreferenceUtil.setCloudBackupPassword(ctx, password);
+                PreferenceUtil.setCloudBackupIntervalHours(ctx, hours);
+                PreferenceUtil.setCloudBackupIncludeMedia(ctx, includeMedia);
+
+                applySchedule(hours);
+                runManualCloudBackup(includeMedia);
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
+    }
+
+    private void applySchedule(int intervalHours) {
+        WorkManager wm = WorkManager.getInstance(requireContext());
+        if (intervalHours <= 0) {
+            wm.cancelUniqueWork(CLOUD_BACKUP_WORK_TAG);
+            return;
+        }
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
+                DriveBackupWorker.class, intervalHours, TimeUnit.HOURS)
+                .addTag(CLOUD_BACKUP_WORK_TAG)
+                .build();
+        wm.enqueueUniquePeriodicWork(
+                CLOUD_BACKUP_WORK_TAG,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                request);
+    }
+
+    private void runManualCloudBackup(boolean includeMedia) {
+        Context ctx = requireContext();
+        String folderUriStr = PreferenceUtil.getCloudBackupUri(ctx);
+        String password     = PreferenceUtil.getCloudBackupPassword(ctx);
+
+        if (folderUriStr == null || password == null || password.isEmpty()) {
+            Toast.makeText(ctx, "Backup folder or password not set.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri folderUri = Uri.parse(folderUriStr);
+        androidx.documentfile.provider.DocumentFile folder =
+                androidx.documentfile.provider.DocumentFile.fromTreeUri(ctx, folderUri);
+
+        if (folder == null || !folder.exists() || !folder.canWrite()) {
+            Toast.makeText(ctx, "Cannot access the backup folder. Please re-pick it.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String timestamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US)
+                .format(new java.util.Date());
+        String filename = "notivault_backup_" + timestamp + ".vault";
+
+        androidx.documentfile.provider.DocumentFile newFile =
+                folder.createFile("application/octet-stream", filename);
+        if (newFile == null) {
+            Toast.makeText(ctx, "Could not create file in the backup folder.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Toast.makeText(ctx, "Backup started…", Toast.LENGTH_SHORT).show();
+
+        BackupUtil.exportBackup(ctx, newFile.getUri(), password, includeMedia, new BackupUtil.BackupProgressListener() {
+            @Override public void onProgress(int progress) {}
+
+            @Override
+            public void onSuccess() {
+                PreferenceManager.getDefaultSharedPreferences(ctx)
+                        .edit().putLong("cloud_backup_last_run", System.currentTimeMillis()).apply();
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(ctx, "✓ Backup saved to " + filename, Toast.LENGTH_LONG).show());
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                try { newFile.delete(); } catch (Exception ignored) {}
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(() ->
+                            Toast.makeText(ctx, "Backup failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void onDestroyView() {
