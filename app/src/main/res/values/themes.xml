@@ -6,6 +6,9 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
+        <item name="android:switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
     </style>
 
     <!-- Purple Theme (Default) -->
