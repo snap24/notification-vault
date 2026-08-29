@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">Confirma la autenticación para desactivar el bloqueo de la app</string>
     <string name="auth_toggle_flag_secure">Confirma la autenticación para cambiar la protección contra capturas de pantalla</string>
     <string name="auth_export_backup">Confirma la autenticación para exportar la copia de seguridad</string>
+    <string name="auth_cloud_backup">Confirma la autenticación para acceder a la copia en la nube</string>
     <string name="auth_access_toast_logs">Autentícate para acceder a tus registros de toasts</string>
     <string name="auth_delete_notifications">Confirma la autenticación para eliminar notificaciones</string>
     <string name="auth_clear_all_notifications">Confirma la autenticación para borrar todas las notificaciones</string>

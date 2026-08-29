@@ -125,7 +125,15 @@ public class HistoryFragment extends Fragment {
             startActivity(intent);
         });
 
-        binding.chipCloudBackup.setOnClickListener(v -> showCloudBackupDialog());
+        binding.chipCloudBackup.setOnClickListener(v -> {
+            boolean isAuthEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean("use_biometrics", true);
+            if (isAuthEnabled) {
+                verifyBiometricsToProceed(this::showCloudBackupDialog, getString(R.string.auth_cloud_backup));
+            } else {
+                showCloudBackupDialog();
+            }
+        });
         binding.chipClearLogs.setOnClickListener(v -> showDeleteCalendar());
 
         viewModel.getFilterFavorites().observe(getViewLifecycleOwner(), favsOnly -> {

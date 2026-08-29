@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">قم بتأكيد هويتك لتعطيل قفل التطبيق</string>
     <string name="auth_toggle_flag_secure">قم بتأكيد هويتك لتغيير حماية لقطات الشاشة</string>
     <string name="auth_export_backup">قم بتأكيد هويتك لتصدير النسخة الاحتياطية</string>
+    <string name="auth_cloud_backup">تأكيد المصادقة للوصول إلى النسخ الاحتياطي السحابي</string>
     <string name="auth_access_toast_logs">قم بتأكيد هويتك للوصول إلى سجلات رسائل التوست</string>
     <string name="auth_delete_notifications">قم بتأكيد هويتك لحذف الإشعارات</string>
     <string name="auth_clear_all_notifications">قم بتأكيد هويتك لمسح جميع الإشعارات</string>

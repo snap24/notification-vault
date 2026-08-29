@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">验证身份以关闭应用锁</string>
     <string name="auth_toggle_flag_secure">验证身份以更改防截屏录屏保护设置</string>
     <string name="auth_export_backup">验证身份以导出备份</string>
+    <string name="auth_cloud_backup">确认身份验证以访问云备份</string>
     <string name="auth_access_toast_logs">验证身份以访问 Toast 日志</string>
     <string name="auth_delete_notifications">验证身份以删除通知</string>
     <string name="auth_clear_all_notifications">验证身份以清除所有通知</string>

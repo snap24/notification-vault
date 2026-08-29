@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">앱 잠금을 해제하려면 인증하세요</string>
     <string name="auth_toggle_flag_secure">화면 캡처 보호 설정을 변경하려면 본인 인증을 진행하세요</string>
     <string name="auth_export_backup">백업을 내보내려면 인증하세요</string>
+    <string name="auth_cloud_backup">클라우드 백업에 액세스하려면 인증을 확인하세요</string>
     <string name="auth_access_toast_logs">토스트 로그에 접근하려면 인증하세요</string>
     <string name="auth_delete_notifications">알림을 삭제하려면 인증하세요</string>
     <string name="auth_clear_all_notifications">모든 알림을 지우려면 인증하세요</string>

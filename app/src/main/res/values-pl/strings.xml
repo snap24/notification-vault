@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">Potwierdź tożsamość, aby wyłączyć blokadę aplikacji</string>
     <string name="auth_toggle_flag_secure">Potwierdź tożsamość, aby zmienić ochronę przed zrzutami ekranu</string>
     <string name="auth_export_backup">Potwierdź tożsamość, aby wyeksportować kopię zapasową</string>
+    <string name="auth_cloud_backup">Potwierdź uwierzytelnienie, aby uzyskać dostęp do kopii zapasowej w chmurze</string>
     <string name="auth_access_toast_logs">Potwierdź tożsamość, aby uzyskać dostęp do dziennika dymków Toast</string>
     <string name="auth_delete_notifications">Potwierdź tożsamość, aby usunąć powiadomienia</string>
     <string name="auth_clear_all_notifications">Potwierdź tożsamość, aby wyczyścić wszystkie powiadomienia</string>

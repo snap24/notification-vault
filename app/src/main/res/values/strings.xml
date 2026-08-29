@@ -78,6 +78,7 @@
     <string name="auth_disable_lock">Confirm authentication to disable App Lock</string>
     <string name="auth_toggle_flag_secure">Confirm authentication to change screenshot protection</string>
     <string name="auth_export_backup">Confirm authentication to export backup</string>
+    <string name="auth_cloud_backup">Confirm authentication to access Cloud Backup</string>
     <string name="auth_access_toast_logs">Authenticate to access your toast logs</string>
     <string name="auth_delete_notifications">Confirm authentication to delete notifications</string>
     <string name="auth_clear_all_notifications">Confirm authentication to clear all notifications</string>

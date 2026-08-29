@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">Konfirmasi autentikasi untuk menonaktifkan Kunci Aplikasi</string>
     <string name="auth_toggle_flag_secure">Konfirmasi autentikasi untuk mengubah perlindungan tangkapan layar</string>
     <string name="auth_export_backup">Konfirmasi autentikasi untuk mengekspor cadangan</string>
+    <string name="auth_cloud_backup">Konfirmasikan autentikasi untuk mengakses Cadangan Cloud</string>
     <string name="auth_access_toast_logs">Autentikasi untuk mengakses log toast Anda</string>
     <string name="auth_delete_notifications">Konfirmasi autentikasi untuk menghapus notifikasi</string>
     <string name="auth_clear_all_notifications">Konfirmasi autentikasi untuk menghapus semua notifikasi</string>

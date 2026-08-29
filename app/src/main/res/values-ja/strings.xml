@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">アプリロックを無効化するには認証してください</string>
     <string name="auth_toggle_flag_secure">スクリーンショット保護設定を変更するには認証してください</string>
     <string name="auth_export_backup">バックアップをエクスポートするには認証してください</string>
+    <string name="auth_cloud_backup">クラウドバックアップにアクセスするための認証を確認してください</string>
     <string name="auth_access_toast_logs">トーストログにアクセスするには認証してください</string>
     <string name="auth_delete_notifications">通知を削除するには認証してください</string>
     <string name="auth_clear_all_notifications">すべての通知をクリアするには認証してください</string>

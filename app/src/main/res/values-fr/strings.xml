@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">Confirmez l\'authentification pour désactiver le verrouillage de l\'application</string>
     <string name="auth_toggle_flag_secure">Confirmez l\'authentification pour modifier la protection contre les captures d\'écran</string>
     <string name="auth_export_backup">Confirmez l\'authentification pour exporter la sauvegarde</string>
+    <string name="auth_cloud_backup">Confirmez l\'authentification pour accéder à la sauvegarde cloud</string>
     <string name="auth_access_toast_logs">Authentifiez-vous pour accéder à vos journaux de toasts</string>
     <string name="auth_delete_notifications">Confirmez l\'authentification pour supprimer les notifications</string>
     <string name="auth_clear_all_notifications">Confirmez l\'authentification pour effacer toutes les notifications</string>

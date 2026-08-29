@@ -62,6 +62,7 @@
     <string name="auth_disable_lock">Uygulama kilidini devre dışı bırakmak için kimliğinizi doğrulayın</string>
     <string name="auth_toggle_flag_secure">Ekran görüntüsü korumasını değiştirmek için kimliğinizi doğrulayın</string>
     <string name="auth_export_backup">Yedeği dışa aktarmak için kimliğinizi doğrulayın</string>
+    <string name="auth_cloud_backup">Bulut Yedeklemeye erişmek için kimlik doğrulamayı onaylayın</string>
     <string name="auth_access_toast_logs">Toast günlüklerine erişmek için kimliğinizi doğrulayın</string>
     <string name="auth_delete_notifications">Bildirimleri silmek için kimliğinizi doğrulayın</string>
     <string name="auth_clear_all_notifications">Tüm bildirimleri temizlemek için kimliğinizi doğrulayın</string>
