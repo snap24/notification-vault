@@ -396,4 +396,26 @@
     <string name="notification_cloud_backup_success_desc">Cadangan terenkripsi Anda telah disimpan ke folder cloud.</string>
     <string name="notification_cloud_backup_failed">Cadangan Cloud Gagal</string>
     <string name="deleting_progress">Menghapus… %d%%</string>
+
+    <string name="chip_date_range">Rentang Tanggal</string>
+    <string name="chip_rules">Aturan</string>
+    <string name="chip_clear_logs">Hapus Log</string>
+    <string name="chip_cloud_backup">Cadangan</string>
+    <string name="filter_app_prefix">Aplikasi: %s</string>
+    <string name="filter_date_prefix">Tanggal: %s</string>
+    <string name="tracked_applications">Aplikasi Terlacak</string>
+    <string name="stats_range_7d">7 Hari</string>
+    <string name="stats_range_30d">30 Hari</string>
+    <string name="stats_velocity_rate">Kecepatan / Laju</string>
+    <string name="stats_peak_disturbance">Puncak Gangguan</string>
+    <string name="stats_toasts_logged">Toast Tercatat</string>
+    <string name="stats_starred_kept">Berbintang / Disimpan</string>
+    <string name="stats_hourly_distribution_desc">Distribusi per jam (Ketuk bilah untuk detail)</string>
+    <string name="stats_tap_bar_inspect">Ketuk bilah untuk memeriksa</string>
+    <string name="stats_daypart_wellness">Kebugaran Waktu Hari</string>
+    <string name="stats_ranked_by_volume">Diurutkan berdasarkan total volume notifikasi pada periode yang dipilih</string>
+    <string name="stats_show_all_apps">Tampilkan Semua Aplikasi</string>
+    <string name="stats_distraction_insight">Wawasan Gangguan</string>
+    <string name="stats_analyzing_pattern">Menganalisis pola notifikasi Anda...</string>
+    <string name="custom_days_dots">Kustom...</string>
 </resources>

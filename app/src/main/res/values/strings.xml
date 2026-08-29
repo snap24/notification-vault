@@ -439,4 +439,26 @@
     <string name="notification_cloud_backup_success_desc">Your encrypted backup was saved to the cloud folder.</string>
     <string name="notification_cloud_backup_failed">Cloud Backup Failed</string>
     <string name="deleting_progress">Deleting… %d%%</string>
+
+    <string name="chip_date_range">Date Range</string>
+    <string name="chip_rules">Rules</string>
+    <string name="chip_clear_logs">Clear Logs</string>
+    <string name="chip_cloud_backup">Backup</string>
+    <string name="filter_app_prefix">App: %s</string>
+    <string name="filter_date_prefix">Date: %s</string>
+    <string name="tracked_applications">Tracked Applications</string>
+    <string name="stats_range_7d">7 Days</string>
+    <string name="stats_range_30d">30 Days</string>
+    <string name="stats_velocity_rate">Velocity / Rate</string>
+    <string name="stats_peak_disturbance">Peak Disturbance</string>
+    <string name="stats_toasts_logged">Toasts Logged</string>
+    <string name="stats_starred_kept">Starred / Kept</string>
+    <string name="stats_hourly_distribution_desc">Hourly distribution (Tap any bar for details)</string>
+    <string name="stats_tap_bar_inspect">Tap bar to inspect</string>
+    <string name="stats_daypart_wellness">Daypart Wellness</string>
+    <string name="stats_ranked_by_volume">Ranked by total notification volume in selected period</string>
+    <string name="stats_show_all_apps">Show All Apps</string>
+    <string name="stats_distraction_insight">Distraction Insight</string>
+    <string name="stats_analyzing_pattern">Analyzing your notification pattern...</string>
+    <string name="custom_days_dots">Custom...</string>
 </resources>

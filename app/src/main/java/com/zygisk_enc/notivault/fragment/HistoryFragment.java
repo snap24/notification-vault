@@ -343,7 +343,7 @@ public class HistoryFragment extends Fragment {
         if (pkg != null && !pkg.isEmpty()) {
             hasActiveFilter = true;
             binding.chipActiveAppFilter.setVisibility(View.VISIBLE);
-            binding.chipActiveAppFilter.setText("App: " + pkg);
+            binding.chipActiveAppFilter.setText(getString(R.string.filter_app_prefix, pkg));
             binding.chipActiveAppFilter.setOnCloseIconClickListener(v -> viewModel.setFilterPackage(null));
         } else {
             binding.chipActiveAppFilter.setVisibility(View.GONE);
@@ -352,7 +352,8 @@ public class HistoryFragment extends Fragment {
         if (dateStart != null) {
             hasActiveFilter = true;
             binding.chipActiveDateFilter.setVisibility(View.VISIBLE);
-            binding.chipActiveDateFilter.setText("Date: " + DateUtils.getRelativeTimeLabel(requireContext(), dateStart));
+            String dateLabel = DateUtils.getRelativeTimeLabel(requireContext(), dateStart);
+            binding.chipActiveDateFilter.setText(getString(R.string.filter_date_prefix, dateLabel));
             binding.chipActiveDateFilter.setOnCloseIconClickListener(v -> viewModel.setDateFilter(null, null));
         } else {
             binding.chipActiveDateFilter.setVisibility(View.GONE);

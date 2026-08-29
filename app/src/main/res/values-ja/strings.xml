@@ -396,4 +396,26 @@
     <string name="notification_cloud_backup_success_desc">暗号化されたバックアップがクラウドフォルダに保存されました。</string>
     <string name="notification_cloud_backup_failed">クラウドバックアップに失敗しました</string>
     <string name="deleting_progress">削除中… %d%%</string>
+
+    <string name="chip_date_range">日付範囲</string>
+    <string name="chip_rules">ルール</string>
+    <string name="chip_clear_logs">ログを消去</string>
+    <string name="chip_cloud_backup">バックアップ</string>
+    <string name="filter_app_prefix">アプリ: %s</string>
+    <string name="filter_date_prefix">日付: %s</string>
+    <string name="tracked_applications">追跡対象のアプリ</string>
+    <string name="stats_range_7d">7日間</string>
+    <string name="stats_range_30d">30日間</string>
+    <string name="stats_velocity_rate">頻度 / レート</string>
+    <string name="stats_peak_disturbance">最多通知時間帯</string>
+    <string name="stats_toasts_logged">記録されたトースト</string>
+    <string name="stats_starred_kept">スター付き / 保存済み</string>
+    <string name="stats_hourly_distribution_desc">時間帯別分布（バーをタップして詳細を表示）</string>
+    <string name="stats_tap_bar_inspect">バーをタップして確認</string>
+    <string name="stats_daypart_wellness">時間帯別ウェルネス</string>
+    <string name="stats_ranked_by_volume">選択期間中の合計通知数順</string>
+    <string name="stats_show_all_apps">すべてのアプリを表示</string>
+    <string name="stats_distraction_insight">妨げのインサイト</string>
+    <string name="stats_analyzing_pattern">通知パターンを分析中...</string>
+    <string name="custom_days_dots">カスタム...</string>
 </resources>

@@ -396,4 +396,26 @@
     <string name="notification_cloud_backup_success_desc">Votre sauvegarde chiffrée a été enregistrée dans le dossier cloud.</string>
     <string name="notification_cloud_backup_failed">Échec de la sauvegarde cloud</string>
     <string name="deleting_progress">Suppression… %d%%</string>
+
+    <string name="chip_date_range">Période</string>
+    <string name="chip_rules">Règles</string>
+    <string name="chip_clear_logs">Effacer les journaux</string>
+    <string name="chip_cloud_backup">Sauvegarde</string>
+    <string name="filter_app_prefix">Appli : %s</string>
+    <string name="filter_date_prefix">Date : %s</string>
+    <string name="tracked_applications">Applications suivies</string>
+    <string name="stats_range_7d">7 jours</string>
+    <string name="stats_range_30d">30 jours</string>
+    <string name="stats_velocity_rate">Vélocité / Taux</string>
+    <string name="stats_peak_disturbance">Pic de perturbation</string>
+    <string name="stats_toasts_logged">Toasts enregistrés</string>
+    <string name="stats_starred_kept">Favoris / Conservés</string>
+    <string name="stats_hourly_distribution_desc">Distribution horaire (Appuyez sur une barre pour les détails)</string>
+    <string name="stats_tap_bar_inspect">Appuyez sur une barre pour inspecter</string>
+    <string name="stats_daypart_wellness">Bien-être par moment de la journée</string>
+    <string name="stats_ranked_by_volume">Classé par volume total de notifications sur la période sélectionnée</string>
+    <string name="stats_show_all_apps">Afficher toutes les applications</string>
+    <string name="stats_distraction_insight">Aperçu des distractions</string>
+    <string name="stats_analyzing_pattern">Analyse de vos habitudes de notification...</string>
+    <string name="custom_days_dots">Personnalisé...</string>
 </resources>

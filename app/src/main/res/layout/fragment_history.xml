@@ -54,7 +54,7 @@
                 android:id="@+id/chip_filter_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Date Range"
+                android:text="@string/chip_date_range"
                 app:chipIcon="@drawable/ic_calendar"
                 app:chipIconSize="18dp"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="Rules"
+                android:text="@string/chip_rules"
                 app:chipIcon="@drawable/ic_rules"
                 app:chipIconSize="18dp"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="Clear Logs"
+                android:text="@string/chip_clear_logs"
                 app:chipIcon="@drawable/ic_delete_sweep"
                 app:chipIconSize="18dp"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
@@ -98,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="Backup"
+                android:text="@string/chip_cloud_backup"
                 app:chipIcon="@drawable/ic_cloud_upload"
                 app:chipIconSize="18dp"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />

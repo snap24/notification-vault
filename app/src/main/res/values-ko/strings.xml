@@ -396,4 +396,26 @@
     <string name="notification_cloud_backup_success_desc">암호화된 백업이 클라우드 폴더에 저장되었습니다.</string>
     <string name="notification_cloud_backup_failed">클라우드 백업 실패</string>
     <string name="deleting_progress">삭제 중… %d%%</string>
+
+    <string name="chip_date_range">날짜 범위</string>
+    <string name="chip_rules">규칙</string>
+    <string name="chip_clear_logs">기록 삭제</string>
+    <string name="chip_cloud_backup">백업</string>
+    <string name="filter_app_prefix">앱: %s</string>
+    <string name="filter_date_prefix">날짜: %s</string>
+    <string name="tracked_applications">추적된 애플리케이션</string>
+    <string name="stats_range_7d">7일</string>
+    <string name="stats_range_30d">30일</string>
+    <string name="stats_velocity_rate">속도 / 비율</string>
+    <string name="stats_peak_disturbance">최대 방해 시간대</string>
+    <string name="stats_toasts_logged">기록된 토스트</string>
+    <string name="stats_starred_kept">즐겨찾기 / 보관됨</string>
+    <string name="stats_hourly_distribution_desc">시간대별 분포 (상세 내용을 보려면 막대를 탭하세요)</string>
+    <string name="stats_tap_bar_inspect">확인하려면 막대를 탭하세요</string>
+    <string name="stats_daypart_wellness">시간대별 웰니스</string>
+    <string name="stats_ranked_by_volume">선택한 기간의 총 알림 수 기준 순위</string>
+    <string name="stats_show_all_apps">모든 앱 보기</string>
+    <string name="stats_distraction_insight">방해 요소 분석</string>
+    <string name="stats_analyzing_pattern">알림 패턴을 분석하는 중...</string>
+    <string name="custom_days_dots">사용자 지정...</string>
 </resources>

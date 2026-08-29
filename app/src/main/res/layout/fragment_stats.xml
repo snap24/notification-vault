@@ -69,14 +69,14 @@
                     android:id="@+id/chip_period_7days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="7 Days"
+                    android:text="@string/stats_range_7d"
                     style="@style/Widget.Material3.Chip.Filter" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_period_30days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="30 Days"
+                    android:text="@string/stats_range_30d"
                     style="@style/Widget.Material3.Chip.Filter" />
 
                 <com.google.android.material.chip.Chip
@@ -174,7 +174,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Velocity / Rate"
+                            android:text="@string/stats_velocity_rate"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -202,7 +202,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Peak Disturbance"
+                            android:text="@string/stats_peak_disturbance"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -229,7 +229,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Toasts Logged"
+                            android:text="@string/stats_toasts_logged"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -256,7 +256,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Starred / Kept"
+                            android:text="@string/stats_starred_kept"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -307,7 +307,7 @@
                     android:id="@+id/tv_chart_subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hourly distribution (Tap any bar for details)"
+                    android:text="@string/stats_hourly_distribution_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginTop="2dp"
@@ -318,7 +318,7 @@
                     android:id="@+id/tv_chart_inspector"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tap bar to inspect"
+                    android:text="@string/stats_tap_bar_inspect"
                     android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
                     android:textColor="?attr/colorPrimary"
                     android:background="@drawable/bg_widget_pill"
@@ -357,7 +357,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Daypart Wellness"
+                    android:text="@string/stats_daypart_wellness"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
@@ -538,7 +538,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ranked by total notification volume in selected period"
+                    android:text="@string/stats_ranked_by_volume"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginTop="2dp"
@@ -566,7 +566,7 @@
                     android:id="@+id/btn_toggle_more_apps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Show All Apps"
+                    android:text="@string/stats_show_all_apps"
                     android:visibility="gone"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_marginTop="8dp" />
@@ -595,7 +595,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Distraction Insight"
+                    android:text="@string/stats_distraction_insight"
                     android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                     android:textColor="?attr/colorPrimary"
                     android:textStyle="bold" />
@@ -604,7 +604,7 @@
                     android:id="@+id/tv_insight_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Analyzing your notification pattern..."
+                    android:text="@string/stats_analyzing_pattern"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginTop="2dp" />

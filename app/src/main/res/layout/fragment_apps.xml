@@ -72,7 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tracked Applications"
+            android:text="@string/tracked_applications"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:textColor="?attr/colorOnSurface"
             android:textStyle="bold" />

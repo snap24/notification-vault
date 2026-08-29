@@ -396,4 +396,26 @@
     <string name="notification_cloud_backup_success_desc">تم حفظ نسختك الاحتياطية المشفرة في المجلد السحابي.</string>
     <string name="notification_cloud_backup_failed">فشل النسخ الاحتياطي السحابي</string>
     <string name="deleting_progress">جارٍ الحذف… %d%%</string>
+
+    <string name="chip_date_range">نطاق التاريخ</string>
+    <string name="chip_rules">القواعد</string>
+    <string name="chip_clear_logs">مسح السجلات</string>
+    <string name="chip_cloud_backup">نسخ احتياطي</string>
+    <string name="filter_app_prefix">التطبيق: %s</string>
+    <string name="filter_date_prefix">التاريخ: %s</string>
+    <string name="tracked_applications">التطبيقات المتبعة</string>
+    <string name="stats_range_7d">7 أيام</string>
+    <string name="stats_range_30d">30 يومًا</string>
+    <string name="stats_velocity_rate">السرعة / المعدل</string>
+    <string name="stats_peak_disturbance">ذروة الإزعاج</string>
+    <string name="stats_toasts_logged">الإشعارات العابرة المسجلة</string>
+    <string name="stats_starred_kept">المميزة بنجمة / المحفوظة</string>
+    <string name="stats_hourly_distribution_desc">التوزيع بالساعة (اضغط على أي عمود للتفاصيل)</string>
+    <string name="stats_tap_bar_inspect">اضغط على العمود للفحص</string>
+    <string name="stats_daypart_wellness">العافية حسب أوقات اليوم</string>
+    <string name="stats_ranked_by_volume">مرتبة حسب الحجم الإجمالي للإشعارات في الفترة المحددة</string>
+    <string name="stats_show_all_apps">عرض جميع التطبيقات</string>
+    <string name="stats_distraction_insight">نظرة عامة على التشتيت</string>
+    <string name="stats_analyzing_pattern">جارٍ تحليل نمط الإشعارات...</string>
+    <string name="custom_days_dots">مخصص...</string>
 </resources>
