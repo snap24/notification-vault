@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         ).build();
 
         if (navController != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigation, (v, insets) -> insets);
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfig);
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             binding.bottomNavigation.setOnItemSelectedListener(item -> {
