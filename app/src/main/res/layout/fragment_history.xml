@@ -101,19 +101,6 @@
                 app:chipIconSize="18dp"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-            <!-- Decryption progress indicator (shown when reading large chunks) -->
-            <TextView
-                android:id="@+id/tv_load_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="Decrypting... 45%" />
-
         </LinearLayout>
 
     </HorizontalScrollView>
@@ -149,7 +136,80 @@
 
     </LinearLayout>
 
-    <!-- 4. Swipe Refresh Layout with Notification Feed -->
+    <!-- 4. Prominent Decryption Progress Banner (visible while loading/decrypting) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_decryption_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorPrimaryContainer"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_decryption_circle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:indicatorSize="18dp"
+                    app:trackThickness="3dp"
+                    app:indicatorColor="?attr/colorOnPrimaryContainer"
+                    app:trackColor="?attr/colorPrimaryContainer"
+                    android:indeterminate="true" />
+
+                <TextView
+                    android:id="@+id/tv_load_progress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="Decrypting secure notifications..."
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_decryption_percent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="45%"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_decryption_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:trackCornerRadius="3dp"
+                app:trackThickness="4dp"
+                app:indicatorColor="?attr/colorOnPrimaryContainer"
+                app:trackColor="?attr/colorSurfaceContainerHigh"
+                android:progress="45" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 5. Swipe Refresh Layout with Notification Feed -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"

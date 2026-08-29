@@ -602,11 +602,12 @@ public class HistoryFragment extends Fragment {
         });
 
         viewModel.getLoadProgress().observe(getViewLifecycleOwner(), progress -> {
-            if (progress == null || progress < 0) {
-                binding.tvLoadProgress.setVisibility(View.GONE);
+            if (progress == null || progress < 0 || progress >= 100) {
+                binding.cardDecryptionProgress.setVisibility(View.GONE);
             } else {
-                binding.tvLoadProgress.setVisibility(View.VISIBLE);
-                binding.tvLoadProgress.setText(getString(R.string.decrypting_progress, progress));
+                binding.cardDecryptionProgress.setVisibility(View.VISIBLE);
+                binding.progressDecryptionBar.setProgress(progress);
+                binding.tvDecryptionPercent.setText(progress + "%");
             }
         });
         
