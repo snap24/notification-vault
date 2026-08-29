@@ -250,7 +250,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             java.io.File file = new java.io.File(firstPath);
                             byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
                             if (decryptedBytes != null) {
-                                Bitmap bitmap = BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inJustDecodeBounds = true;
+                                BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length, options);
+
+                                int inSampleSize = 1;
+                                int reqSize = 512;
+                                if (options.outHeight > reqSize || options.outWidth > reqSize) {
+                                    int halfH = options.outHeight / 2;
+                                    int halfW = options.outWidth / 2;
+                                    while ((halfH / inSampleSize) >= reqSize && (halfW / inSampleSize) >= reqSize) {
+                                        inSampleSize *= 2;
+                                    }
+                                }
+                                options.inSampleSize = inSampleSize;
+                                options.inJustDecodeBounds = false;
+                                options.inPreferredConfig = Bitmap.Config.RGB_565;
+
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length, options);
                                 if (bitmap != null) {
                                     imageCache.put(firstPath, bitmap);
                                     
