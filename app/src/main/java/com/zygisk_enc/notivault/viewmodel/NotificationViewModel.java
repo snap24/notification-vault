@@ -245,8 +245,19 @@ public class NotificationViewModel extends AndroidViewModel {
                                     // 2) Initial feed batch (0 - 500 items)
                                     // For subsequent scroll batches (501+), toolbar pill shows progress while list appends once at 100%
                                     if (allowProgressiveListStreaming) {
-                                        int step = searchingMode ? 25 : 10;
-                                        int milestone = progress / step;
+                                        int milestone;
+                                        if (searchingMode) {
+                                            if (progress < 20) {
+                                                milestone = progress / 10;
+                                            } else if (progress < 25) {
+                                                milestone = 2;
+                                            } else {
+                                                milestone = 2 + (progress / 25);
+                                            }
+                                        } else {
+                                            milestone = progress / 10;
+                                        }
+
                                         boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
 
                                         if (milestoneTrigger && runToken == currentRunToken) {
