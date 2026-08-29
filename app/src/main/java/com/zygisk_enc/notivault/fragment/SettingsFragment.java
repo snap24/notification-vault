@@ -99,14 +99,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
         });
 
-        dialog.show();
+        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), dialog);
     }
 
     private void showImportPasswordDialog(Uri uri) {
         View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_import_backup, null);
         TextInputEditText tietPassword = view.findViewById(R.id.tiet_import_password);
 
-        new MaterialAlertDialogBuilder(requireContext())
+        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.decrypt_and_import, (dialog, which) -> {
@@ -140,12 +140,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             requireContext(), com.google.android.material.R.attr.colorPrimary, android.graphics.Color.BLUE));
                     progressLayout.addView(tvProgress);
 
-                    androidx.appcompat.app.AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(R.string.importing_backup_title)
-                            .setMessage(R.string.importing_backup_message)
-                            .setView(progressLayout)
-                            .setCancelable(false)
-                            .show();
+                    androidx.appcompat.app.AlertDialog progressDialog = com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), 
+                            new MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle(R.string.importing_backup_title)
+                                    .setMessage(R.string.importing_backup_message)
+                                    .setView(progressLayout)
+                                    .setCancelable(false));
+
+                    // Keep screen awake while importing so display timeout does not turn off screen mid-import
+                    if (getActivity() != null) {
+                        getActivity().getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                    if (progressDialog.getWindow() != null) {
+                        progressDialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                    progressDialog.setOnDismissListener(d -> {
+                        if (getActivity() != null) {
+                            getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        }
+                    });
 
                     BackupUtil.importBackup(requireContext(), uri, password, new BackupUtil.BackupProgressListener() {
                         @Override
@@ -162,6 +175,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         public void onSuccess() {
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
+                                    if (getActivity() != null) {
+                                        getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                    }
                                     progressDialog.dismiss();
                                     Toast.makeText(requireContext(), 
                                             R.string.backup_import_success, Toast.LENGTH_SHORT).show();
@@ -173,6 +189,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         public void onFailure(Exception e) {
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
+                                    if (getActivity() != null) {
+                                        getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                    }
                                     progressDialog.dismiss();
                                     Toast.makeText(requireContext(), 
                                             getString(R.string.backup_import_failed, e.getMessage()), Toast.LENGTH_LONG).show();
@@ -180,8 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             }
                         }
                     });
-                })
-                .show();
+                }));
     }
 
     @Override
