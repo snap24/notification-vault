@@ -77,6 +77,8 @@ public class NotiVaultApp extends Application {
         super.onTrimMemory(level);
         if (level >= TRIM_MEMORY_BACKGROUND) {
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+            com.zygisk_enc.notivault.adapter.NotificationAdapter.clearImageCache();
+            com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
         }
     }
 
@@ -84,5 +86,7 @@ public class NotiVaultApp extends Application {
     public void onLowMemory() {
         super.onLowMemory();
         com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+        com.zygisk_enc.notivault.adapter.NotificationAdapter.clearImageCache();
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
     }
 }

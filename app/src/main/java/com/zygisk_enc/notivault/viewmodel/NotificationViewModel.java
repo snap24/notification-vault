@@ -37,7 +37,11 @@ public class NotificationViewModel extends AndroidViewModel {
             this.bigText = bigText;
         }
     }
-    private static final java.util.concurrent.ConcurrentHashMap<Long, DecryptedText> decryptedCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(5000);
+
+    public static void clearDecryptedCache() {
+        decryptedCache.evictAll();
+    }
 
     private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();

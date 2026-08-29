@@ -92,6 +92,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private static final java.util.concurrent.ExecutorService imageExecutor = java.util.concurrent.Executors.newFixedThreadPool(3);
+    private static final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private static final android.util.LruCache<String, Bitmap> imageCache;
     static {
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -102,6 +103,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return bitmap.getByteCount() / 1024;
             }
         };
+    }
+
+    public static void clearImageCache() {
+        if (imageCache != null) {
+            imageCache.evictAll();
+        }
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -259,7 +266,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                 if (bitmap != null) {
                                     imageCache.put(firstPath, bitmap);
                                     
-                                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                    mainHandler.post(() -> {
                                         if (firstPath.equals(ivNotificationImage.getTag())) {
                                             ivNotificationImage.setImageBitmap(bitmap);
                                         }

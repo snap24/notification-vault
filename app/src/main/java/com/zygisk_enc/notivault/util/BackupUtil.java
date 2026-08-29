@@ -438,6 +438,10 @@ public class BackupUtil {
                 if (callback instanceof BackupProgressListener) {
                     ((BackupProgressListener) callback).onProgress(100);
                 }
+
+                // Immediately index imported notifications for sub-5ms instant encrypted search
+                BlindIndexManager.ensureDatabaseIndexed(context);
+
                 callback.onSuccess();
             } catch (Exception e) {
                 callback.onFailure(e);
