@@ -244,12 +244,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         .getBoolean("biometric_lock", false);
                 if (isBiometricEnabled) {
                     verifyBiometricsToProceed(() -> {
-                        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showUnifiedAutoDeleteDialog(
-                                requireContext(), () -> updateAutoDeleteSummary(autoDeleteHistoryPref));
+                        startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.AutoDeleteRulesActivity.class));
                     }, getString(R.string.auth_manage_auto_delete));
                 } else {
-                    com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showUnifiedAutoDeleteDialog(
-                            requireContext(), () -> updateAutoDeleteSummary(autoDeleteHistoryPref));
+                    startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.AutoDeleteRulesActivity.class));
                 }
                 return true;
             });
@@ -482,6 +480,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .registerOnSharedPreferenceChangeListener(this);
+        Preference autoDeleteHistoryPref = findPreference("auto_delete_history");
+        if (autoDeleteHistoryPref != null) {
+            updateAutoDeleteSummary(autoDeleteHistoryPref);
+        }
     }
 
     @Override

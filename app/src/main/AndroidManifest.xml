@@ -52,6 +52,12 @@
             android:label="App Capture Rules" />
 
         <activity
+            android:name=".AutoDeleteRulesActivity"
+            android:exported="false"
+            android:label="@string/dialog_unified_auto_delete_title"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".AppRuleEditActivity"
             android:exported="false"
             android:label="Edit Capture Rule"
