@@ -1,6 +1,7 @@
 package com.zygisk_enc.notivault.service;
 
 import android.app.Notification;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.NotificationEntity;
 import com.zygisk_enc.notivault.database.AppRuleEntity;
+import com.zygisk_enc.notivault.util.AppLockManager;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.util.EncryptionHelper;
 import java.io.ByteArrayOutputStream;
@@ -540,5 +542,11 @@ public class NotiVaultService extends NotificationListenerService {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        AppLockManager.reset();
     }
 }

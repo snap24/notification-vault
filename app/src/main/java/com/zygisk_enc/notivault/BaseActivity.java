@@ -72,9 +72,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeHelper.applyTheme(this);
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            AppLockManager.setUnlocked(savedInstanceState.getBoolean("is_authenticated", AppLockManager.isUnlocked()));
-        }
     }
 
     @Override
@@ -331,11 +328,5 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (isBiometricEnabled || !AppLockManager.isUnlocked()) {
             dismissAllOpenDialogs();
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("is_authenticated", AppLockManager.isUnlocked());
     }
 }

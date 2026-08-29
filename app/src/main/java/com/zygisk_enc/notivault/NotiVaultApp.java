@@ -44,7 +44,7 @@ public class NotiVaultApp extends Application {
             public void onActivityStarted(@NonNull Activity activity) {
                 if (!(activity instanceof com.zygisk_enc.notivault.util.AuthActionActivity) &&
                     !(activity instanceof com.zygisk_enc.notivault.widget.WidgetConfigAuthActivity)) {
-                    AppLockManager.onActivityStarted();
+                    AppLockManager.onActivityStarted(activity);
                 }
             }
 
@@ -56,11 +56,9 @@ public class NotiVaultApp extends Application {
 
             @Override
             public void onActivityStopped(@NonNull Activity activity) {
-                if (!activity.isChangingConfigurations()) {
-                    if (!(activity instanceof com.zygisk_enc.notivault.util.AuthActionActivity) &&
-                        !(activity instanceof com.zygisk_enc.notivault.widget.WidgetConfigAuthActivity)) {
-                        AppLockManager.onActivityStopped();
-                    }
+                if (!(activity instanceof com.zygisk_enc.notivault.util.AuthActionActivity) &&
+                    !(activity instanceof com.zygisk_enc.notivault.widget.WidgetConfigAuthActivity)) {
+                    AppLockManager.onActivityStopped(activity);
                 }
             }
 

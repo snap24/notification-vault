@@ -66,4 +66,10 @@ public class ToastRecorderService extends AccessibilityService {
     @Override
     public void onInterrupt() {
     }
+
+    @Override
+    public void onTaskRemoved(android.content.Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        com.zygisk_enc.notivault.util.AppLockManager.reset();
+    }
 }
