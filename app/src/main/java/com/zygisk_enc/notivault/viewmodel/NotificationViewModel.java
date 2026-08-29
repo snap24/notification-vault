@@ -354,6 +354,10 @@ public class NotificationViewModel extends AndroidViewModel {
         return unreadCount;
     }
 
+    public LiveData<String> getSearchQuery() {
+        return searchQuery;
+    }
+
     public void setSearchQuery(String query) {
         String current = searchQuery.getValue();
         if ((query == null && current == null) || (query != null && query.equals(current))) {

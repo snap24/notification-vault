@@ -636,11 +636,22 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        
         viewModel.getScrollToTopEvent().observe(getViewLifecycleOwner(), scroll -> {
             if (scroll != null && scroll) {
+                closeSearchBox();
                 binding.recyclerView.scrollToPosition(0);
                 viewModel.clearScrollToTopEvent();
+            }
+        });
+
+        viewModel.getSearchQuery().observe(getViewLifecycleOwner(), query -> {
+            if (query == null || query.isEmpty()) {
+                if (binding != null && binding.etSearch.getText() != null && binding.etSearch.getText().length() > 0) {
+                    binding.etSearch.setText("");
+                }
+                if (searchBackPressedCallback != null) {
+                    searchBackPressedCallback.setEnabled(false);
+                }
             }
         });
     }
