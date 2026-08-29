@@ -4,7 +4,7 @@
     <string name="service_label">Notification Vault Notification Listener</string>
 
     <!-- Navigation -->
-    <string name="nav_history">History</string>
+    <string name="nav_history">Logs</string>
     <string name="nav_apps">Apps</string>
     <string name="nav_stats">Stats</string>
     <string name="nav_settings">Settings</string>
