@@ -29,6 +29,18 @@ public interface NotificationDao {
     @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0")
     void deleteOlderThan(long timestamp);
 
+    @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND packageName NOT IN (:excludedPackages)")
+    void deleteOlderThanExcludingPackages(long timestamp, List<String> excludedPackages);
+
+    @Query("SELECT imagePath FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND packageName NOT IN (:excludedPackages) AND imagePath IS NOT NULL")
+    List<String> getOldImagePathsExcludingPackages(long timestamp, List<String> excludedPackages);
+
+    @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND packageName = :packageName")
+    void deleteOlderThanForPackage(long timestamp, String packageName);
+
+    @Query("SELECT imagePath FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND packageName = :packageName AND imagePath IS NOT NULL")
+    List<String> getOldImagePathsForPackage(long timestamp, String packageName);
+
     @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND packageName IN (:packages)")
     void deleteOlderThanForPackages(long timestamp, List<String> packages);
 

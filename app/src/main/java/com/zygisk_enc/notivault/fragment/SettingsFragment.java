@@ -235,43 +235,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
-        // Auto-delete preference summary
-        ListPreference autoDeletePref = findPreference("auto_delete_days");
-        if (autoDeletePref != null) {
-            autoDeletePref.setSummaryProvider(preference -> {
-                int days = PreferenceUtil.getAutoDeleteDays(requireContext());
-                if (days == 0) return getString(R.string.never);
-                if (days == 1) return getString(R.string.after_1_day);
-                return getString(R.string.after_x_days, days);
-            });
-        }
-
-        // Auto-delete scope / mode preference summary
-        ListPreference autoDeleteModePref = findPreference("auto_delete_mode");
-        Preference managePerAppPref = findPreference("manage_per_app_auto_delete");
-        if (autoDeleteModePref != null) {
-            autoDeleteModePref.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
-            if (managePerAppPref != null) {
-                managePerAppPref.setVisible("per_app".equals(autoDeleteModePref.getValue()));
-            }
-            autoDeleteModePref.setOnPreferenceChangeListener((pref, newValue) -> {
-                if (managePerAppPref != null) {
-                    managePerAppPref.setVisible("per_app".equals(newValue));
-                }
-                return true;
-            });
-        }
-
-        if (managePerAppPref != null) {
-            managePerAppPref.setOnPreferenceClickListener(pref -> {
+        // Unified Auto-Delete History preference
+        Preference autoDeleteHistoryPref = findPreference("auto_delete_history");
+        if (autoDeleteHistoryPref != null) {
+            updateAutoDeleteSummary(autoDeleteHistoryPref);
+            autoDeleteHistoryPref.setOnPreferenceClickListener(pref -> {
                 boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                         .getBoolean("biometric_lock", false);
                 if (isBiometricEnabled) {
                     verifyBiometricsToProceed(() -> {
-                        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
+                        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showUnifiedAutoDeleteDialog(
+                                requireContext(), () -> updateAutoDeleteSummary(autoDeleteHistoryPref));
                     }, getString(R.string.auth_manage_auto_delete));
                 } else {
-                    com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
+                    com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showUnifiedAutoDeleteDialog(
+                            requireContext(), () -> updateAutoDeleteSummary(autoDeleteHistoryPref));
                 }
                 return true;
             });
@@ -496,48 +474,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public void onDisplayPreferenceDialog(@NonNull Preference preference) {
-        if ("auto_delete_days".equals(preference.getKey())) {
-            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(() -> showAutoDeleteDaysDialog(preference), getString(R.string.auth_change_auto_delete));
-                return;
-            }
-            showAutoDeleteDaysDialog(preference);
-            return;
-        }
-        if ("auto_delete_mode".equals(preference.getKey())) {
-            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(() -> super.onDisplayPreferenceDialog(preference), getString(R.string.auth_change_auto_delete));
-                return;
-            }
-        }
         super.onDisplayPreferenceDialog(preference);
-    }
-
-    private void showAutoDeleteDaysDialog(Preference preference) {
-        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showCustomDaysDialog(requireContext(), () -> {
-            if (preference instanceof ListPreference) {
-                ((ListPreference) preference).setValue(String.valueOf(PreferenceUtil.getAutoDeleteDays(requireContext())));
-            }
-            // Trigger background cleanup if days > 0
-            int days = PreferenceUtil.getAutoDeleteDays(requireContext());
-            if (days > 0) {
-                long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
-                NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
-                String mode = PreferenceUtil.getAutoDeleteMode(requireContext());
-                if ("per_app".equals(mode)) {
-                    java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(requireContext());
-                    if (pkgs != null && !pkgs.isEmpty()) {
-                        viewModel.deleteOlderThanForPackages(cutoff, new java.util.ArrayList<>(pkgs));
-                    }
-                } else {
-                    viewModel.deleteOlderThan(cutoff);
-                }
-            }
-        });
     }
 
     @Override
@@ -560,20 +497,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             if (getActivity() != null) {
                 getActivity().recreate();
             }
-        } else if ("auto_delete_days".equals(key) || "auto_delete_mode".equals(key)) {
-            int days = PreferenceUtil.getAutoDeleteDays(requireContext());
-            if (days > 0) {
-                long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
-                NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
-                String mode = PreferenceUtil.getAutoDeleteMode(requireContext());
-                if ("per_app".equals(mode)) {
-                    java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(requireContext());
-                    if (pkgs != null && !pkgs.isEmpty()) {
-                        viewModel.deleteOlderThanForPackages(cutoff, new java.util.ArrayList<>(pkgs));
-                    }
-                } else {
-                    viewModel.deleteOlderThan(cutoff);
-                }
+        } else if ("auto_delete_days".equals(key) || "auto_delete_app_rules".equals(key)) {
+            Preference autoDeleteHistoryPref = findPreference("auto_delete_history");
+            if (autoDeleteHistoryPref != null) {
+                updateAutoDeleteSummary(autoDeleteHistoryPref);
             }
         } else if ("capture_enabled".equals(key)) {
             // Notify the QS tile to refresh its state from the updated preference
@@ -586,6 +513,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         } else if ("qs_tile_enabled".equals(key)) {
             boolean tileEnabled = sharedPreferences.getBoolean("qs_tile_enabled", true);
             PreferenceUtil.setTileServiceEnabled(requireContext(), tileEnabled);
+        }
+    }
+
+    private void updateAutoDeleteSummary(Preference pref) {
+        if (pref == null || getContext() == null) return;
+        int globalDays = PreferenceUtil.getGlobalAutoDeleteDays(requireContext());
+        java.util.Map<String, Integer> appRules = PreferenceUtil.getAppAutoDeleteRules(requireContext());
+        int customCount = appRules.size();
+
+        String globalLabel = globalDays == 0 ? getString(R.string.never)
+                : globalDays == 1 ? getString(R.string.after_1_day)
+                : getString(R.string.after_x_days, globalDays);
+
+        if (customCount > 0) {
+            pref.setSummary(getString(R.string.auto_delete_summary_format, globalLabel, customCount));
+        } else {
+            pref.setSummary(getString(R.string.auto_delete_summary_simple, globalLabel));
         }
     }
 }

@@ -11,8 +11,17 @@ public class PreferenceUtil {
     private static final String KEY_AUTO_DELETE_DAYS = "auto_delete_days";
     private static final String KEY_AUTO_DELETE_MODE = "auto_delete_mode";
     private static final String KEY_AUTO_DELETE_PACKAGES = "auto_delete_packages";
+    private static final String KEY_AUTO_DELETE_APP_RULES = "auto_delete_app_rules";
     private static final String KEY_CAPTURE_ENABLED = "capture_enabled";
     private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
+
+    public static int getGlobalAutoDeleteDays(Context context) {
+        return getAutoDeleteDays(context);
+    }
+
+    public static void setGlobalAutoDeleteDays(Context context, int days) {
+        setAutoDeleteDays(context, days);
+    }
 
     public static int getAutoDeleteDays(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -27,6 +36,53 @@ public class PreferenceUtil {
     public static void setAutoDeleteDays(Context context, int days) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().putString(KEY_AUTO_DELETE_DAYS, String.valueOf(days)).apply();
+    }
+
+    public static java.util.Map<String, Integer> getAppAutoDeleteRules(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        java.util.Map<String, Integer> rules = new java.util.HashMap<>();
+        String json = prefs.getString(KEY_AUTO_DELETE_APP_RULES, null);
+        if (json != null && !json.trim().isEmpty()) {
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(json);
+                java.util.Iterator<String> keys = obj.keys();
+                while (keys.hasNext()) {
+                    String pkg = keys.next();
+                    rules.put(pkg, obj.getInt(pkg));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return rules;
+    }
+
+    public static void setAppAutoDeleteRules(Context context, java.util.Map<String, Integer> rules) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        org.json.JSONObject obj = new org.json.JSONObject();
+        if (rules != null) {
+            for (java.util.Map.Entry<String, Integer> entry : rules.entrySet()) {
+                try {
+                    obj.put(entry.getKey(), entry.getValue());
+                } catch (Exception ignored) {}
+            }
+        }
+        prefs.edit().putString(KEY_AUTO_DELETE_APP_RULES, obj.toString()).apply();
+    }
+
+    public static void setAppAutoDeleteRule(Context context, String packageName, Integer days) {
+        java.util.Map<String, Integer> rules = getAppAutoDeleteRules(context);
+        if (days == null) {
+            rules.remove(packageName);
+        } else {
+            rules.put(packageName, days);
+        }
+        setAppAutoDeleteRules(context, rules);
+    }
+
+    public static Integer getAppAutoDeleteRule(Context context, String packageName) {
+        java.util.Map<String, Integer> rules = getAppAutoDeleteRules(context);
+        return rules.get(packageName);
     }
 
     public static String getAutoDeleteMode(Context context) {

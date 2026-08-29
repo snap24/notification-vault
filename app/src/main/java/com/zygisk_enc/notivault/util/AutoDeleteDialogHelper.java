@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,17 +17,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.zygisk_enc.notivault.R;
+import com.zygisk_enc.notivault.database.AppDatabase;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoDeleteDialogHelper {
@@ -37,7 +39,7 @@ public class AutoDeleteDialogHelper {
         public boolean isSystem;
     }
 
-    public static void showPerAppAutoDeleteDialog(Context context) {
+    public static void showUnifiedAutoDeleteDialog(Context context, Runnable onDismiss) {
         PackageManager pm = context.getPackageManager();
         AppExecutor.execute(() -> {
             List<ApplicationInfo> installedApps = pm.getInstalledApplications(0);
@@ -71,43 +73,63 @@ public class AutoDeleteDialogHelper {
             Collections.sort(userList, (a, b) -> a.appName.compareToIgnoreCase(b.appName));
             Collections.sort(systemList, (a, b) -> a.appName.compareToIgnoreCase(b.appName));
 
-            Set<String> savedPackages = PreferenceUtil.getAutoDeletePackages(context);
-            Set<String> workingSelection = new HashSet<>(savedPackages);
-
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_per_app_auto_delete, null);
+                View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_unified_auto_delete, null);
+                
+                TextView tvGlobalDesc = dialogView.findViewById(R.id.tv_global_status_desc);
+                ChipGroup chipGroupGlobal = dialogView.findViewById(R.id.chip_group_global_days);
                 TextInputEditText etSearch = dialogView.findViewById(R.id.et_search_apps);
-                ChipGroup chipGroup = dialogView.findViewById(R.id.chip_group_filters);
-                TextView tvToggleAllTitle = dialogView.findViewById(R.id.tv_toggle_all_title);
-                TextView tvToggleAllDesc = dialogView.findViewById(R.id.tv_toggle_all_desc);
-                MaterialSwitch switchToggleAll = dialogView.findViewById(R.id.switch_toggle_all);
+                ChipGroup chipGroupFilters = dialogView.findViewById(R.id.chip_group_filters);
                 RecyclerView rvApps = dialogView.findViewById(R.id.rv_apps_list);
 
+                final int[] workingGlobalDays = new int[]{PreferenceUtil.getGlobalAutoDeleteDays(context)};
+                final Map<String, Integer> workingAppRules = new HashMap<>(PreferenceUtil.getAppAutoDeleteRules(context));
+
+                updateGlobalChips(dialogView, workingGlobalDays[0], tvGlobalDesc);
+
                 rvApps.setLayoutManager(new LinearLayoutManager(context));
-                AutoDeleteAppAdapter adapter = new AutoDeleteAppAdapter(context, userList, systemList, workingSelection);
+                UnifiedAutoDeleteAdapter adapter = new UnifiedAutoDeleteAdapter(
+                        context, userList, systemList, workingAppRules, () -> workingGlobalDays[0]);
                 rvApps.setAdapter(adapter);
 
-                adapter.setOnSelectionListener(() -> {
-                    updateToggleAllState(adapter, tvToggleAllTitle, tvToggleAllDesc, switchToggleAll);
-                });
+                chipGroupGlobal.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                    if (checkedIds.isEmpty()) return;
+                    int checkedId = checkedIds.get(0);
+                    int newDays = workingGlobalDays[0];
 
-                updateToggleAllState(adapter, tvToggleAllTitle, tvToggleAllDesc, switchToggleAll);
-
-                switchToggleAll.setOnClickListener(v -> {
-                    boolean isChecked = switchToggleAll.isChecked();
-                    adapter.toggleAllVisible(isChecked);
-                    updateToggleAllState(adapter, tvToggleAllTitle, tvToggleAllDesc, switchToggleAll);
-                });
-
-                chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-                    if (checkedIds.contains(R.id.chip_system)) {
-                        adapter.setFilterMode(AutoDeleteAppAdapter.MODE_SYSTEM);
-                    } else if (checkedIds.contains(R.id.chip_all)) {
-                        adapter.setFilterMode(AutoDeleteAppAdapter.MODE_ALL);
-                    } else {
-                        adapter.setFilterMode(AutoDeleteAppAdapter.MODE_USER);
+                    if (checkedId == R.id.chip_global_never) newDays = 0;
+                    else if (checkedId == R.id.chip_global_1d) newDays = 1;
+                    else if (checkedId == R.id.chip_global_2d) newDays = 2;
+                    else if (checkedId == R.id.chip_global_3d) newDays = 3;
+                    else if (checkedId == R.id.chip_global_7d) newDays = 7;
+                    else if (checkedId == R.id.chip_global_14d) newDays = 14;
+                    else if (checkedId == R.id.chip_global_30d) newDays = 30;
+                    else if (checkedId == R.id.chip_global_60d) newDays = 60;
+                    else if (checkedId == R.id.chip_global_90d) newDays = 90;
+                    else if (checkedId == R.id.chip_global_custom) {
+                        showCustomDaysDialog(context, workingGlobalDays[0], days -> {
+                            workingGlobalDays[0] = days;
+                            updateGlobalChips(dialogView, days, tvGlobalDesc);
+                            adapter.notifyDataSetChanged();
+                        });
+                        return;
                     }
-                    updateToggleAllState(adapter, tvToggleAllTitle, tvToggleAllDesc, switchToggleAll);
+
+                    workingGlobalDays[0] = newDays;
+                    updateGlobalDesc(context, newDays, tvGlobalDesc);
+                    adapter.notifyDataSetChanged();
+                });
+
+                chipGroupFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                    if (checkedIds.contains(R.id.chip_customized)) {
+                        adapter.setFilterMode(UnifiedAutoDeleteAdapter.MODE_CUSTOMIZED);
+                    } else if (checkedIds.contains(R.id.chip_system)) {
+                        adapter.setFilterMode(UnifiedAutoDeleteAdapter.MODE_SYSTEM);
+                    } else if (checkedIds.contains(R.id.chip_all)) {
+                        adapter.setFilterMode(UnifiedAutoDeleteAdapter.MODE_ALL);
+                    } else {
+                        adapter.setFilterMode(UnifiedAutoDeleteAdapter.MODE_USER);
+                    }
                 });
 
                 etSearch.addTextChangedListener(new TextWatcher() {
@@ -116,24 +138,20 @@ public class AutoDeleteDialogHelper {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         adapter.setSearchQuery(s != null ? s.toString() : "");
-                        updateToggleAllState(adapter, tvToggleAllTitle, tvToggleAllDesc, switchToggleAll);
                     }
                     @Override
                     public void afterTextChanged(Editable s) {}
                 });
 
                 AlertDialog dialog = new MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.dialog_per_app_auto_delete_title)
+                        .setTitle(R.string.dialog_unified_auto_delete_title)
                         .setView(dialogView)
-                        .setNegativeButton(R.string.cancel, null)
                         .setPositiveButton(R.string.save, (d, which) -> {
-                            PreferenceUtil.setAutoDeletePackages(context, workingSelection);
-                            int count = workingSelection.size();
-                            String toastMsg = count == 1
-                                    ? context.getString(R.string.toast_saved_auto_delete_singular, count)
-                                    : context.getString(R.string.toast_saved_auto_delete_plural, count);
-                            Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT).show();
+                            PreferenceUtil.setGlobalAutoDeleteDays(context, workingGlobalDays[0]);
+                            PreferenceUtil.setAppAutoDeleteRules(context, workingAppRules);
+                            if (onDismiss != null) onDismiss.run();
                         })
+                        .setNegativeButton(R.string.cancel, null)
                         .create();
 
                 com.zygisk_enc.notivault.BaseActivity.showDialog(context, dialog);
@@ -141,14 +159,44 @@ public class AutoDeleteDialogHelper {
         });
     }
 
-    public static void showCustomDaysDialog(Context context, Runnable onSaved) {
-        int currentDays = PreferenceUtil.getAutoDeleteDays(context);
-        final int[] workingDays = new int[]{currentDays};
+    private static void updateGlobalChips(View root, int days, TextView tvDesc) {
+        ChipGroup group = root.findViewById(R.id.chip_group_global_days);
+        group.clearCheck();
+        if (days == 0) group.check(R.id.chip_global_never);
+        else if (days == 1) group.check(R.id.chip_global_1d);
+        else if (days == 2) group.check(R.id.chip_global_2d);
+        else if (days == 3) group.check(R.id.chip_global_3d);
+        else if (days == 7) group.check(R.id.chip_global_7d);
+        else if (days == 14) group.check(R.id.chip_global_14d);
+        else if (days == 30) group.check(R.id.chip_global_30d);
+        else if (days == 60) group.check(R.id.chip_global_60d);
+        else if (days == 90) group.check(R.id.chip_global_90d);
+        else {
+            Chip customChip = root.findViewById(R.id.chip_global_custom);
+            customChip.setText(days + "d");
+            group.check(R.id.chip_global_custom);
+        }
+        updateGlobalDesc(root.getContext(), days, tvDesc);
+    }
+
+    private static void updateGlobalDesc(Context context, int days, TextView tvDesc) {
+        if (tvDesc == null) return;
+        if (days == 0) {
+            tvDesc.setText("Global auto-delete is disabled (Never delete)");
+        } else if (days == 1) {
+            tvDesc.setText("Default: Delete notifications older than 1 day");
+        } else {
+            tvDesc.setText("Default: Delete notifications older than " + days + " days");
+        }
+    }
+
+    public static void showCustomDaysDialog(Context context, int currentVal, CustomDaysCallback callback) {
+        final int[] workingDays = new int[]{Math.max(0, currentVal)};
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_custom_auto_delete_days, null);
         TextInputEditText etDays = dialogView.findViewById(R.id.et_custom_days);
-        android.widget.ImageButton btnMinus = dialogView.findViewById(R.id.btn_minus_days);
-        android.widget.ImageButton btnPlus = dialogView.findViewById(R.id.btn_plus_days);
+        ImageButton btnMinus = dialogView.findViewById(R.id.btn_minus_days);
+        ImageButton btnPlus = dialogView.findViewById(R.id.btn_plus_days);
 
         etDays.setText(String.valueOf(workingDays[0]));
 
@@ -158,9 +206,7 @@ public class AutoDeleteDialogHelper {
                 val--;
                 workingDays[0] = val;
                 etDays.setText(String.valueOf(val));
-                if (etDays.getText() != null) {
-                    etDays.setSelection(etDays.getText().length());
-                }
+                if (etDays.getText() != null) etDays.setSelection(etDays.getText().length());
             }
         });
 
@@ -170,9 +216,7 @@ public class AutoDeleteDialogHelper {
                 val++;
                 workingDays[0] = val;
                 etDays.setText(String.valueOf(val));
-                if (etDays.getText() != null) {
-                    etDays.setSelection(etDays.getText().length());
-                }
+                if (etDays.getText() != null) etDays.setSelection(etDays.getText().length());
             }
         });
 
@@ -181,37 +225,31 @@ public class AutoDeleteDialogHelper {
             etDays.setText("0");
             etDays.setSelection(1);
         });
-
         dialogView.findViewById(R.id.chip_preset_7).setOnClickListener(v -> {
             workingDays[0] = 7;
             etDays.setText("7");
             etDays.setSelection(1);
         });
-
         dialogView.findViewById(R.id.chip_preset_15).setOnClickListener(v -> {
             workingDays[0] = 15;
             etDays.setText("15");
             etDays.setSelection(2);
         });
-
         dialogView.findViewById(R.id.chip_preset_30).setOnClickListener(v -> {
             workingDays[0] = 30;
             etDays.setText("30");
             etDays.setSelection(2);
         });
-
         dialogView.findViewById(R.id.chip_preset_60).setOnClickListener(v -> {
             workingDays[0] = 60;
             etDays.setText("60");
             etDays.setSelection(2);
         });
-
         dialogView.findViewById(R.id.chip_preset_90).setOnClickListener(v -> {
             workingDays[0] = 90;
             etDays.setText("90");
             etDays.setSelection(2);
         });
-
         dialogView.findViewById(R.id.chip_preset_180).setOnClickListener(v -> {
             workingDays[0] = 180;
             etDays.setText("180");
@@ -224,11 +262,12 @@ public class AutoDeleteDialogHelper {
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.save, (d, which) -> {
                     int days = parseDays(etDays.getText());
-                    PreferenceUtil.setAutoDeleteDays(context, days);
-                    if (onSaved != null) {
-                        onSaved.run();
-                    }
+                    if (callback != null) callback.onSelected(days);
                 }));
+    }
+
+    public interface CustomDaysCallback {
+        void onSelected(int days);
     }
 
     private static int parseDays(CharSequence text) {
@@ -240,66 +279,97 @@ public class AutoDeleteDialogHelper {
         }
     }
 
-    private static void updateToggleAllState(AutoDeleteAppAdapter adapter, TextView title, TextView desc, MaterialSwitch switchView) {
-        int visibleCount = adapter.getVisibleCount();
-        int selectedVisibleCount = adapter.getSelectedVisibleCount();
+    public static void executeAutoDelete(Context context, AppDatabase db) {
+        long now = System.currentTimeMillis();
+        int globalDays = PreferenceUtil.getGlobalAutoDeleteDays(context);
+        Map<String, Integer> appRules = PreferenceUtil.getAppAutoDeleteRules(context);
 
-        switchView.setOnCheckedChangeListener(null);
-        switchView.setChecked(visibleCount > 0 && selectedVisibleCount == visibleCount);
+        // 1. Process specific per-app overrides
+        List<String> customizedPackages = new ArrayList<>(appRules.keySet());
+        for (Map.Entry<String, Integer> entry : appRules.entrySet()) {
+            String pkg = entry.getKey();
+            int days = entry.getValue();
+            if (days > 0) {
+                long cutoff = now - (days * 24L * 60L * 60L * 1000L);
+                List<String> imagePaths = db.notificationDao().getOldImagePathsForPackage(cutoff, pkg);
+                if (imagePaths != null) {
+                    for (String p : imagePaths) deleteFile(p);
+                }
+                db.notificationDao().deleteOlderThanForPackage(cutoff, pkg);
+            }
+            // If days == -1 (Never), no deletion is performed for this package!
+        }
 
-        Context context = title.getContext();
-        String category = adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_SYSTEM
-                ? context.getString(R.string.category_system_apps)
-                : adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_ALL
-                ? context.getString(R.string.category_apps)
-                : context.getString(R.string.category_user_apps);
+        // 2. Process global default for all non-customized apps
+        if (globalDays > 0) {
+            long globalCutoff = now - (globalDays * 24L * 60L * 60L * 1000L);
+            if (!customizedPackages.isEmpty()) {
+                List<String> imagePaths = db.notificationDao().getOldImagePathsExcludingPackages(globalCutoff, customizedPackages);
+                if (imagePaths != null) {
+                    for (String p : imagePaths) deleteFile(p);
+                }
+                db.notificationDao().deleteOlderThanExcludingPackages(globalCutoff, customizedPackages);
+            } else {
+                List<String> imagePaths = db.notificationDao().getOldImagePaths(globalCutoff);
+                if (imagePaths != null) {
+                    for (String p : imagePaths) deleteFile(p);
+                }
+                db.notificationDao().deleteOlderThan(globalCutoff);
+            }
+        }
 
-        title.setText(context.getString(R.string.auto_delete_all_category, category));
-        desc.setText(context.getString(R.string.auto_delete_enabled_count, selectedVisibleCount, visibleCount));
+        PreferenceUtil.setLastAutoDeleteTime(context, now);
     }
 
-    static class AutoDeleteAppAdapter extends RecyclerView.Adapter<AutoDeleteAppAdapter.ViewHolder> {
+    private static void deleteFile(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            String[] paths = imagePath.split("\\|");
+            for (String p : paths) {
+                if (p != null && !p.trim().isEmpty()) {
+                    File file = new File(p.trim());
+                    if (file.exists()) file.delete();
+                }
+            }
+        }
+    }
+
+    public interface GlobalDaysProvider {
+        int getGlobalDays();
+    }
+
+    static class UnifiedAutoDeleteAdapter extends RecyclerView.Adapter<UnifiedAutoDeleteAdapter.ViewHolder> {
 
         public static final int MODE_USER = 0;
-        public static final int MODE_SYSTEM = 1;
-        public static final int MODE_ALL = 2;
-
-        public interface OnSelectionListener {
-            void onSelectionChanged();
-        }
+        public static final int MODE_CUSTOMIZED = 1;
+        public static final int MODE_SYSTEM = 2;
+        public static final int MODE_ALL = 3;
 
         private final Context context;
         private final PackageManager pm;
         private final List<AppItem> userApps;
         private final List<AppItem> systemApps;
-        private final Set<String> selectedPackages;
+        private final Map<String, Integer> appRules;
+        private final GlobalDaysProvider globalDaysProvider;
         private final List<AppItem> displayList = new ArrayList<>();
         private final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
         private int filterMode = MODE_USER;
         private String searchQuery = "";
-        private OnSelectionListener selectionListener;
 
-        AutoDeleteAppAdapter(Context context, List<AppItem> userApps, List<AppItem> systemApps, Set<String> selectedPackages) {
+        UnifiedAutoDeleteAdapter(Context context, List<AppItem> userApps, List<AppItem> systemApps,
+                                 Map<String, Integer> appRules, GlobalDaysProvider globalDaysProvider) {
             this.context = context;
             this.pm = context.getPackageManager();
             this.userApps = userApps;
             this.systemApps = systemApps;
-            this.selectedPackages = selectedPackages;
+            this.appRules = appRules;
+            this.globalDaysProvider = globalDaysProvider;
             refreshDisplayList();
-        }
-
-        void setOnSelectionListener(OnSelectionListener listener) {
-            this.selectionListener = listener;
         }
 
         void setFilterMode(int mode) {
             this.filterMode = mode;
             refreshDisplayList();
             notifyDataSetChanged();
-        }
-
-        int getFilterMode() {
-            return filterMode;
         }
 
         void setSearchQuery(String query) {
@@ -313,6 +383,13 @@ public class AutoDeleteDialogHelper {
             List<AppItem> source = new ArrayList<>();
             if (filterMode == MODE_USER) {
                 source.addAll(userApps);
+            } else if (filterMode == MODE_CUSTOMIZED) {
+                for (AppItem item : userApps) {
+                    if (appRules.containsKey(item.packageName)) source.add(item);
+                }
+                for (AppItem item : systemApps) {
+                    if (appRules.containsKey(item.packageName)) source.add(item);
+                }
             } else if (filterMode == MODE_SYSTEM) {
                 source.addAll(systemApps);
             } else {
@@ -331,38 +408,10 @@ public class AutoDeleteDialogHelper {
             }
         }
 
-        void toggleAllVisible(boolean enable) {
-            for (AppItem item : displayList) {
-                if (enable) {
-                    selectedPackages.add(item.packageName);
-                } else {
-                    selectedPackages.remove(item.packageName);
-                }
-            }
-            notifyDataSetChanged();
-            if (selectionListener != null) {
-                selectionListener.onSelectionChanged();
-            }
-        }
-
-        int getVisibleCount() {
-            return displayList.size();
-        }
-
-        int getSelectedVisibleCount() {
-            int count = 0;
-            for (AppItem item : displayList) {
-                if (selectedPackages.contains(item.packageName)) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_auto_delete_app, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_unified_auto_delete_app, parent, false);
             return new ViewHolder(view);
         }
 
@@ -372,33 +421,25 @@ public class AutoDeleteDialogHelper {
             holder.tvAppName.setText(item.appName);
             holder.tvPackageName.setText(item.packageName + (item.isSystem ? " • System" : ""));
 
-            boolean isChecked = selectedPackages.contains(item.packageName);
-            holder.switchAutoDelete.setOnCheckedChangeListener(null);
-            holder.switchAutoDelete.setChecked(isChecked);
+            Integer rule = appRules.get(item.packageName);
+            int globalDays = globalDaysProvider.getGlobalDays();
+            String globalLabel = globalDays == 0 ? "Never" : globalDays + "d";
 
-            holder.itemView.setOnClickListener(v -> {
-                boolean next = !holder.switchAutoDelete.isChecked();
-                holder.switchAutoDelete.setChecked(next);
-                if (next) {
-                    selectedPackages.add(item.packageName);
-                } else {
-                    selectedPackages.remove(item.packageName);
-                }
-                if (selectionListener != null) {
-                    selectionListener.onSelectionChanged();
-                }
-            });
+            if (rule == null) {
+                holder.chipRule.setText("Global (" + globalLabel + ")");
+                holder.chipRule.setChipIconResource(R.drawable.ic_clock);
+                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+            } else if (rule == -1) {
+                holder.chipRule.setText("Never Delete");
+                holder.chipRule.setChipIconResource(R.drawable.ic_lock);
+                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+            } else {
+                holder.chipRule.setText(rule == 1 ? "After 1 day" : "After " + rule + " days");
+                holder.chipRule.setChipIconResource(R.drawable.ic_delete_sweep);
+                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+            }
 
-            holder.switchAutoDelete.setOnCheckedChangeListener((btn, checked) -> {
-                if (checked) {
-                    selectedPackages.add(item.packageName);
-                } else {
-                    selectedPackages.remove(item.packageName);
-                }
-                if (selectionListener != null) {
-                    selectionListener.onSelectionChanged();
-                }
-            });
+            holder.itemView.setOnClickListener(v -> showRuleSelectorDialog(item));
 
             Drawable cachedIcon = iconCache.get(item.packageName);
             if (cachedIcon != null) {
@@ -419,6 +460,87 @@ public class AutoDeleteDialogHelper {
             }
         }
 
+        private void showRuleSelectorDialog(AppItem item) {
+            int globalDays = globalDaysProvider.getGlobalDays();
+            String globalLabel = globalDays == 0 ? "Never" : globalDays + " days";
+
+            String[] options = new String[]{
+                    "Use Global Default (" + globalLabel + ")",
+                    "After 1 day (e.g. OTP / Banking)",
+                    "After 2 days",
+                    "After 3 days",
+                    "After 7 days",
+                    "After 14 days",
+                    "After 30 days",
+                    "Never Auto-Delete (Keep forever)",
+                    "Custom days..."
+            };
+
+            Integer currentRule = appRules.get(item.packageName);
+            int selectedIdx = 0;
+            if (currentRule == null) selectedIdx = 0;
+            else if (currentRule == 1) selectedIdx = 1;
+            else if (currentRule == 2) selectedIdx = 2;
+            else if (currentRule == 3) selectedIdx = 3;
+            else if (currentRule == 7) selectedIdx = 4;
+            else if (currentRule == 14) selectedIdx = 5;
+            else if (currentRule == 30) selectedIdx = 6;
+            else if (currentRule == -1) selectedIdx = 7;
+            else selectedIdx = 8;
+
+            com.zygisk_enc.notivault.BaseActivity.showDialog(context, new MaterialAlertDialogBuilder(context)
+                    .setTitle(item.appName)
+                    .setSingleChoiceItems(options, selectedIdx, (dialog, which) -> {
+                        dialog.dismiss();
+                        switch (which) {
+                            case 0:
+                                appRules.remove(item.packageName);
+                                notifyDataSetChanged();
+                                break;
+                            case 1:
+                                appRules.put(item.packageName, 1);
+                                notifyDataSetChanged();
+                                break;
+                            case 2:
+                                appRules.put(item.packageName, 2);
+                                notifyDataSetChanged();
+                                break;
+                            case 3:
+                                appRules.put(item.packageName, 3);
+                                notifyDataSetChanged();
+                                break;
+                            case 4:
+                                appRules.put(item.packageName, 7);
+                                notifyDataSetChanged();
+                                break;
+                            case 5:
+                                appRules.put(item.packageName, 14);
+                                notifyDataSetChanged();
+                                break;
+                            case 6:
+                                appRules.put(item.packageName, 30);
+                                notifyDataSetChanged();
+                                break;
+                            case 7:
+                                appRules.put(item.packageName, -1);
+                                notifyDataSetChanged();
+                                break;
+                            case 8:
+                                int currentCustom = (currentRule != null && currentRule > 0) ? currentRule : 7;
+                                showCustomDaysDialog(context, currentCustom, days -> {
+                                    if (days <= 0) {
+                                        appRules.put(item.packageName, -1);
+                                    } else {
+                                        appRules.put(item.packageName, days);
+                                    }
+                                    notifyDataSetChanged();
+                                });
+                                break;
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null));
+        }
+
         @Override
         public int getItemCount() {
             return displayList.size();
@@ -428,14 +550,14 @@ public class AutoDeleteDialogHelper {
             final ImageView ivAppIcon;
             final TextView tvAppName;
             final TextView tvPackageName;
-            final MaterialSwitch switchAutoDelete;
+            final Chip chipRule;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
                 tvAppName = itemView.findViewById(R.id.tv_app_name);
                 tvPackageName = itemView.findViewById(R.id.tv_package_name);
-                switchAutoDelete = itemView.findViewById(R.id.switch_auto_delete);
+                chipRule = itemView.findViewById(R.id.chip_app_rule);
             }
         }
     }

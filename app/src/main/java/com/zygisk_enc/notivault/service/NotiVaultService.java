@@ -355,29 +355,7 @@ public class NotiVaultService extends NotificationListenerService {
             long lastDelete = PreferenceUtil.getLastAutoDeleteTime(this);
             long now = System.currentTimeMillis();
             if (now - lastDelete >= 24 * 60 * 60 * 1000L) {
-                int days = PreferenceUtil.getAutoDeleteDays(this);
-                if (days > 0) {
-                    long cutoff = now - (days * 24L * 60L * 60L * 1000L);
-                    String mode = PreferenceUtil.getAutoDeleteMode(this);
-                    if ("per_app".equals(mode)) {
-                        java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(this);
-                        if (pkgs != null && !pkgs.isEmpty()) {
-                            java.util.List<String> pkgList = new java.util.ArrayList<>(pkgs);
-                            java.util.List<String> imagePaths = db.notificationDao().getOldImagePathsForPackages(cutoff, pkgList);
-                            if (imagePaths != null) {
-                                for (String p : imagePaths) deleteEncryptedFile(p);
-                            }
-                            db.notificationDao().deleteOlderThanForPackages(cutoff, pkgList);
-                        }
-                    } else {
-                        java.util.List<String> imagePaths = db.notificationDao().getOldImagePaths(cutoff);
-                        if (imagePaths != null) {
-                            for (String p : imagePaths) deleteEncryptedFile(p);
-                        }
-                        db.notificationDao().deleteOlderThan(cutoff);
-                    }
-                }
-                PreferenceUtil.setLastAutoDeleteTime(this, now);
+                com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.executeAutoDelete(this, db);
             }
 
             com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(NotiVaultService.this);

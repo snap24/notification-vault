@@ -139,6 +139,11 @@
     <string name="pref_about_summary">Version 2.0.1 · Open Source · No ads · No tracking</string>
 
     <!-- Auto-Delete Dialogs -->
+    <string name="dialog_unified_auto_delete_title">Auto-Delete Rules</string>
+    <string name="global_auto_delete_section">Default Retention Period</string>
+    <string name="global_auto_delete_section_desc">Applied to all apps unless a custom override is set below</string>
+    <string name="per_app_auto_delete_section">Custom App Overrides</string>
+    <string name="per_app_auto_delete_section_desc">Set specific retention rules for individual applications</string>
     <string name="dialog_per_app_auto_delete_title">Per-App Auto Delete</string>
     <string name="dialog_custom_days_title">Custom Auto Delete</string>
     <string name="dialog_custom_days_desc">Set the number of days to keep notifications before automatic cleanup.</string>
@@ -146,6 +151,11 @@
     <string name="never">Never</string>
     <string name="after_1_day">After 1 day</string>
     <string name="after_x_days">After %d days</string>
+    <string name="rule_use_global">Use Global Default (%s)</string>
+    <string name="rule_never_auto_delete">Never delete (Keep forever)</string>
+    <string name="filter_customized">Customized</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d custom rules</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
 
     <!-- App Rules & Management -->
     <string name="app_rules">App Rules</string>

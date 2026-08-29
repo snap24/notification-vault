@@ -92,28 +92,10 @@
 
     <PreferenceCategory app:title="@string/pref_category_storage">
 
-        <ListPreference
-            app:key="auto_delete_days"
+        <Preference
+            app:key="auto_delete_history"
             app:title="@string/pref_auto_delete_title"
             app:summary="@string/pref_auto_delete_summary"
-            app:entries="@array/auto_delete_entries"
-            app:entryValues="@array/auto_delete_values"
-            app:defaultValue="0"
-            app:iconSpaceReserved="false" />
-
-        <ListPreference
-            app:key="auto_delete_mode"
-            app:title="@string/pref_auto_delete_mode_title"
-            app:summary="@string/pref_auto_delete_mode_summary"
-            app:entries="@array/auto_delete_mode_entries"
-            app:entryValues="@array/auto_delete_mode_values"
-            app:defaultValue="all"
-            app:iconSpaceReserved="false" />
-
-        <Preference
-            app:key="manage_per_app_auto_delete"
-            app:title="@string/pref_manage_per_app_auto_delete_title"
-            app:summary="@string/pref_manage_per_app_auto_delete_summary"
             app:iconSpaceReserved="false" />
 
         <Preference
