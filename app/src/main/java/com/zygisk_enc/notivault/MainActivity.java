@@ -64,9 +64,7 @@ public class MainActivity extends BaseActivity {
                     com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
                             new androidx.lifecycle.ViewModelProvider(this)
                             .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
-                    vm.setFilterPackage(null);
-                    vm.setFilterFavorites(false);
-                    vm.setDateFilter(null, null);
+                    vm.resetAllFilters();
                     vm.requestScrollToTop();
                 }
                 return NavigationUI.onNavDestinationSelected(item, navController);
@@ -77,9 +75,7 @@ public class MainActivity extends BaseActivity {
                     com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
                             new androidx.lifecycle.ViewModelProvider(this)
                             .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
-                    vm.setFilterPackage(null);
-                    vm.setFilterFavorites(false);
-                    vm.setDateFilter(null, null);
+                    vm.resetAllFilters();
                     vm.requestScrollToTop();
                 }
             });

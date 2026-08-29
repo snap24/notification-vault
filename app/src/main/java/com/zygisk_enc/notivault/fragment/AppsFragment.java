@@ -41,10 +41,6 @@ public class AppsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setEnterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setExitTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReenterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReturnTransition(new com.google.android.material.transition.MaterialFadeThrough());
     }
 
     @Nullable
@@ -62,6 +58,8 @@ public class AppsFragment extends Fragment {
 
         adapter = new AppFilterAdapter();
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setItemViewCacheSize(25);
         binding.recyclerView.setAdapter(adapter);
 
         // System back navigation callback when selection mode is active

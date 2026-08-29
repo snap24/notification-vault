@@ -49,18 +49,20 @@ public class NotificationViewModel extends AndroidViewModel {
         return loadProgress;
     }
 
+    private boolean isBatchingUpdates = false;
+
     public NotificationViewModel(Application application) {
         super(application);
         repository = new NotificationRepository(application);
         appSummaries = repository.getAppSummaries();
         unreadCount = repository.getUnreadCount();
 
-        notifications.addSource(searchQuery, query -> { resetLimit(); updateSource(); });
-        notifications.addSource(filterPackage, pkg -> { resetLimit(); updateSource(); });
-        notifications.addSource(filterFavorites, favs -> { resetLimit(); updateSource(); });
-        notifications.addSource(filterDateStart, date -> { resetLimit(); updateSource(); });
-        notifications.addSource(filterDateEnd, date -> { resetLimit(); updateSource(); });
-        notifications.addSource(filterLimit, limit -> updateSource());
+        notifications.addSource(searchQuery, query -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterPackage, pkg -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterFavorites, favs -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterDateStart, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterDateEnd, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterLimit, limit -> { if (!isBatchingUpdates) { updateSource(); } });
     }
 
     private void resetLimit() {
@@ -312,6 +314,36 @@ public class NotificationViewModel extends AndroidViewModel {
             return;
         }
         filterPackage.setValue(packageName);
+    }
+
+    public void resetAllFilters() {
+        boolean changed = false;
+        isBatchingUpdates = true;
+        try {
+            if (searchQuery.getValue() != null && !searchQuery.getValue().isEmpty()) {
+                searchQuery.setValue(null);
+                changed = true;
+            }
+            if (filterPackage.getValue() != null && !filterPackage.getValue().isEmpty()) {
+                filterPackage.setValue(null);
+                changed = true;
+            }
+            if (filterFavorites.getValue() != null && filterFavorites.getValue()) {
+                filterFavorites.setValue(false);
+                changed = true;
+            }
+            if (filterDateStart.getValue() != null || filterDateEnd.getValue() != null) {
+                filterDateStart.setValue(null);
+                filterDateEnd.setValue(null);
+                changed = true;
+            }
+        } finally {
+            isBatchingUpdates = false;
+        }
+        if (changed) {
+            resetLimit();
+            updateSource();
+        }
     }
 
     public LiveData<Boolean> getScrollToTopEvent() {

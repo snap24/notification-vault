@@ -62,10 +62,6 @@ public class StatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setEnterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setExitTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReenterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReturnTransition(new com.google.android.material.transition.MaterialFadeThrough());
     }
 
     @Nullable
@@ -75,6 +71,8 @@ public class StatsFragment extends Fragment {
         binding = FragmentStatsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
+    private long lastAnalyticsLoadTimestamp = 0L;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -90,7 +88,9 @@ public class StatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadAnalytics();
+        if (System.currentTimeMillis() - lastAnalyticsLoadTimestamp > 3000L) {
+            loadAnalytics();
+        }
     }
 
     private static final String PREF_STATS_PERIOD = "stats_selected_period";
@@ -199,6 +199,7 @@ public class StatsFragment extends Fragment {
     private void loadAnalytics() {
         Context context = getContext();
         if (context == null) return;
+        lastAnalyticsLoadTimestamp = System.currentTimeMillis();
 
         AppExecutor.execute(() -> {
             long now = System.currentTimeMillis();
@@ -439,8 +440,8 @@ public class StatsFragment extends Fragment {
     }
 
     private void renderTopApps(List<AppSummary> apps, int totalCount) {
-        binding.layoutTopAppsContainer.removeAllViews();
         if (apps == null || apps.isEmpty()) {
+            binding.layoutTopAppsContainer.removeAllViews();
             binding.tvNoAppsStats.setVisibility(View.VISIBLE);
             binding.btnToggleMoreApps.setVisibility(View.GONE);
             return;
@@ -459,10 +460,18 @@ public class StatsFragment extends Fragment {
         int maxAppCount = apps.get(0).count;
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         PackageManager pm = requireContext().getPackageManager();
+        int existingChildCount = binding.layoutTopAppsContainer.getChildCount();
 
         for (int i = 0; i < displayLimit; i++) {
             AppSummary app = apps.get(i);
-            View row = inflater.inflate(R.layout.item_app_stat_row, binding.layoutTopAppsContainer, false);
+            View row;
+            if (i < existingChildCount) {
+                row = binding.layoutTopAppsContainer.getChildAt(i);
+                row.setVisibility(View.VISIBLE);
+            } else {
+                row = inflater.inflate(R.layout.item_app_stat_row, binding.layoutTopAppsContainer, false);
+                binding.layoutTopAppsContainer.addView(row);
+            }
 
             TextView tvRank = row.findViewById(R.id.tv_app_rank);
             ImageView ivIcon = row.findViewById(R.id.iv_app_icon);
@@ -489,18 +498,27 @@ public class StatsFragment extends Fragment {
                 ivIcon.setImageDrawable(cached);
             } else {
                 ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+                final String targetPkg = app.packageName;
+                ivIcon.setTag(targetPkg);
                 AppExecutor.execute(() -> {
                     try {
-                        Drawable icon = pm.getApplicationIcon(app.packageName);
-                        iconCache.put(app.packageName, icon);
+                        Drawable icon = pm.getApplicationIcon(targetPkg);
+                        iconCache.put(targetPkg, icon);
                         if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> ivIcon.setImageDrawable(icon));
+                            getActivity().runOnUiThread(() -> {
+                                if (targetPkg.equals(ivIcon.getTag())) {
+                                    ivIcon.setImageDrawable(icon);
+                                }
+                            });
                         }
                     } catch (Exception ignored) {}
                 });
             }
+        }
 
-            binding.layoutTopAppsContainer.addView(row);
+        // Hide any surplus views already in the container
+        for (int i = displayLimit; i < binding.layoutTopAppsContainer.getChildCount(); i++) {
+            binding.layoutTopAppsContainer.getChildAt(i).setVisibility(View.GONE);
         }
     }
 

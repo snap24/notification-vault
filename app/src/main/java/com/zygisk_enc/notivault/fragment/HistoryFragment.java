@@ -92,10 +92,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setEnterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setExitTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReenterTransition(new com.google.android.material.transition.MaterialFadeThrough());
-        setReturnTransition(new com.google.android.material.transition.MaterialFadeThrough());
     }
 
     @Nullable
@@ -182,9 +178,7 @@ public class HistoryFragment extends Fragment {
     private void setupSwipeToRefresh() {
         binding.swipeRefresh.setOnRefreshListener(() -> {
             // Reset filters to show all notifications on refresh
-            viewModel.setFilterPackage(null);
-            viewModel.setFilterFavorites(false);
-            viewModel.setDateFilter(null, null);
+            viewModel.resetAllFilters();
             closeSearchBox();
             binding.recyclerView.scrollToPosition(0);
 
@@ -197,6 +191,8 @@ public class HistoryFragment extends Fragment {
         adapter = new NotificationAdapter();
         adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setItemViewCacheSize(25);
         binding.recyclerView.setAdapter(adapter);
 
         // Disable change animations to prevent item update animations from shifting scroll position
