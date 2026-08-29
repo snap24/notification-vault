@@ -82,36 +82,13 @@ public class NotiVaultService extends NotificationListenerService {
 
         long messageTime = sbn.getPostTime();
 
-        // Extract full messages array for messaging apps (Discord, Telegram, WhatsApp, Messenger, etc.)
+        // Extract latest message for messaging apps (Discord, Telegram, WhatsApp, Messenger, etc.)
         Parcelable[] messages = (Parcelable[]) extras.get("android.messages");
         if (messages != null && messages.length > 0) {
-            StringBuilder conversationBuilder = new StringBuilder();
-            for (Parcelable p : messages) {
-                if (p instanceof Bundle) {
-                    Bundle msgBundle = (Bundle) p;
-                    CharSequence sender = msgBundle.getCharSequence("sender");
-                    CharSequence msgText = msgBundle.getCharSequence("text");
-                    if (msgText == null || msgText.toString().trim().isEmpty()) {
-                        String mimeType = msgBundle.getString("type");
-                        if (mimeType != null && mimeType.startsWith("image/")) {
-                            msgText = "📷 Photo";
-                        }
-                    }
-                    if (msgText != null && !msgText.toString().trim().isEmpty()) {
-                        if (conversationBuilder.length() > 0) {
-                            conversationBuilder.append("\n");
-                        }
-                        if (sender != null && !sender.toString().trim().isEmpty()) {
-                            conversationBuilder.append(sender).append(": ");
-                        }
-                        conversationBuilder.append(msgText.toString().trim());
-                    }
-                }
-            }
-
             Parcelable lastMsgParcel = messages[messages.length - 1];
             if (lastMsgParcel instanceof Bundle) {
                 Bundle msgBundle = (Bundle) lastMsgParcel;
+                CharSequence sender = msgBundle.getCharSequence("sender");
                 CharSequence textVal = msgBundle.getCharSequence("text");
                 if (textVal == null || textVal.toString().trim().isEmpty()) {
                     String mimeType = msgBundle.getString("type");
@@ -121,8 +98,11 @@ public class NotiVaultService extends NotificationListenerService {
                 }
                 
                 if (textVal != null && !textVal.toString().trim().isEmpty()) {
-                    if (text.isEmpty()) {
-                        text = textVal.toString().trim();
+                    text = textVal.toString().trim();
+                    if (sender != null && !sender.toString().trim().isEmpty()) {
+                        bigText = sender.toString().trim() + ": " + text;
+                    } else {
+                        bigText = text;
                     }
                 }
 
@@ -131,30 +111,16 @@ public class NotiVaultService extends NotificationListenerService {
                     messageTime = msgTime;
                 }
             }
-
-            if (conversationBuilder.length() > 0) {
-                bigText = conversationBuilder.toString();
-            }
         }
 
         // Fallback to text lines (e.g. Gmail, group summaries, batched Discord/Facebook alerts)
         CharSequence[] lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES);
-        if (lines != null && lines.length > 0) {
-            StringBuilder linesBuilder = new StringBuilder();
-            for (CharSequence line : lines) {
-                if (line != null && !line.toString().trim().isEmpty()) {
-                    if (linesBuilder.length() > 0) {
-                        linesBuilder.append("\n");
-                    }
-                    linesBuilder.append(line.toString().trim());
-                }
-            }
-            if (linesBuilder.length() > 0) {
+        if (lines != null && lines.length > 0 && (messages == null || messages.length == 0)) {
+            CharSequence lastLine = lines[lines.length - 1];
+            if (lastLine != null && !lastLine.toString().trim().isEmpty()) {
+                text = lastLine.toString().trim();
                 if (bigText == null || bigText.isEmpty()) {
-                    bigText = linesBuilder.toString();
-                }
-                if (text.isEmpty()) {
-                    text = lines[lines.length - 1].toString().trim();
+                    bigText = text;
                 }
             }
         }
@@ -336,6 +302,10 @@ public class NotiVaultService extends NotificationListenerService {
 
                 // 2. TEXT DUPLICATE MERGING: Group consecutive identical text messages without timer limit
                 } else if (!isIncomingImage && !lastIsImage && !isMediaEvent && titleMatches && textMatches) {
+                    if (entity.timestamp == lastNotif.timestamp) {
+                        // Exact same notification event re-posted by OS -> ignore
+                        return;
+                    }
                     isDuplicate = true;
                     db.notificationDao().updateDuplicate(lastNotif.id, lastNotif.duplicateCount + 1, entity.timestamp);
                 }
