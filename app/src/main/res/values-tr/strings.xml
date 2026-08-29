@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Widget Filtresini Kilitle (Son Bildirimler Widget\'ı)</string>
     <string name="pref_widget_filter_auth_summary">Bildirimleri filtrelemek için zil simgesine dokunulduğunda biyometrik doğrulama iste</string>
+    <string name="sort_most_alerts">En Çok Bildirim</string>
+    <string name="sort_name_az">İsim (A–Z)</string>
+    <string name="sort_least_alerts">En Az Bildirim</string>
 </resources>

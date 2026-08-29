@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Блокировка фильтра виджета (Виджет недавних уведомлений)</string>
     <string name="pref_widget_filter_auth_summary">Требовать биометрическую аутентификацию при нажатии на значок колокольчика для фильтрации уведомлений</string>
+    <string name="sort_most_alerts">Больше всего</string>
+    <string name="sort_name_az">По имени (А–Я)</string>
+    <string name="sort_least_alerts">Меньше всего</string>
 </resources>

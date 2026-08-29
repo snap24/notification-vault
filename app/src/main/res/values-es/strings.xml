@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Bloquear filtro del widget (Widget de notificaciones recientes)</string>
     <string name="pref_widget_filter_auth_summary">Requerir autenticación biométrica al tocar el icono de campana para filtrar notificaciones</string>
+    <string name="sort_most_alerts">Más alertas</string>
+    <string name="sort_name_az">Nombre (A–Z)</string>
+    <string name="sort_least_alerts">Menos alertas</string>
 </resources>

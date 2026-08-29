@@ -158,6 +158,9 @@
     <string name="filter_customized">Customized</string>
     <string name="auto_delete_summary_format">%1$s • %2$d custom rules</string>
     <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="sort_most_alerts">Most Alerts</string>
+    <string name="sort_name_az">Name (A–Z)</string>
+    <string name="sort_least_alerts">Least Alerts</string>
 
     <!-- App Rules & Management -->
     <string name="app_rules">App Rules</string>

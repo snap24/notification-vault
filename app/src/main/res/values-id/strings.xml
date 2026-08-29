@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Kunci Filter Widget (Widget Notifikasi Terbaru)</string>
     <string name="pref_widget_filter_auth_summary">Wajibkan autentikasi biometrik saat mengetuk ikon lonceng untuk memfilter notifikasi</string>
+    <string name="sort_most_alerts">Paling Banyak</string>
+    <string name="sort_name_az">Nama (A–Z)</string>
+    <string name="sort_least_alerts">Paling Sedikit</string>
 </resources>

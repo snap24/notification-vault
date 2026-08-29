@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Zablokuj filtr widżetu (Widżet ostatnich powiadomień)</string>
     <string name="pref_widget_filter_auth_summary">Wymagaj uwierzytelnienia biometrycznego po dotknięciu ikony dzwonka w celu filtrowania powiadomień</string>
+    <string name="sort_most_alerts">Najwięcej powiadomień</string>
+    <string name="sort_name_az">Nazwa (A–Z)</string>
+    <string name="sort_least_alerts">Najmniej powiadomień</string>
 </resources>

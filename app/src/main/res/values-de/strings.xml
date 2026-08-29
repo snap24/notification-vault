@@ -327,4 +327,7 @@
     <string name="auto_delete_summary_simple">%1$s</string>
     <string name="pref_widget_filter_auth_title">Widget-Filter sperren (Widget für letzte Benachrichtigungen)</string>
     <string name="pref_widget_filter_auth_summary">Biometrische Authentifizierung beim Tippen auf das Glockensymbol zur Benachrichtigungsfilterung anfordern</string>
+    <string name="sort_most_alerts">Meiste Benachrichtigungen</string>
+    <string name="sort_name_az">Name (A–Z)</string>
+    <string name="sort_least_alerts">Wenigste Benachrichtigungen</string>
 </resources>

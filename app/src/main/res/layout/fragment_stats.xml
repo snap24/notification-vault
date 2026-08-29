@@ -381,7 +381,7 @@
                     <TextView
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="🌅 Morning"
+                        android:text="@string/stats_morning"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -415,7 +415,7 @@
                     <TextView
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="☀️ Afternoon"
+                        android:text="@string/stats_afternoon"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -449,7 +449,7 @@
                     <TextView
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="🌆 Evening"
+                        android:text="@string/stats_evening"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -482,7 +482,7 @@
                     <TextView
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="🌙 Night"
+                        android:text="@string/stats_night"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
