@@ -77,7 +77,9 @@ public class NotificationViewModel extends AndroidViewModel {
         final long runToken = ++currentRunToken;
         lastRawList = null;
 
-        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        String rawQuery = searchQuery.getValue();
+        boolean isSearching = rawQuery != null && !rawQuery.trim().isEmpty();
+        int limit = isSearching ? Integer.MAX_VALUE : (filterLimit.getValue() != null ? filterLimit.getValue() : 500);
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
 
@@ -138,8 +140,12 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     String query = searchQuery.getValue();
                     String lowerQuery = query != null ? query.toLowerCase().trim() : "";
+                    boolean searchingMode = !lowerQuery.isEmpty();
 
                     java.util.List<NotificationEntity> filtered = new java.util.ArrayList<>();
+                    long lastPostTime = System.currentTimeMillis();
+                    int lastPostedCount = 0;
+
                     boolean posted5 = false;
                     boolean posted10 = false;
                     boolean posted20 = false;
@@ -178,10 +184,8 @@ public class NotificationViewModel extends AndroidViewModel {
                             }
                         }
 
-
-
                         // 2. Filter by search query (case-insensitive on pre-decrypted fields)
-                        if (!lowerQuery.isEmpty()) {
+                        if (searchingMode) {
                             boolean appNameMatches = entity.appName != null && entity.appName.toLowerCase().contains(lowerQuery);
                             boolean titleMatches = entity.decryptedTitle != null && entity.decryptedTitle.toLowerCase().contains(lowerQuery);
                             boolean textMatches = entity.decryptedText != null && entity.decryptedText.toLowerCase().contains(lowerQuery);
@@ -194,9 +198,17 @@ public class NotificationViewModel extends AndroidViewModel {
 
                         filtered.add(entity);
 
-                        // Progressive rendering: post intermediate snapshots to UI only on initial load
-                        boolean isInitialLoad = (limit <= 500);
-                        if (isInitialLoad) {
+                        // Progressive rendering:
+                        // 1) For search: Post updates as soon as items match (first item immediately, then throttled every 80ms)
+                        // 2) For initial page load: Post at 5%, 10%, 20%, 30%
+                        if (searchingMode) {
+                            long currentTime = System.currentTimeMillis();
+                            if ((filtered.size() == 1 || (filtered.size() - lastPostedCount >= 20 && currentTime - lastPostTime >= 80)) && runToken == currentRunToken) {
+                                lastPostTime = currentTime;
+                                lastPostedCount = filtered.size();
+                                notifications.postValue(new java.util.ArrayList<>(filtered));
+                            }
+                        } else if (limit <= 500) {
                             if (progress >= 5 && !posted5) {
                                 posted5 = true;
                                 if (runToken == currentRunToken) {
