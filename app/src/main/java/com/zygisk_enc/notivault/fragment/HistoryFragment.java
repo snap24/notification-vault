@@ -171,6 +171,12 @@ public class HistoryFragment extends Fragment {
         });
     }
 
+    private final Runnable stopRefreshRunnable = () -> {
+        if (binding != null) {
+            binding.swipeRefresh.setRefreshing(false);
+        }
+    };
+
     private void setupSwipeToRefresh() {
         binding.swipeRefresh.setOnRefreshListener(() -> {
             // Reset filters to show all notifications on refresh
@@ -180,11 +186,8 @@ public class HistoryFragment extends Fragment {
             closeSearchBox();
             binding.recyclerView.scrollToPosition(0);
 
-            binding.swipeRefresh.postDelayed(() -> {
-                if (binding != null) {
-                    binding.swipeRefresh.setRefreshing(false);
-                }
-            }, 800);
+            binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
+            binding.swipeRefresh.postDelayed(stopRefreshRunnable, 600);
         });
     }
 
@@ -544,6 +547,10 @@ public class HistoryFragment extends Fragment {
 
     private void observeNotifications() {
         viewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            if (binding != null) {
+                binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
+                binding.swipeRefresh.setRefreshing(false);
+            }
             if (notifications == null || notifications.isEmpty()) {
                 showRecyclerView(false);
             } else {
@@ -1105,13 +1112,30 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (binding != null) {
+            binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
+            binding.swipeRefresh.setRefreshing(false);
+        }
         if (adapter != null && getContext() != null) {
             adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
         }
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if (binding != null) {
+            binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
+            binding.swipeRefresh.setRefreshing(false);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
+        if (binding != null) {
+            binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
+            binding.swipeRefresh.setRefreshing(false);
+        }
         super.onDestroyView();
         binding = null;
     }
