@@ -298,6 +298,29 @@ public class HistoryFragment extends Fragment {
                 }
             }
         });
+
+        binding.etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH ||
+                actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER && event.getAction() == android.view.KeyEvent.ACTION_DOWN)) {
+
+                if (searchDebounceRunnable != null) {
+                    searchDebounceHandler.removeCallbacks(searchDebounceRunnable);
+                }
+
+                String query = binding.etSearch.getText() != null ? binding.etSearch.getText().toString().trim() : "";
+                viewModel.setSearchQuery(query.isEmpty() ? null : query);
+
+                // Hide soft keyboard and clear focus
+                InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
+                }
+                binding.etSearch.clearFocus();
+                return true;
+            }
+            return false;
+        });
     }
 
     private void updateActiveFilters() {
