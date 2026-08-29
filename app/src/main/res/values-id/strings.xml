@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault Layanan Pendengar Notifikasi</string>
-    <string name="nav_history">Riwayat</string>
+    <string name="nav_history">Log</string>
     <string name="nav_apps">Aplikasi</string>
     <string name="nav_stats">Statistik</string>
     <string name="nav_settings">Pengaturan</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">Perekaman Cepat</string>
     <string name="widget_capture_desc">Sakelar sekali ketuk untuk menjeda atau melanjutkan perekaman brankas</string>
     <string name="widget_add_action">Tambah</string>
+
+    <string name="tap_to_edit_rule">Ketuk untuk mengedit</string>
+    <string name="filter_by_app">Filter berdasarkan aplikasi</string>
+    <string name="app_filter_cleared">Filter aplikasi dihapus</string>
+    <string name="app_filter_format">Aplikasi: %s</string>
+    <string name="app_and_date_filter_format">Aplikasi: %1$s  |  Tanggal: %2$s</string>
 </resources>

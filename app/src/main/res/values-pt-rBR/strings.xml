@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault Ouvinte de Notificações</string>
-    <string name="nav_history">Histórico</string>
+    <string name="nav_history">Registros</string>
     <string name="nav_apps">Aplicativos</string>
     <string name="nav_stats">Estatísticas</string>
     <string name="nav_settings">Configurações</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">Captura rápida</string>
     <string name="widget_capture_desc">Interruptor de um toque para pausar ou retomar a captura do cofre</string>
     <string name="widget_add_action">Adicionar</string>
+
+    <string name="tap_to_edit_rule">Toque para editar</string>
+    <string name="filter_by_app">Filtrar por aplicativo</string>
+    <string name="app_filter_cleared">Filtro de aplicativo limpo</string>
+    <string name="app_filter_format">App: %s</string>
+    <string name="app_and_date_filter_format">App: %1$s  |  Data: %2$s</string>
 </resources>

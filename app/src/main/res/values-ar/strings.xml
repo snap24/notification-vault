@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">خدمة الاستماع للإشعارات Notification Vault</string>
-    <string name="nav_history">السجل</string>
+    <string name="nav_history">السجلات</string>
     <string name="nav_apps">التطبيقات</string>
     <string name="nav_stats">الإحصائيات</string>
     <string name="nav_settings">الإعدادات</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">التقاط سريع</string>
     <string name="widget_capture_desc">مفتاح بلمسة واحدة لإيقاف أو استئناف التقاط الخزنة</string>
     <string name="widget_add_action">إضافة</string>
+
+    <string name="tap_to_edit_rule">اضغط للتعديل</string>
+    <string name="filter_by_app">تصفية حسب التطبيق</string>
+    <string name="app_filter_cleared">تمت إزالة تصفية التطبيقات</string>
+    <string name="app_filter_format">التطبيق: %s</string>
+    <string name="app_and_date_filter_format">التطبيق: %1$s  |  التاريخ: %2$s</string>
 </resources>

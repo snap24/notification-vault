@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault 알림 리스너 서비스</string>
-    <string name="nav_history">기록</string>
+    <string name="nav_history">로그</string>
     <string name="nav_apps">앱</string>
     <string name="nav_stats">통계</string>
     <string name="nav_settings">설정</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">빠른 캡처</string>
     <string name="widget_capture_desc">보관함 캡처를 일시 중지하거나 다시 시작하는 원탭 스위치</string>
     <string name="widget_add_action">추가</string>
+
+    <string name="tap_to_edit_rule">수정하려면 탭</string>
+    <string name="filter_by_app">앱별 필터링</string>
+    <string name="app_filter_cleared">앱 필터 초기화됨</string>
+    <string name="app_filter_format">앱: %s</string>
+    <string name="app_and_date_filter_format">앱: %1$s  |  날짜: %2$s</string>
 </resources>

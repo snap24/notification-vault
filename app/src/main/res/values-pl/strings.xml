@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault Nasłuchiwacz powiadomień</string>
-    <string name="nav_history">Historia</string>
+    <string name="nav_history">Dzienniki</string>
     <string name="nav_apps">Aplikacje</string>
     <string name="nav_stats">Statystyki</string>
     <string name="nav_settings">Ustawienia</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">Szybkie przechwytywanie</string>
     <string name="widget_capture_desc">Przełącznik jednym dotknięciem do wstrzymania lub wznowienia przechwytywania</string>
     <string name="widget_add_action">Dodaj</string>
+
+    <string name="tap_to_edit_rule">Dotknij, aby edytować</string>
+    <string name="filter_by_app">Filtruj według aplikacji</string>
+    <string name="app_filter_cleared">Filtr aplikacji wyczyszczony</string>
+    <string name="app_filter_format">Aplikacja: %s</string>
+    <string name="app_and_date_filter_format">Aplikacja: %1$s  |  Data: %2$s</string>
 </resources>

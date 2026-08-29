@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault Benachrichtigungs-Listener</string>
-    <string name="nav_history">Verlauf</string>
+    <string name="nav_history">Protokolle</string>
     <string name="nav_apps">Apps</string>
     <string name="nav_stats">Statistiken</string>
     <string name="nav_settings">Einstellungen</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">Schnellerfassung</string>
     <string name="widget_capture_desc">Ein-Tipp-Schalter zum Anhalten oder Fortsetzen der Erfassung</string>
     <string name="widget_add_action">Hinzufügen</string>
+
+    <string name="tap_to_edit_rule">Tippen zum Bearbeiten</string>
+    <string name="filter_by_app">Nach App filtern</string>
+    <string name="app_filter_cleared">App-Filter gelöscht</string>
+    <string name="app_filter_format">App: %s</string>
+    <string name="app_and_date_filter_format">App: %1$s  |  Datum: %2$s</string>
 </resources>

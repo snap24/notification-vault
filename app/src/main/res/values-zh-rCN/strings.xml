@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Notification Vault</string>
     <string name="service_label">Notification Vault 通知监听服务</string>
-    <string name="nav_history">历史记录</string>
+    <string name="nav_history">日志</string>
     <string name="nav_apps">应用</string>
     <string name="nav_stats">统计</string>
     <string name="nav_settings">设置</string>
@@ -349,4 +349,10 @@
     <string name="widget_capture_name">快速捕获</string>
     <string name="widget_capture_desc">一键暂停或恢复密码库捕获的开关</string>
     <string name="widget_add_action">添加</string>
+
+    <string name="tap_to_edit_rule">点击编辑</string>
+    <string name="filter_by_app">按应用筛选</string>
+    <string name="app_filter_cleared">已清除应用筛选</string>
+    <string name="app_filter_format">应用: %s</string>
+    <string name="app_and_date_filter_format">应用: %1$s  |  日期: %2$s</string>
 </resources>
