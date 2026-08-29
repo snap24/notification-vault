@@ -5,34 +5,53 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingVertical="8dp">
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="4dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Rank Badge -->
+    <TextView
+        android:id="@+id/tv_app_rank"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:text="#1"
+        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+        android:textColor="?attr/colorPrimary"
+        android:textStyle="bold"
+        android:background="@drawable/bg_widget_pill"
+        android:layout_marginEnd="10dp" />
 
     <!-- App Icon -->
     <ImageView
         android:id="@+id/iv_app_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:importantForAccessibility="no" />
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="12dp"
+        android:importantForAccessibility="no"
+        android:src="@android:drawable/sym_def_app_icon" />
 
-    <!-- Details -->
+    <!-- App Details & Progress Bar -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tv_app_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:text="App Name"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -41,19 +60,41 @@
                 android:id="@+id/tv_app_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:text="142"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginStart="8dp" />
 
         </LinearLayout>
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progress_percentage"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            app:trackCornerRadius="2dp"
-            app:trackThickness="4dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_percentage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="6dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="?attr/colorSurfaceContainerHigh" />
+
+            <TextView
+                android:id="@+id/tv_app_percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="38%"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

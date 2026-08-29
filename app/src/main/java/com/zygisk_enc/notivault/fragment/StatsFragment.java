@@ -1,6 +1,7 @@
 package com.zygisk_enc.notivault.fragment;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,20 +13,51 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.zygisk_enc.notivault.R;
+import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.AppSummary;
-import com.zygisk_enc.notivault.database.NotificationEntity;
 import com.zygisk_enc.notivault.databinding.FragmentStatsBinding;
-import com.zygisk_enc.notivault.viewmodel.NotificationViewModel;
+import com.zygisk_enc.notivault.util.AppExecutor;
+import com.zygisk_enc.notivault.view.AnalyticsDistributionChartView;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class StatsFragment extends Fragment {
 
+    private enum Period {
+        TODAY, YESTERDAY, DAYS_7, DAYS_30, ALL
+    }
+
     private FragmentStatsBinding binding;
-    private NotificationViewModel viewModel;
+    private Period currentPeriod = Period.TODAY;
+    private boolean isShowAllApps = false;
+    private final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
+    private AnalyticsData lastCalculatedData = null;
+
+    private static class AnalyticsData {
+        int totalCount;
+        int favoritesCount;
+        int toastsCount;
+        String velocityRate;
+        String peakHourString;
+        int morning;
+        int afternoon;
+        int evening;
+        int night;
+        List<AnalyticsDistributionChartView.BarItem> chartBars;
+        List<AppSummary> topApps;
+        String insight;
+        String chartSubtitle;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,138 +79,371 @@ public class StatsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
 
-        setupCountStats();
-        setupTopApps();
-        setupTimeDistribution();
+        setupPeriodChips();
+        setupChartInspector();
+        setupMoreAppsButton();
+
+        loadAnalytics();
     }
 
-    private Integer currentTodayCount = null;
-    private Integer currentTotalSinceYesterday = null;
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadAnalytics();
+    }
 
-    private void updateYesterdayCount() {
-        if (currentTodayCount != null && currentTotalSinceYesterday != null) {
-            int yesterday = Math.max(0, currentTotalSinceYesterday - currentTodayCount);
-            binding.tvCountYesterday.setText(String.valueOf(yesterday));
+    private void setupPeriodChips() {
+        binding.chipGroupPeriods.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            int checkedId = checkedIds.get(0);
+
+            if (checkedId == R.id.chip_period_today) {
+                currentPeriod = Period.TODAY;
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_today);
+            } else if (checkedId == R.id.chip_period_yesterday) {
+                currentPeriod = Period.YESTERDAY;
+                binding.tvHeroPeriodLabel.setText(R.string.stats_logged_yesterday);
+            } else if (checkedId == R.id.chip_period_7days) {
+                currentPeriod = Period.DAYS_7;
+                binding.tvHeroPeriodLabel.setText("Captured in Last 7 Days");
+            } else if (checkedId == R.id.chip_period_30days) {
+                currentPeriod = Period.DAYS_30;
+                binding.tvHeroPeriodLabel.setText("Captured in Last 30 Days");
+            } else if (checkedId == R.id.chip_period_all) {
+                currentPeriod = Period.ALL;
+                binding.tvHeroPeriodLabel.setText("All-Time Captured");
+            }
+
+            isShowAllApps = false;
+            loadAnalytics();
+        });
+    }
+
+    private void setupChartInspector() {
+        binding.chartDistribution.setOnBarSelectedListener((index, item) -> {
+            if (item != null && binding != null) {
+                binding.tvChartInspector.setText(item.label + " • " + item.count + " notifications");
+            }
+        });
+    }
+
+    private void setupMoreAppsButton() {
+        binding.btnToggleMoreApps.setOnClickListener(v -> {
+            isShowAllApps = !isShowAllApps;
+            binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All Apps");
+            if (lastCalculatedData != null) {
+                renderTopApps(lastCalculatedData.topApps, lastCalculatedData.totalCount);
+            }
+        });
+    }
+
+    private void loadAnalytics() {
+        Context context = getContext();
+        if (context == null) return;
+
+        AppExecutor.execute(() -> {
+            long now = System.currentTimeMillis();
+            long startTime;
+            long endTime = now;
+
+            Calendar cal = Calendar.getInstance();
+            switch (currentPeriod) {
+                case TODAY:
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    startTime = cal.getTimeInMillis();
+                    break;
+                case YESTERDAY:
+                    cal.add(Calendar.DAY_OF_YEAR, -1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    startTime = cal.getTimeInMillis();
+
+                    cal.set(Calendar.HOUR_OF_DAY, 23);
+                    cal.set(Calendar.MINUTE, 59);
+                    cal.set(Calendar.SECOND, 59);
+                    endTime = cal.getTimeInMillis();
+                    break;
+                case DAYS_7:
+                    cal.add(Calendar.DAY_OF_YEAR, -7);
+                    startTime = cal.getTimeInMillis();
+                    break;
+                case DAYS_30:
+                    cal.add(Calendar.DAY_OF_YEAR, -30);
+                    startTime = cal.getTimeInMillis();
+                    break;
+                case ALL:
+                default:
+                    startTime = 0L;
+                    break;
+            }
+
+            AppDatabase db = AppDatabase.getInstance(context);
+            int total = db.notificationDao().getCountBetweenSync(startTime, endTime);
+            int favorites = db.notificationDao().getFavoritesCountBetweenSync(startTime, endTime);
+            int toasts = db.toastDao().getToastCountBetweenSync(startTime, endTime);
+            List<AppSummary> topApps = db.notificationDao().getTopAppsBetweenSync(startTime, endTime, 100);
+            List<Long> timestamps = db.notificationDao().getTimestampsBetweenSync(startTime, endTime);
+
+            AnalyticsData data = computeAnalytics(context, currentPeriod, startTime, endTime, total, favorites, toasts, topApps, timestamps);
+
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    lastCalculatedData = data;
+                    renderUI(data);
+                });
+            }
+        });
+    }
+
+    private AnalyticsData computeAnalytics(Context context, Period period, long startTime, long endTime,
+                                           int total, int favorites, int toasts,
+                                           List<AppSummary> topApps, List<Long> timestamps) {
+        AnalyticsData data = new AnalyticsData();
+        data.totalCount = total;
+        data.favoritesCount = favorites;
+        data.toastsCount = toasts;
+        data.topApps = topApps != null ? topApps : new ArrayList<>();
+
+        // 1. Calculate Velocity Rate
+        long durationMs = Math.max(1000L, endTime - startTime);
+        float durationHours = durationMs / (1000f * 60f * 60f);
+        float durationDays = durationHours / 24f;
+
+        if (period == Period.TODAY || period == Period.YESTERDAY) {
+            float ratePerHour = durationHours > 0 ? (total / Math.max(1f, durationHours)) : 0f;
+            data.velocityRate = String.format(Locale.getDefault(), "%.1f / hr", ratePerHour);
+        } else {
+            float ratePerDay = durationDays > 0 ? (total / Math.max(1f, durationDays)) : 0f;
+            data.velocityRate = String.format(Locale.getDefault(), "%.1f / day", ratePerDay);
         }
-    }
 
-    private void setupCountStats() {
-        long todayStart = getStartOfDay(0);
-        long yesterdayStart = getStartOfDay(-1);
+        // 2. Daypart Breakdown & Hourly distribution
+        int[] hourBuckets = new int[24];
+        int morning = 0;
+        int afternoon = 0;
+        int evening = 0;
+        int night = 0;
 
-        // Today's notifications
-        viewModel.getCountSince(todayStart).observe(getViewLifecycleOwner(), countToday -> {
-            currentTodayCount = countToday != null ? countToday : 0;
-            binding.tvCountToday.setText(String.valueOf(currentTodayCount));
-            updateYesterdayCount();
-        });
-
-        // Yesterday's notifications (count since yesterday minus count since today)
-        viewModel.getCountSince(yesterdayStart).observe(getViewLifecycleOwner(), totalSinceYesterday -> {
-            currentTotalSinceYesterday = totalSinceYesterday != null ? totalSinceYesterday : 0;
-            updateYesterdayCount();
-        });
-    }
-
-    private void setupTopApps() {
-        viewModel.getTopAppsSince(0, 3).observe(getViewLifecycleOwner(), topApps -> {
-            binding.layoutTopAppsContainer.removeAllViews();
-            if (topApps == null || topApps.isEmpty()) {
-                binding.tvNoAppsStats.setVisibility(View.VISIBLE);
-                return;
-            }
-            binding.tvNoAppsStats.setVisibility(View.GONE);
-
-            // Compute total count of top 3 to base progress bar percentage
-            int maxCount = 0;
-            for (AppSummary app : topApps) {
-                if (app.count > maxCount) maxCount = app.count;
+        Calendar c = Calendar.getInstance();
+        for (Long ts : timestamps) {
+            if (ts == null) continue;
+            c.setTimeInMillis(ts);
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            if (hour >= 0 && hour < 24) {
+                hourBuckets[hour]++;
             }
 
-            LayoutInflater inflater = LayoutInflater.from(requireContext());
-            for (AppSummary app : topApps) {
-                View row = inflater.inflate(R.layout.item_app_stat_row, binding.layoutTopAppsContainer, false);
-                ImageView ivIcon = row.findViewById(R.id.iv_app_icon);
-                TextView tvName = row.findViewById(R.id.tv_app_name);
-                TextView tvCount = row.findViewById(R.id.tv_app_count);
-                LinearProgressIndicator progress = row.findViewById(R.id.progress_percentage);
+            if (hour >= 6 && hour < 12) morning++;
+            else if (hour >= 12 && hour < 18) afternoon++;
+            else if (hour >= 18 && hour < 24) evening++;
+            else night++;
+        }
 
-                // Icon
-                try {
-                    PackageManager pm = requireContext().getPackageManager();
-                    Drawable icon = pm.getApplicationIcon(app.packageName);
-                    ivIcon.setImageDrawable(icon);
-                } catch (PackageManager.NameNotFoundException e) {
-                    ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-                }
+        data.morning = morning;
+        data.afternoon = afternoon;
+        data.evening = evening;
+        data.night = night;
 
-                tvName.setText(app.appName != null ? app.appName : app.packageName);
-                tvCount.setText(String.valueOf(app.count));
-
-                // Progress percentage
-                int percent = maxCount > 0 ? (int) (((float) app.count / maxCount) * 100) : 0;
-                progress.setProgress(percent);
-
-                binding.layoutTopAppsContainer.addView(row);
+        // 3. Peak Hour calculation
+        int maxHourCount = 0;
+        int peakHour = -1;
+        for (int h = 0; h < 24; h++) {
+            if (hourBuckets[h] > maxHourCount) {
+                maxHourCount = hourBuckets[h];
+                peakHour = h;
             }
-        });
-    }
+        }
 
-    private void setupTimeDistribution() {
-        // Calculate daily hour stats from last 7 days for wellness analysis
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -7);
-        long sevenDaysAgo = cal.getTimeInMillis();
+        if (peakHour >= 0 && maxHourCount > 0) {
+            int displayHour = peakHour % 12 == 0 ? 12 : peakHour % 12;
+            String ampm = peakHour < 12 ? "AM" : "PM";
+            data.peakHourString = displayHour + ":00 " + ampm;
+        } else {
+            data.peakHourString = "None";
+        }
 
-        viewModel.getNotificationsSince(sevenDaysAgo).observe(getViewLifecycleOwner(), notifications -> {
-            int morning = 0;
-            int afternoon = 0;
-            int evening = 0;
-            int night = 0;
+        // 4. Chart Bar Items
+        List<AnalyticsDistributionChartView.BarItem> barItems = new ArrayList<>();
+        if (period == Period.TODAY || period == Period.YESTERDAY) {
+            data.chartSubtitle = "24-Hour Distribution (Tap bar to inspect)";
+            for (int h = 0; h < 24; h++) {
+                int displayH = h % 12 == 0 ? 12 : h % 12;
+                String ampm = h < 12 ? "a" : "p";
+                String label = displayH + ampm;
+                boolean isPeak = (h == peakHour) && (maxHourCount > 0);
+                barItems.add(new AnalyticsDistributionChartView.BarItem(label, hourBuckets[h], isPeak));
+            }
+        } else if (period == Period.DAYS_7) {
+            data.chartSubtitle = "Daily Volume (Last 7 Days)";
+            int[] dayCounts = new int[7];
+            String[] dayLabels = new String[7];
+            Calendar dayCal = Calendar.getInstance();
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
 
-            if (notifications != null) {
-                Calendar checkCal = Calendar.getInstance();
-                for (NotificationEntity notif : notifications) {
-                    checkCal.setTimeInMillis(notif.timestamp);
-                    int hour = checkCal.get(Calendar.HOUR_OF_DAY);
+            for (int d = 6; d >= 0; d--) {
+                Calendar check = Calendar.getInstance();
+                check.add(Calendar.DAY_OF_YEAR, -d);
+                dayLabels[6 - d] = dayFormat.format(check.getTime());
+            }
 
-                    if (hour >= 6 && hour < 12) {
-                        morning++;
-                    } else if (hour >= 12 && hour < 18) {
-                        afternoon++;
-                    } else if (hour >= 18 && hour < 24) {
-                        evening++;
-                    } else {
-                        night++;
-                    }
+            for (Long ts : timestamps) {
+                if (ts == null) continue;
+                long diffDays = (endTime - ts) / (24L * 60L * 60L * 1000L);
+                if (diffDays >= 0 && diffDays < 7) {
+                    dayCounts[6 - (int) diffDays]++;
                 }
             }
 
-            // Find maximum count to compute scale percentages
-            int maxVal = Math.max(morning, Math.max(afternoon, Math.max(evening, night)));
+            int peakDayIdx = -1;
+            int maxDayCount = 0;
+            for (int i = 0; i < 7; i++) {
+                if (dayCounts[i] > maxDayCount) {
+                    maxDayCount = dayCounts[i];
+                    peakDayIdx = i;
+                }
+            }
 
-            binding.tvCountMorning.setText(String.valueOf(morning));
-            binding.tvCountAfternoon.setText(String.valueOf(afternoon));
-            binding.tvCountEvening.setText(String.valueOf(evening));
-            binding.tvCountNight.setText(String.valueOf(night));
+            for (int i = 0; i < 7; i++) {
+                barItems.add(new AnalyticsDistributionChartView.BarItem(dayLabels[i], dayCounts[i], i == peakDayIdx));
+            }
+        } else {
+            data.chartSubtitle = "Hourly Aggregate Profile";
+            for (int h = 0; h < 24; h++) {
+                int displayH = h % 12 == 0 ? 12 : h % 12;
+                String ampm = h < 12 ? "a" : "p";
+                String label = displayH + ampm;
+                boolean isPeak = (h == peakHour) && (maxHourCount > 0);
+                barItems.add(new AnalyticsDistributionChartView.BarItem(label, hourBuckets[h], isPeak));
+            }
+        }
+        data.chartBars = barItems;
 
-            binding.progressMorning.setProgress(maxVal > 0 ? (int) (((float) morning / maxVal) * 100) : 0);
-            binding.progressAfternoon.setProgress(maxVal > 0 ? (int) (((float) afternoon / maxVal) * 100) : 0);
-            binding.progressEvening.setProgress(maxVal > 0 ? (int) (((float) evening / maxVal) * 100) : 0);
-            binding.progressNight.setProgress(maxVal > 0 ? (int) (((float) night / maxVal) * 100) : 0);
-        });
+        // 5. Smart Insight Generator
+        if (total == 0) {
+            data.insight = "No notifications captured during this time frame.";
+        } else if (!data.topApps.isEmpty() && data.topApps.get(0).count > (total * 0.40)) {
+            AppSummary loudest = data.topApps.get(0);
+            String name = loudest.appName != null ? loudest.appName : loudest.packageName;
+            int percent = (int) (((float) loudest.count / total) * 100);
+            data.insight = name + " is your loudest app, generating " + percent + "% of all distraction alerts.";
+        } else if (night > 0 && night > (total * 0.35)) {
+            data.insight = "High nighttime disturbance (" + night + " alerts during sleep hours). Consider Quiet Hours or Notification Rules.";
+        } else if (night == 0) {
+            data.insight = "Zero disturbance during sleep hours (00:00–06:00). Excellent digital hygiene!";
+        } else if (data.peakHourString != null && !data.peakHourString.equals("None")) {
+            data.insight = "Your peak notification spike happens around " + data.peakHourString + ".";
+        } else {
+            data.insight = "Balanced notification flow throughout your active day.";
+        }
+
+        return data;
     }
 
-    private long getStartOfDay(int offsetDays) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, offsetDays);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTimeInMillis();
+    private void renderUI(AnalyticsData data) {
+        if (data == null || binding == null) return;
+
+        // Hero Metric Card
+        binding.tvTotalCount.setText(String.valueOf(data.totalCount));
+        binding.tvMetricRate.setText(data.velocityRate);
+        binding.tvMetricPeak.setText(data.peakHourString);
+        binding.tvMetricToasts.setText(String.valueOf(data.toastsCount));
+        binding.tvMetricFavorites.setText(String.valueOf(data.favoritesCount));
+
+        // Chart
+        binding.tvChartSubtitle.setText(data.chartSubtitle);
+        binding.tvChartInspector.setText("Tap bar to inspect");
+        binding.chartDistribution.setData(data.chartBars);
+
+        // Time of Day Daypart Breakdown
+        int maxDaypart = Math.max(data.morning, Math.max(data.afternoon, Math.max(data.evening, data.night)));
+        binding.tvCountMorning.setText(String.valueOf(data.morning));
+        binding.tvCountAfternoon.setText(String.valueOf(data.afternoon));
+        binding.tvCountEvening.setText(String.valueOf(data.evening));
+        binding.tvCountNight.setText(String.valueOf(data.night));
+
+        binding.progressMorning.setProgress(maxDaypart > 0 ? (int) (((float) data.morning / maxDaypart) * 100) : 0);
+        binding.progressAfternoon.setProgress(maxDaypart > 0 ? (int) (((float) data.afternoon / maxDaypart) * 100) : 0);
+        binding.progressEvening.setProgress(maxDaypart > 0 ? (int) (((float) data.evening / maxDaypart) * 100) : 0);
+        binding.progressNight.setProgress(maxDaypart > 0 ? (int) (((float) data.night / maxDaypart) * 100) : 0);
+
+        // Top Loudest Apps Leaderboard
+        renderTopApps(data.topApps, data.totalCount);
+
+        // Smart Insights
+        binding.tvInsightText.setText(data.insight);
+    }
+
+    private void renderTopApps(List<AppSummary> apps, int totalCount) {
+        binding.layoutTopAppsContainer.removeAllViews();
+        if (apps == null || apps.isEmpty()) {
+            binding.tvNoAppsStats.setVisibility(View.VISIBLE);
+            binding.btnToggleMoreApps.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.tvNoAppsStats.setVisibility(View.GONE);
+
+        int displayLimit = isShowAllApps ? apps.size() : Math.min(5, apps.size());
+        if (apps.size() > 5) {
+            binding.btnToggleMoreApps.setVisibility(View.VISIBLE);
+            binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All (" + apps.size() + " Apps)");
+        } else {
+            binding.btnToggleMoreApps.setVisibility(View.GONE);
+        }
+
+        int maxAppCount = apps.get(0).count;
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        PackageManager pm = requireContext().getPackageManager();
+
+        for (int i = 0; i < displayLimit; i++) {
+            AppSummary app = apps.get(i);
+            View row = inflater.inflate(R.layout.item_app_stat_row, binding.layoutTopAppsContainer, false);
+
+            TextView tvRank = row.findViewById(R.id.tv_app_rank);
+            ImageView ivIcon = row.findViewById(R.id.iv_app_icon);
+            TextView tvName = row.findViewById(R.id.tv_app_name);
+            TextView tvCount = row.findViewById(R.id.tv_app_count);
+            TextView tvPercentage = row.findViewById(R.id.tv_app_percentage);
+            LinearProgressIndicator progress = row.findViewById(R.id.progress_percentage);
+
+            int rank = i + 1;
+            tvRank.setText("#" + rank);
+
+            tvName.setText(app.appName != null ? app.appName : app.packageName);
+            tvCount.setText(String.valueOf(app.count));
+
+            int percentOfTotal = totalCount > 0 ? (int) Math.round(((double) app.count / totalCount) * 100.0) : 0;
+            tvPercentage.setText(percentOfTotal + "% of total");
+
+            int progressPercent = maxAppCount > 0 ? (int) (((float) app.count / maxAppCount) * 100) : 0;
+            progress.setProgress(progressPercent);
+
+            // Icon loading with cache
+            Drawable cached = iconCache.get(app.packageName);
+            if (cached != null) {
+                ivIcon.setImageDrawable(cached);
+            } else {
+                ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+                AppExecutor.execute(() -> {
+                    try {
+                        Drawable icon = pm.getApplicationIcon(app.packageName);
+                        iconCache.put(app.packageName, icon);
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> ivIcon.setImageDrawable(icon));
+                        }
+                    } catch (Exception ignored) {}
+                });
+            }
+
+            binding.layoutTopAppsContainer.addView(row);
+        }
     }
 
     @Override

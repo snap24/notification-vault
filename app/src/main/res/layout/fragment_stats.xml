@@ -12,12 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="96dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="108dp">
 
-        <!-- Title / Header -->
+        <!-- Header Title & Subtitle -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,121 +24,78 @@
             android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginTop="4dp" />
 
-        <!-- Count Cards Row -->
-        <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stats_top_apps_desc"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- 1. Time Horizon Filter Chips -->
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            android:scrollbars="none">
 
-            <!-- Today Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_periods"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:singleLine="true">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_period_today"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="@string/today"
+                    android:checked="true"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/today"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_count_today"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textAppearance="@style/TextAppearance.Material3.DisplayMedium"
-                        android:textColor="?attr/colorPrimary"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stats_captured_today"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="4dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Yesterday Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_period_yesterday"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="@string/yesterday"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/yesterday"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textStyle="bold" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_period_7days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7 Days"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                    <TextView
-                        android:id="@+id/tv_count_yesterday"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textAppearance="@style/TextAppearance.Material3.DisplayMedium"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_period_30days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30 Days"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stats_logged_yesterday"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="4dp" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_period_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_all"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                </LinearLayout>
+            </com.google.android.material.chip.ChipGroup>
 
-            </com.google.android.material.card.MaterialCardView>
+        </HorizontalScrollView>
 
-        </LinearLayout>
-
-        <!-- Top Spamming Apps Card -->
+        <!-- 2. Hero Overview & Metrics Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
@@ -149,51 +105,185 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/stats_top_loudest_apps"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/stats_top_apps_desc"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="16dp" />
+                android:padding="18dp">
 
                 <LinearLayout
-                    android:id="@+id/layout_top_apps_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/tv_no_apps_stats"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_hero_period_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/stats_captured_today"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/tv_total_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textAppearance="@style/TextAppearance.Material3.DisplayMedium"
+                            android:textColor="?attr/colorPrimary"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_analytics"
+                        app:tint="?attr/colorPrimary"
+                        android:importantForAccessibility="no" />
+
+                </LinearLayout>
+
+                <!-- Divider -->
+                <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/stats_empty_top_apps"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:visibility="gone" />
+                    android:layout_marginVertical="14dp"
+                    app:dividerColor="?attr/colorOutlineVariant" />
+
+                <!-- 4 Quick Metric Badges Grid -->
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:rowCount="2">
+
+                    <!-- Metric 1: Velocity -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Velocity / Rate"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/tv_metric_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- / hr"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                    <!-- Metric 2: Peak Hour -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Peak Disturbance"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/tv_metric_peak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorTertiary"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                    <!-- Metric 3: Toast Logs -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toasts Logged"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/tv_metric_toasts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                    <!-- Metric 4: Starred / Favorite -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Starred / Kept"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/tv_metric_favorites"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                </GridLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Time Distribution Card -->
+        <!-- 3. Hourly / Daily Activity Distribution Chart Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
@@ -203,7 +293,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -214,12 +304,72 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_chart_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hourly distribution (Tap any bar for details)"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Interactive Inspector Text Bubble -->
+                <TextView
+                    android:id="@+id/tv_chart_inspector"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tap bar to inspect"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorPrimary"
+                    android:background="@drawable/bg_widget_pill"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Custom Bar Chart View -->
+                <com.zygisk_enc.notivault.view.AnalyticsDistributionChartView
+                    android:id="@+id/chart_distribution"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 4. Time of Day Wellness Breakdown Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daypart Wellness"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/stats_time_distribution_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="20dp" />
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Morning Row -->
                 <LinearLayout
@@ -227,11 +377,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="12dp">
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/stats_morning"
+                        android:text="🌅 Morning"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -241,12 +391,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="10dp"
-                        app:indicatorColor="#FFC107"
-                        app:trackColor="?attr/colorSurfaceVariant" />
+                        app:trackThickness="8dp"
+                        app:indicatorColor="#FFB300"
+                        app:trackColor="?attr/colorSurfaceContainerHigh" />
                     <TextView
                         android:id="@+id/tv_count_morning"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
@@ -261,11 +411,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="12dp">
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/stats_afternoon"
+                        android:text="☀️ Afternoon"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -275,12 +425,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="10dp"
-                        app:indicatorColor="#FF5722"
-                        app:trackColor="?attr/colorSurfaceVariant" />
+                        app:trackThickness="8dp"
+                        app:indicatorColor="#FB8C00"
+                        app:trackColor="?attr/colorSurfaceContainerHigh" />
                     <TextView
                         android:id="@+id/tv_count_afternoon"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
@@ -295,11 +445,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="12dp">
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/stats_evening"
+                        android:text="🌆 Evening"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -309,12 +459,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="10dp"
-                        app:indicatorColor="#9C27B0"
-                        app:trackColor="?attr/colorSurfaceVariant" />
+                        app:trackThickness="8dp"
+                        app:indicatorColor="#8E24AA"
+                        app:trackColor="?attr/colorSurfaceContainerHigh" />
                     <TextView
                         android:id="@+id/tv_count_evening"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
@@ -330,9 +480,9 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/stats_night"
+                        android:text="🌙 Night"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -342,18 +492,138 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:trackCornerRadius="4dp"
-                        app:trackThickness="10dp"
-                        app:indicatorColor="#3F51B5"
-                        app:trackColor="?attr/colorSurfaceVariant" />
+                        app:trackThickness="8dp"
+                        app:indicatorColor="#3949AB"
+                        app:trackColor="?attr/colorSurfaceContainerHigh" />
                     <TextView
                         android:id="@+id/tv_count_night"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:gravity="end"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 5. Top Loudest Apps Leaderboard Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stats_top_loudest_apps"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ranked by total notification volume in selected period"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="14dp" />
+
+                <LinearLayout
+                    android:id="@+id/layout_top_apps_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/tv_no_apps_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stats_empty_top_apps"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone" />
+
+                <!-- Show More / Less Toggle Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_toggle_more_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Show All Apps"
+                    android:visibility="gone"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 6. Smart Distraction Insights Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_smart_insights"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_star"
+                    app:tint="?attr/colorPrimary"
+                    android:importantForAccessibility="no" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Distraction Insight"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_insight_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Analyzing your notification pattern..."
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="2dp" />
+
                 </LinearLayout>
 
             </LinearLayout>

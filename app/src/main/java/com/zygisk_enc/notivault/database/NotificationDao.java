@@ -94,6 +94,12 @@ public interface NotificationDao {
     @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp")
     int getCountSinceSync(long startTimestamp);
 
+    @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    int getCountBetweenSync(long startTimestamp, long endTimestamp);
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE isFavorite = 1 AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    int getFavoritesCountBetweenSync(long startTimestamp, long endTimestamp);
+
     @Query("SELECT * FROM notifications ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsSync(int limit);
 
@@ -102,6 +108,12 @@ public interface NotificationDao {
 
     @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications GROUP BY packageName ORDER BY count DESC")
     List<AppSummary> getAppSummariesSync();
+
+    @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp GROUP BY packageName ORDER BY count DESC LIMIT :limit")
+    List<AppSummary> getTopAppsBetweenSync(long startTimestamp, long endTimestamp, int limit);
+
+    @Query("SELECT timestamp FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp ORDER BY timestamp ASC")
+    List<Long> getTimestampsBetweenSync(long startTimestamp, long endTimestamp);
 
     @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications WHERE timestamp >= :startTimestamp GROUP BY packageName ORDER BY count DESC LIMIT :limit")
     LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit);

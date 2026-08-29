@@ -26,6 +26,9 @@ public interface ToastDao {
     @Query("SELECT COUNT(*) FROM toasts WHERE timestamp >= :startTimestamp")
     int getCountSinceSync(long startTimestamp);
 
+    @Query("SELECT COUNT(*) FROM toasts WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    int getToastCountBetweenSync(long startTimestamp, long endTimestamp);
+
     @Query("SELECT MIN(timestamp) FROM toasts")
     androidx.lifecycle.LiveData<Long> getOldestTimestamp();
 }
