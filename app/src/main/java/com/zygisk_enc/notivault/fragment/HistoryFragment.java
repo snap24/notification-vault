@@ -603,11 +603,35 @@ public class HistoryFragment extends Fragment {
 
         viewModel.getLoadProgress().observe(getViewLifecycleOwner(), progress -> {
             if (progress == null || progress < 0 || progress >= 100) {
-                binding.cardDecryptionProgress.setVisibility(View.GONE);
+                if (binding.cardFloatingDecryption.getVisibility() == View.VISIBLE) {
+                    binding.cardFloatingDecryption.animate()
+                            .alpha(0f)
+                            .translationY(-20f)
+                            .setDuration(250)
+                            .withEndAction(() -> {
+                                if (binding != null) {
+                                    binding.cardFloatingDecryption.setVisibility(View.GONE);
+                                    binding.progressDecryptionHairline.setVisibility(View.GONE);
+                                }
+                            });
+                } else {
+                    binding.cardFloatingDecryption.setVisibility(View.GONE);
+                    binding.progressDecryptionHairline.setVisibility(View.GONE);
+                }
             } else {
-                binding.cardDecryptionProgress.setVisibility(View.VISIBLE);
-                binding.progressDecryptionBar.setProgress(progress);
-                binding.tvDecryptionPercent.setText(progress + "%");
+                if (binding.cardFloatingDecryption.getVisibility() != View.VISIBLE) {
+                    binding.cardFloatingDecryption.setVisibility(View.VISIBLE);
+                    binding.cardFloatingDecryption.setAlpha(0f);
+                    binding.cardFloatingDecryption.setTranslationY(-20f);
+                    binding.cardFloatingDecryption.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(250)
+                            .setListener(null);
+                }
+                binding.progressDecryptionHairline.setVisibility(View.VISIBLE);
+                binding.progressDecryptionHairline.setProgress(progress);
+                binding.tvFloatingDecryptionText.setText(getString(R.string.decrypting_progress, progress));
             }
         });
         
