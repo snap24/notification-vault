@@ -3,10 +3,14 @@ package com.zygisk_enc.notivault;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -32,6 +36,7 @@ import java.util.concurrent.Executor;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private View lockOverlayView;
+    private View privacyBlurOverlayView;
     private boolean isAuthenticating = false;
     private final Set<Dialog> activeDialogs = Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -75,36 +80,51 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        setupLockOverlay();
+        setupOverlays();
     }
 
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
-        setupLockOverlay();
+        setupOverlays();
     }
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
-        setupLockOverlay();
+        setupOverlays();
     }
 
-    private void setupLockOverlay() {
+    private void setupOverlays() {
         ViewGroup root = findViewById(android.R.id.content);
-        if (root != null && lockOverlayView == null) {
-            View existingOverlay = findViewById(R.id.layout_lock_overlay);
-            if (existingOverlay != null) {
-                lockOverlayView = existingOverlay;
-            } else {
-                lockOverlayView = LayoutInflater.from(this).inflate(R.layout.view_lock_overlay, root, false);
-                root.addView(lockOverlayView);
+        if (root != null) {
+            // 1. Setup Privacy Blur Overlay for Recent Apps
+            if (privacyBlurOverlayView == null) {
+                View existingPrivacyOverlay = findViewById(R.id.layout_privacy_blur_overlay);
+                if (existingPrivacyOverlay != null) {
+                    privacyBlurOverlayView = existingPrivacyOverlay;
+                } else {
+                    privacyBlurOverlayView = LayoutInflater.from(this).inflate(R.layout.view_privacy_blur_overlay, root, false);
+                    root.addView(privacyBlurOverlayView);
+                }
+                privacyBlurOverlayView.setVisibility(View.GONE);
             }
-            MaterialButton btnUnlock = lockOverlayView.findViewById(R.id.btn_unlock);
-            if (btnUnlock != null) {
-                btnUnlock.setOnClickListener(v -> showBiometricPrompt());
+
+            // 2. Setup Full-Screen Biometric Lock Overlay
+            if (lockOverlayView == null) {
+                View existingLockOverlay = findViewById(R.id.layout_lock_overlay);
+                if (existingLockOverlay != null) {
+                    lockOverlayView = existingLockOverlay;
+                } else {
+                    lockOverlayView = LayoutInflater.from(this).inflate(R.layout.view_lock_overlay, root, false);
+                    root.addView(lockOverlayView);
+                }
+                MaterialButton btnUnlock = lockOverlayView.findViewById(R.id.btn_unlock);
+                if (btnUnlock != null) {
+                    btnUnlock.setOnClickListener(v -> showBiometricPrompt());
+                }
+                lockOverlayView.setVisibility(View.GONE);
             }
-            lockOverlayView.setVisibility(View.GONE);
         }
     }
 
@@ -218,8 +238,72 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        boolean isFlagSecure = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("flag_secure", true);
+
+        if (isFlagSecure) {
+            // Apply GPU Gaussian blur on Android 12+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                View contentRoot = findViewById(android.R.id.content);
+                if (contentRoot != null) {
+                    try {
+                        contentRoot.setRenderEffect(RenderEffect.createBlurEffect(
+                                35f, 35f, Shader.TileMode.CLAMP));
+                    } catch (Exception ignored) {}
+                }
+            }
+            // Show frosted translucent privacy overlay
+            if (privacyBlurOverlayView != null) {
+                privacyBlurOverlayView.setVisibility(View.VISIBLE);
+                privacyBlurOverlayView.bringToFront();
+            }
+            // Temporarily clear FLAG_SECURE so OS snapshot captures the blurred preview
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        boolean isFlagSecure = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("flag_secure", true);
+
+        if (isFlagSecure) {
+            // Re-arm FLAG_SECURE on foreground window to block live screenshots & recordings
+            getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_SECURE,
+                    WindowManager.LayoutParams.FLAG_SECURE
+            );
+            // Clear GPU blur
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                View contentRoot = findViewById(android.R.id.content);
+                if (contentRoot != null) {
+                    try {
+                        contentRoot.setRenderEffect(null);
+                    } catch (Exception ignored) {}
+                }
+            }
+            // Hide privacy overlay
+            if (privacyBlurOverlayView != null) {
+                privacyBlurOverlayView.setVisibility(View.GONE);
+            }
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                View contentRoot = findViewById(android.R.id.content);
+                if (contentRoot != null) {
+                    try {
+                        contentRoot.setRenderEffect(null);
+                    } catch (Exception ignored) {}
+                }
+            }
+            if (privacyBlurOverlayView != null) {
+                privacyBlurOverlayView.setVisibility(View.GONE);
+            }
+        }
+
         checkBiometricLock();
     }
 
