@@ -107,7 +107,7 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
     public void setSortMode(int sortMode) {
         this.currentSortMode = sortMode;
         applySort();
-        notifyDataSetChanged();
+        filter(currentQuery);
     }
 
     public void submitList(List<AppSummary> newItems) {
