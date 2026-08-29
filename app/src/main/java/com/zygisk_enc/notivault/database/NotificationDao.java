@@ -14,6 +14,9 @@ public interface NotificationDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(NotificationEntity notification);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertAll(List<NotificationEntity> notifications);
+
     @Delete
     void delete(NotificationEntity notification);
 

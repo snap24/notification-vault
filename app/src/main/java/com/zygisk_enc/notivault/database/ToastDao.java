@@ -11,6 +11,9 @@ public interface ToastDao {
     @Insert
     void insert(ToastEntity toast);
 
+    @Insert
+    void insertAll(List<ToastEntity> toasts);
+
     @Query("SELECT * FROM toasts ORDER BY timestamp DESC")
     LiveData<List<ToastEntity>> getAllToasts();
 

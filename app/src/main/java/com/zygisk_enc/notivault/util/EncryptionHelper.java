@@ -20,7 +20,12 @@ public class EncryptionHelper {
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128;
 
+    private static volatile SecretKey cachedSecretKey = null;
+
     private static synchronized SecretKey getSecretKey() {
+        if (cachedSecretKey != null) {
+            return cachedSecretKey;
+        }
         try {
             KeyStore keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER);
             keyStore.load(null);
@@ -36,7 +41,8 @@ public class EncryptionHelper {
                         .build());
                 keyGenerator.generateKey();
             }
-            return (SecretKey) keyStore.getKey(KEY_ALIAS, null);
+            cachedSecretKey = (SecretKey) keyStore.getKey(KEY_ALIAS, null);
+            return cachedSecretKey;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -44,6 +50,7 @@ public class EncryptionHelper {
     }
 
     public static void handleKeyInvalidated() {
+        cachedSecretKey = null;
         try {
             KeyStore keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER);
             keyStore.load(null);
@@ -59,7 +66,7 @@ public class EncryptionHelper {
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                     .setKeySize(256)
                     .build());
-            keyGenerator.generateKey();
+            cachedSecretKey = keyGenerator.generateKey();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -313,6 +313,10 @@ public class BackupUtil {
                 }
 
                 List<NotificationEntity> notifications = new ArrayList<>();
+                int totalItems = (notificationsArray != null ? notificationsArray.length() : 0) + 
+                                 (toastsArray != null ? toastsArray.length() : 0);
+                int processedItems = 0;
+
                 if (notificationsArray != null) {
                     for (int i = 0; i < notificationsArray.length(); i++) {
                         JSONObject obj = notificationsArray.getJSONObject(i);
@@ -352,6 +356,11 @@ public class BackupUtil {
                         }
 
                         notifications.add(notif);
+                        processedItems++;
+                        if (callback instanceof BackupProgressListener && totalItems > 0) {
+                            int progress = (processedItems * 65) / totalItems;
+                            ((BackupProgressListener) callback).onProgress(progress);
+                        }
                     }
                 }
 
@@ -369,28 +378,45 @@ public class BackupUtil {
                                 obj.optLong("timestamp", System.currentTimeMillis())
                         );
                         toasts.add(toast);
+                        processedItems++;
+                        if (callback instanceof BackupProgressListener && totalItems > 0) {
+                            int progress = (processedItems * 65) / totalItems;
+                            ((BackupProgressListener) callback).onProgress(progress);
+                        }
                     }
                 }
 
-                // Insert into database with progress reporting
-                int totalOps = notifications.size() + toasts.size();
-                int currentOp = 0;
+                // Batch insert into database in chunks with progress reporting (65% -> 100%)
+                AppDatabase db = AppDatabase.getInstance(context);
+                final int CHUNK_SIZE = 500;
                 
-                for (NotificationEntity notif : notifications) {
-                    AppDatabase.getInstance(context).notificationDao().insert(notif);
-                    currentOp++;
-                    if (callback instanceof BackupProgressListener && totalOps > 0) {
-                        int progress = (currentOp * 100) / totalOps;
-                        ((BackupProgressListener) callback).onProgress(progress);
+                int insertedSoFar = 0;
+                int totalToInsert = notifications.size() + toasts.size();
+
+                for (int i = 0; i < notifications.size(); i += CHUNK_SIZE) {
+                    int end = Math.min(i + CHUNK_SIZE, notifications.size());
+                    List<NotificationEntity> chunk = notifications.subList(i, end);
+                    db.notificationDao().insertAll(chunk);
+                    insertedSoFar += chunk.size();
+                    if (callback instanceof BackupProgressListener && totalToInsert > 0) {
+                        int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
+                        ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
                     }
                 }
-                for (com.zygisk_enc.notivault.database.ToastEntity toast : toasts) {
-                    AppDatabase.getInstance(context).toastDao().insert(toast);
-                    currentOp++;
-                    if (callback instanceof BackupProgressListener && totalOps > 0) {
-                        int progress = (currentOp * 100) / totalOps;
-                        ((BackupProgressListener) callback).onProgress(progress);
+
+                for (int i = 0; i < toasts.size(); i += CHUNK_SIZE) {
+                    int end = Math.min(i + CHUNK_SIZE, toasts.size());
+                    List<com.zygisk_enc.notivault.database.ToastEntity> chunk = toasts.subList(i, end);
+                    db.toastDao().insertAll(chunk);
+                    insertedSoFar += chunk.size();
+                    if (callback instanceof BackupProgressListener && totalToInsert > 0) {
+                        int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
+                        ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
                     }
+                }
+
+                if (callback instanceof BackupProgressListener) {
+                    ((BackupProgressListener) callback).onProgress(100);
                 }
                 callback.onSuccess();
             } catch (Exception e) {
