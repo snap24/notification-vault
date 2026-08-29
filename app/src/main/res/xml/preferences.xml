@@ -61,6 +61,14 @@
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
+            app:key="widget_filter_auth"
+            app:title="@string/pref_widget_filter_auth_title"
+            app:summary="@string/pref_widget_filter_auth_summary"
+            app:defaultValue="false"
+            app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
             app:key="flag_secure"
             app:title="@string/pref_flag_secure_title"
             app:summary="@string/pref_flag_secure_summary"

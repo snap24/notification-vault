@@ -114,6 +114,8 @@
     <string name="pref_pitch_black_summary">Pure black background in dark mode</string>
     <string name="pref_biometric_lock_title">Biometric App Lock</string>
     <string name="pref_biometric_lock_summary">Require biometric authentication to open app</string>
+    <string name="pref_widget_filter_auth_title">Lock Widget Feed Filter</string>
+    <string name="pref_widget_filter_auth_summary">Require biometric authentication when tapping the bell icon to filter notifications</string>
     <string name="pref_flag_secure_title">Block Screenshots &amp; Screen Recording</string>
     <string name="pref_flag_secure_summary">Prevent screenshots, screen recordings, and hide previews in recent apps</string>
     <string name="pref_show_read_unread_title">Show Read / Unread Status</string>

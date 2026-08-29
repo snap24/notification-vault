@@ -34,6 +34,15 @@ public class WidgetFilterActivity extends BaseActivity {
     private AppFilterAdapter adapter;
 
     @Override
+    protected boolean isBiometricLockEnabledForActivity() {
+        boolean masterLock = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("biometric_lock", false);
+        boolean widgetFilterAuth = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("widget_filter_auth", false);
+        return masterLock && widgetFilterAuth;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_widget_filter);

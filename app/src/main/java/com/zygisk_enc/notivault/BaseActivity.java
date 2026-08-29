@@ -174,7 +174,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    protected boolean isBiometricLockEnabledForActivity() {
+        return true;
+    }
+
     public void checkBiometricLock() {
+        if (!isBiometricLockEnabledForActivity()) {
+            if (lockOverlayView != null) {
+                lockOverlayView.setVisibility(View.GONE);
+            }
+            return;
+        }
+
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("biometric_lock", false);
 

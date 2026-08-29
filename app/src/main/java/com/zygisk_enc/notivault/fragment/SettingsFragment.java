@@ -298,19 +298,48 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         // Biometric Switch lock verification before turning off
         Preference biometricPref = findPreference("biometric_lock");
+        Preference widgetFilterAuthPref = findPreference("widget_filter_auth");
+
+        if (widgetFilterAuthPref != null) {
+            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean("biometric_lock", false);
+            widgetFilterAuthPref.setEnabled(isBiometricEnabled);
+        }
+
         if (biometricPref != null) {
             biometricPref.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean isEnabling = (boolean) newValue;
+                if (widgetFilterAuthPref != null) {
+                    widgetFilterAuthPref.setEnabled(isEnabling);
+                }
                 if (!isEnabling) {
                     // Require identity verification to disable security lock
                     verifyBiometricsToProceed(() -> {
                         if (preference instanceof SwitchPreferenceCompat) {
                             ((SwitchPreferenceCompat) preference).setChecked(false);
                         }
+                        if (widgetFilterAuthPref != null) {
+                            widgetFilterAuthPref.setEnabled(false);
+                        }
                     }, getString(R.string.auth_disable_lock));
                     return false; // Intercept: don't toggle yet
                 }
                 return true; // Let enabling proceed directly
+            });
+        }
+
+        if (widgetFilterAuthPref != null) {
+            widgetFilterAuthPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean isEnabling = (boolean) newValue;
+                if (!isEnabling) {
+                    verifyBiometricsToProceed(() -> {
+                        if (preference instanceof SwitchPreferenceCompat) {
+                            ((SwitchPreferenceCompat) preference).setChecked(false);
+                        }
+                    }, getString(R.string.auth_confirm_unlock));
+                    return false;
+                }
+                return true;
             });
         }
 
