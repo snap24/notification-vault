@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="auto_delete_entries">
+        <item>从不</item>
+        <item>7天后</item>
+        <item>15天后</item>
+        <item>30天后</item>
+        <item>90天后</item>
+        <item>自定义…</item>
+    </string-array>
+
+    <string-array name="auto_delete_mode_entries">
+        <item>所有应用（全局）</item>
+        <item>特定应用（按应用）</item>
+    </string-array>
+
+    <string-array name="theme_color_entries">
+        <item>灰色（默认）</item>
+        <item>紫色</item>
+        <item>蓝色</item>
+        <item>绿色</item>
+        <item>橙色</item>
+    </string-array>
+
+    <string-array name="cloud_backup_schedule_entries">
+        <item>关闭（仅手动）</item>
+        <item>每天</item>
+        <item>每周</item>
+        <item>每月（30天）</item>
+    </string-array>
+
+</resources>

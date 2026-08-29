@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="auto_delete_entries">
+        <item>Никогда</item>
+        <item>Через 7 дней</item>
+        <item>Через 15 дней</item>
+        <item>Через 30 дней</item>
+        <item>Через 90 дней</item>
+        <item>Вручную…</item>
+    </string-array>
+
+    <string-array name="auto_delete_mode_entries">
+        <item>Все приложения (Глобально)</item>
+        <item>Выбранные приложения (По приложению)</item>
+    </string-array>
+
+    <string-array name="theme_color_entries">
+        <item>Серый (По умолчанию)</item>
+        <item>Фиолетовый</item>
+        <item>Синий</item>
+        <item>Зелёный</item>
+        <item>Оранжевый</item>
+    </string-array>
+
+    <string-array name="cloud_backup_schedule_entries">
+        <item>Отключено (только вручную)</item>
+        <item>Ежедневно</item>
+        <item>Еженедельно</item>
+        <item>Ежемесячно (30 дней)</item>
+    </string-array>
+
+</resources>

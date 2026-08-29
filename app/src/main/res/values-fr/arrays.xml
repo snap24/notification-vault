@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="auto_delete_entries">
+        <item>Jamais</item>
+        <item>Après 7 jours</item>
+        <item>Après 15 jours</item>
+        <item>Après 30 jours</item>
+        <item>Après 90 jours</item>
+        <item>Personnalisé…</item>
+    </string-array>
+
+    <string-array name="auto_delete_mode_entries">
+        <item>Toutes les applications (Global)</item>
+        <item>Applications spécifiques (Par application)</item>
+    </string-array>
+
+    <string-array name="theme_color_entries">
+        <item>Gris (Par défaut)</item>
+        <item>Violet</item>
+        <item>Bleu</item>
+        <item>Vert</item>
+        <item>Orange</item>
+    </string-array>
+
+    <string-array name="cloud_backup_schedule_entries">
+        <item>Désactivé (manuel uniquement)</item>
+        <item>Quotidien</item>
+        <item>Hebdomadaire</item>
+        <item>Mensuel (30 jours)</item>
+    </string-array>
+
+</resources>
