@@ -93,7 +93,47 @@ public class StatsFragment extends Fragment {
         loadAnalytics();
     }
 
+    private static final String PREF_STATS_PERIOD = "stats_selected_period";
+    private static final String PREF_STATS_SHOW_ALL = "stats_show_all_apps";
+
     private void setupPeriodChips() {
+        if (getContext() != null) {
+            android.content.SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext());
+            String savedPeriodName = prefs.getString(PREF_STATS_PERIOD, Period.TODAY.name());
+            try {
+                currentPeriod = Period.valueOf(savedPeriodName);
+            } catch (Exception e) {
+                currentPeriod = Period.TODAY;
+            }
+        }
+
+        int targetChipId;
+        switch (currentPeriod) {
+            case YESTERDAY:
+                targetChipId = R.id.chip_period_yesterday;
+                binding.tvHeroPeriodLabel.setText(R.string.stats_logged_yesterday);
+                break;
+            case DAYS_7:
+                targetChipId = R.id.chip_period_7days;
+                binding.tvHeroPeriodLabel.setText("Captured in Last 7 Days");
+                break;
+            case DAYS_30:
+                targetChipId = R.id.chip_period_30days;
+                binding.tvHeroPeriodLabel.setText("Captured in Last 30 Days");
+                break;
+            case ALL:
+                targetChipId = R.id.chip_period_all;
+                binding.tvHeroPeriodLabel.setText("All-Time Captured");
+                break;
+            case TODAY:
+            default:
+                targetChipId = R.id.chip_period_today;
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_today);
+                break;
+        }
+
+        binding.chipGroupPeriods.check(targetChipId);
+
         binding.chipGroupPeriods.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
             int checkedId = checkedIds.get(0);
@@ -115,7 +155,13 @@ public class StatsFragment extends Fragment {
                 binding.tvHeroPeriodLabel.setText("All-Time Captured");
             }
 
-            isShowAllApps = false;
+            if (getContext() != null) {
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .edit()
+                        .putString(PREF_STATS_PERIOD, currentPeriod.name())
+                        .apply();
+            }
+
             loadAnalytics();
         });
     }
@@ -129,8 +175,20 @@ public class StatsFragment extends Fragment {
     }
 
     private void setupMoreAppsButton() {
+        if (getContext() != null) {
+            isShowAllApps = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean(PREF_STATS_SHOW_ALL, false);
+        }
+        binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All Apps");
+
         binding.btnToggleMoreApps.setOnClickListener(v -> {
             isShowAllApps = !isShowAllApps;
+            if (getContext() != null) {
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .edit()
+                        .putBoolean(PREF_STATS_SHOW_ALL, isShowAllApps)
+                        .apply();
+            }
             binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All Apps");
             if (lastCalculatedData != null) {
                 renderTopApps(lastCalculatedData.topApps, lastCalculatedData.totalCount);
