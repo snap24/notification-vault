@@ -2,18 +2,32 @@ package com.zygisk_enc.notivault.util;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.NotificationEntity;
+import com.zygisk_enc.notivault.database.ToastEntity;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -23,10 +37,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
-import java.security.spec.KeySpec;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 
 public class BackupUtil {
 
@@ -40,6 +50,25 @@ public class BackupUtil {
 
     public interface BackupProgressListener extends BackupCallback {
         void onProgress(int progress);
+    }
+
+    private static class RawNotificationItem {
+        String packageName = "unknown";
+        String appName = "Unknown App";
+        String title = "";
+        String text = "";
+        String bigText = null;
+        long timestamp = System.currentTimeMillis();
+        boolean isRead = false;
+        boolean isFavorite = false;
+        String imagePath = null;
+    }
+
+    private static class RawToastItem {
+        String packageName = "unknown";
+        String appName = "Unknown App";
+        String text = "";
+        long timestamp = System.currentTimeMillis();
     }
 
     private static SecretKey deriveKey(String password, byte[] salt) throws Exception {
@@ -116,7 +145,6 @@ public class BackupUtil {
                     obj.put("packageName", notif.packageName);
                     obj.put("appName", notif.appName);
                     
-                    // Decrypt using current device's local Keystore to export as plaintext (secured inside encrypted zip)
                     String decryptedTitle = EncryptionHelper.decrypt(notif.title);
                     String decryptedText = EncryptionHelper.decrypt(notif.text);
                     String decryptedBigText = notif.bigText != null ? EncryptionHelper.decrypt(notif.bigText) : null;
@@ -129,7 +157,6 @@ public class BackupUtil {
                     obj.put("isRead", notif.isRead ? 1 : 0);
                     obj.put("isFavorite", notif.isFavorite ? 1 : 0);
 
-                    // If including media, decrypt file using local Keystore to put raw bytes in Zip
                     if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
                         String[] paths = notif.imagePath.split("\\|");
                         StringBuilder savedFileNames = new StringBuilder();
@@ -159,7 +186,7 @@ public class BackupUtil {
                     jsonArray.put(obj);
 
                     if (callback instanceof BackupProgressListener) {
-                        int progress = ((i + 1) * 100) / total;
+                        int progress = ((i + 1) * 100) / (total > 0 ? total : 1);
                         ((BackupProgressListener) callback).onProgress(progress);
                     }
                 }
@@ -170,9 +197,9 @@ public class BackupUtil {
 
                 JSONArray toastsArray = new JSONArray();
                 try {
-                    List<com.zygisk_enc.notivault.database.ToastEntity> toasts = AppDatabase.getInstance(context)
+                    List<ToastEntity> toasts = AppDatabase.getInstance(context)
                             .toastDao().getAllToastsSync();
-                    for (com.zygisk_enc.notivault.database.ToastEntity toast : toasts) {
+                    for (ToastEntity toast : toasts) {
                         JSONObject obj = new JSONObject();
                         obj.put("packageName", toast.packageName);
                         obj.put("appName", toast.appName);
@@ -190,7 +217,6 @@ public class BackupUtil {
                 byte[] finalBytesToEncrypt;
 
                 if (includeMedia && !mediaFiles.isEmpty()) {
-                    // Create a Zip Archive in memory
                     ByteArrayOutputStream zipBos = new ByteArrayOutputStream();
                     try (ZipOutputStream zos = new ZipOutputStream(zipBos)) {
                         ZipEntry jsonEntry = new ZipEntry("backup_data.json");
@@ -210,7 +236,6 @@ public class BackupUtil {
                     finalBytesToEncrypt = jsonBytes;
                 }
 
-                // Encrypt bytes using the user password
                 byte[] encryptedData = encryptBytes(finalBytesToEncrypt, password);
 
                 try (OutputStream os = context.getContentResolver().openOutputStream(fileUri)) {
@@ -229,6 +254,8 @@ public class BackupUtil {
 
     public static void importBackup(Context context, Uri fileUri, String password, BackupCallback callback) {
         AppExecutor.execute(() -> {
+            int cores = Math.max(2, Runtime.getRuntime().availableProcessors());
+            ExecutorService threadPool = Executors.newFixedThreadPool(cores);
             try {
                 byte[] fileBytes;
                 try (InputStream is = context.getContentResolver().openInputStream(fileUri)) {
@@ -237,7 +264,7 @@ public class BackupUtil {
                         return;
                     }
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[2048];
+                    byte[] buffer = new byte[4096];
                     int len;
                     while ((len = is.read(buffer)) > 0) {
                         bos.write(buffer, 0, len);
@@ -254,17 +281,15 @@ public class BackupUtil {
                     return;
                 }
 
-                String jsonString;
-                Map<String, String> mediaPathMap = new HashMap<>();
+                byte[] jsonBytes = null;
+                Map<String, String> mediaPathMap = new ConcurrentHashMap<>();
+                List<Future<?>> mediaTasks = new ArrayList<>();
 
                 if (isZip(decrypted)) {
-                    // Unzip archive
                     ByteArrayInputStream bis = new ByteArrayInputStream(decrypted);
                     ZipInputStream zis = new ZipInputStream(bis);
                     ZipEntry entry;
-                    
-                    byte[] buffer = new byte[2048];
-                    ByteArrayOutputStream jsonBos = null;
+                    byte[] buffer = new byte[4096];
 
                     while ((entry = zis.getNextEntry()) != null) {
                         ByteArrayOutputStream entryBos = new ByteArrayOutputStream();
@@ -275,140 +300,135 @@ public class BackupUtil {
                         byte[] entryBytes = entryBos.toByteArray();
 
                         if (entry.getName().equals("backup_data.json")) {
-                            jsonBos = entryBos;
+                            jsonBytes = entryBytes;
                         } else if (entry.getName().startsWith("media/")) {
                             String fileName = new File(entry.getName()).getName();
                             File localFile = new File(context.getFilesDir(), fileName);
-                            
-                            // Re-encrypt file using the device KeyStore master key
-                            boolean success = EncryptionHelper.encryptFile(entryBytes, localFile);
-                            if (success) {
-                                mediaPathMap.put(fileName, localFile.getAbsolutePath());
-                            }
+                            mediaTasks.add(threadPool.submit(() -> {
+                                boolean success = EncryptionHelper.encryptFile(entryBytes, localFile);
+                                if (success) {
+                                    mediaPathMap.put(fileName, localFile.getAbsolutePath());
+                                }
+                            }));
                         }
                         zis.closeEntry();
                     }
                     zis.close();
 
-                    if (jsonBos == null) {
+                    if (jsonBytes == null) {
                         callback.onFailure(new Exception("Backup JSON data not found in Zip."));
                         return;
                     }
-                    jsonString = new String(jsonBos.toByteArray(), StandardCharsets.UTF_8);
                 } else {
-                    jsonString = new String(decrypted, StandardCharsets.UTF_8);
+                    jsonBytes = decrypted;
                 }
 
-                JSONArray notificationsArray = null;
-                JSONArray toastsArray = null;
-
-                if (jsonString.trim().startsWith("[")) {
-                    // Old format: root is array of notifications
-                    notificationsArray = new JSONArray(jsonString);
-                } else {
-                    // New format: root is object
-                    JSONObject rootJson = new JSONObject(jsonString);
-                    notificationsArray = rootJson.optJSONArray("notifications");
-                    toastsArray = rootJson.optJSONArray("toasts");
+                // Wait for all concurrent media encryptions to complete
+                for (Future<?> task : mediaTasks) {
+                    task.get();
                 }
 
-                List<NotificationEntity> notifications = new ArrayList<>();
-                int totalItems = (notificationsArray != null ? notificationsArray.length() : 0) + 
-                                 (toastsArray != null ? toastsArray.length() : 0);
-                int processedItems = 0;
+                // Streaming Parse JSON via JsonReader
+                List<RawNotificationItem> rawNotifs = new ArrayList<>();
+                List<RawToastItem> rawToasts = new ArrayList<>();
+                try (ByteArrayInputStream jsonStream = new ByteArrayInputStream(jsonBytes)) {
+                    parseJsonStreaming(jsonStream, rawNotifs, rawToasts);
+                }
 
-                if (notificationsArray != null) {
-                    for (int i = 0; i < notificationsArray.length(); i++) {
-                        JSONObject obj = notificationsArray.getJSONObject(i);
-                        String titlePlain = obj.optString("title", "");
-                        String textPlain = obj.optString("text", "");
-                        String bigTextPlain = obj.isNull("bigText") ? null : obj.optString("bigText");
+                int totalItems = rawNotifs.size() + rawToasts.size();
+                AtomicInteger processedCounter = new AtomicInteger(0);
 
-                        String encTitle = EncryptionHelper.encrypt(titlePlain);
-                        String encText = EncryptionHelper.encrypt(textPlain);
-                        String encBigText = bigTextPlain != null ? EncryptionHelper.encrypt(bigTextPlain) : null;
+                // Multi-Core Parallel Chunk Encryption
+                NotificationEntity[] encryptedNotifs = new NotificationEntity[rawNotifs.size()];
+                int notifChunkSize = Math.max(50, (rawNotifs.size() + cores - 1) / cores);
+                List<Future<?>> encryptTasks = new ArrayList<>();
 
-                        NotificationEntity notif = new NotificationEntity(
-                                obj.optString("packageName", "unknown"),
-                                obj.optString("appName", "Unknown App"),
-                                encTitle,
-                                encText,
-                                encBigText,
-                                obj.optLong("timestamp", System.currentTimeMillis())
-                        );
-                        notif.isRead = obj.optInt("isRead", 0) == 1;
-                        notif.isFavorite = obj.optInt("isFavorite", 0) == 1;
+                for (int i = 0; i < rawNotifs.size(); i += notifChunkSize) {
+                    final int start = i;
+                    final int end = Math.min(i + notifChunkSize, rawNotifs.size());
+                    encryptTasks.add(threadPool.submit(() -> {
+                        for (int j = start; j < end; j++) {
+                            RawNotificationItem raw = rawNotifs.get(j);
+                            String encTitle = EncryptionHelper.encrypt(raw.title);
+                            String encText = EncryptionHelper.encrypt(raw.text);
+                            String encBigText = raw.bigText != null ? EncryptionHelper.encrypt(raw.bigText) : null;
 
-                        String exportedFileName = obj.isNull("imagePath") ? null : obj.optString("imagePath");
-                        if (exportedFileName != null) {
-                            String[] parts = exportedFileName.split("\\|");
-                            StringBuilder restoredPaths = new StringBuilder();
-                            for (String part : parts) {
-                                String localPath = mediaPathMap.get(part.trim());
-                                if (localPath != null) {
-                                    if (restoredPaths.length() > 0) restoredPaths.append("|");
-                                    restoredPaths.append(localPath);
+                            NotificationEntity notif = new NotificationEntity(
+                                    raw.packageName, raw.appName, encTitle, encText, encBigText, raw.timestamp);
+                            notif.isRead = raw.isRead;
+                            notif.isFavorite = raw.isFavorite;
+
+                            if (raw.imagePath != null) {
+                                String[] parts = raw.imagePath.split("\\|");
+                                StringBuilder restoredPaths = new StringBuilder();
+                                for (String part : parts) {
+                                    String localPath = mediaPathMap.get(part.trim());
+                                    if (localPath != null) {
+                                        if (restoredPaths.length() > 0) restoredPaths.append("|");
+                                        restoredPaths.append(localPath);
+                                    }
                                 }
+                                notif.imagePath = restoredPaths.length() > 0 ? restoredPaths.toString() : null;
                             }
-                            notif.imagePath = restoredPaths.length() > 0 ? restoredPaths.toString() : null;
-                        } else {
-                            notif.imagePath = null;
-                        }
 
-                        notifications.add(notif);
-                        processedItems++;
-                        if (callback instanceof BackupProgressListener && totalItems > 0) {
-                            int progress = (processedItems * 65) / totalItems;
-                            ((BackupProgressListener) callback).onProgress(progress);
+                            encryptedNotifs[j] = notif;
+                            int count = processedCounter.incrementAndGet();
+                            if (callback instanceof BackupProgressListener && totalItems > 0) {
+                                int progress = (count * 65) / totalItems;
+                                ((BackupProgressListener) callback).onProgress(progress);
+                            }
                         }
-                    }
+                    }));
                 }
 
-                List<com.zygisk_enc.notivault.database.ToastEntity> toasts = new ArrayList<>();
-                if (toastsArray != null) {
-                    for (int i = 0; i < toastsArray.length(); i++) {
-                        JSONObject obj = toastsArray.getJSONObject(i);
-                        String textPlain = obj.optString("text", "");
-                        String encText = EncryptionHelper.encrypt(textPlain);
-                        
-                        com.zygisk_enc.notivault.database.ToastEntity toast = new com.zygisk_enc.notivault.database.ToastEntity(
-                                obj.optString("packageName", "unknown"),
-                                obj.optString("appName", "Unknown App"),
-                                encText,
-                                obj.optLong("timestamp", System.currentTimeMillis())
-                        );
-                        toasts.add(toast);
-                        processedItems++;
-                        if (callback instanceof BackupProgressListener && totalItems > 0) {
-                            int progress = (processedItems * 65) / totalItems;
-                            ((BackupProgressListener) callback).onProgress(progress);
+                ToastEntity[] encryptedToasts = new ToastEntity[rawToasts.size()];
+                int toastChunkSize = Math.max(50, (rawToasts.size() + cores - 1) / cores);
+                for (int i = 0; i < rawToasts.size(); i += toastChunkSize) {
+                    final int start = i;
+                    final int end = Math.min(i + toastChunkSize, rawToasts.size());
+                    encryptTasks.add(threadPool.submit(() -> {
+                        for (int j = start; j < end; j++) {
+                            RawToastItem raw = rawToasts.get(j);
+                            String encText = EncryptionHelper.encrypt(raw.text);
+                            ToastEntity toast = new ToastEntity(
+                                    raw.packageName, raw.appName, encText, raw.timestamp);
+                            encryptedToasts[j] = toast;
+                            int count = processedCounter.incrementAndGet();
+                            if (callback instanceof BackupProgressListener && totalItems > 0) {
+                                int progress = (count * 65) / totalItems;
+                                ((BackupProgressListener) callback).onProgress(progress);
+                            }
                         }
-                    }
+                    }));
+                }
+
+                for (Future<?> task : encryptTasks) {
+                    task.get();
                 }
 
                 // Batch insert into database in chunks with progress reporting (65% -> 100%)
                 AppDatabase db = AppDatabase.getInstance(context);
-                final int CHUNK_SIZE = 500;
-                
-                int insertedSoFar = 0;
-                int totalToInsert = notifications.size() + toasts.size();
+                List<NotificationEntity> notifList = Arrays.asList(encryptedNotifs);
+                List<ToastEntity> toastList = Arrays.asList(encryptedToasts);
 
-                for (int i = 0; i < notifications.size(); i += CHUNK_SIZE) {
-                    int end = Math.min(i + CHUNK_SIZE, notifications.size());
-                    List<NotificationEntity> chunk = notifications.subList(i, end);
-                    db.notificationDao().insertAll(chunk);
-                    insertedSoFar += chunk.size();
+                int totalToInsert = notifList.size() + toastList.size();
+                int insertedSoFar = 0;
+                final int DB_CHUNK = 500;
+
+                for (int i = 0; i < notifList.size(); i += DB_CHUNK) {
+                    int end = Math.min(i + DB_CHUNK, notifList.size());
+                    db.notificationDao().insertAll(notifList.subList(i, end));
+                    insertedSoFar += (end - i);
                     if (callback instanceof BackupProgressListener && totalToInsert > 0) {
                         int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
                         ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
                     }
                 }
 
-                for (int i = 0; i < toasts.size(); i += CHUNK_SIZE) {
-                    int end = Math.min(i + CHUNK_SIZE, toasts.size());
-                    List<com.zygisk_enc.notivault.database.ToastEntity> chunk = toasts.subList(i, end);
-                    db.toastDao().insertAll(chunk);
-                    insertedSoFar += chunk.size();
+                for (int i = 0; i < toastList.size(); i += DB_CHUNK) {
+                    int end = Math.min(i + DB_CHUNK, toastList.size());
+                    db.toastDao().insertAll(toastList.subList(i, end));
+                    insertedSoFar += (end - i);
                     if (callback instanceof BackupProgressListener && totalToInsert > 0) {
                         int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
                         ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
@@ -421,7 +441,92 @@ public class BackupUtil {
                 callback.onSuccess();
             } catch (Exception e) {
                 callback.onFailure(e);
+            } finally {
+                threadPool.shutdown();
             }
         });
+    }
+
+    private static void parseJsonStreaming(InputStream is, List<RawNotificationItem> notifs, List<RawToastItem> toasts) throws Exception {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            JsonToken rootToken = reader.peek();
+            if (rootToken == JsonToken.BEGIN_ARRAY) {
+                // Legacy format: root is an array of notifications
+                reader.beginArray();
+                while (reader.hasNext()) {
+                    notifs.add(readSingleNotification(reader));
+                }
+                reader.endArray();
+            } else if (rootToken == JsonToken.BEGIN_OBJECT) {
+                // Modern format: root is an object with notifications & toasts
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if ("notifications".equals(name) && reader.peek() == JsonToken.BEGIN_ARRAY) {
+                        reader.beginArray();
+                        while (reader.hasNext()) {
+                            notifs.add(readSingleNotification(reader));
+                        }
+                        reader.endArray();
+                    } else if ("toasts".equals(name) && reader.peek() == JsonToken.BEGIN_ARRAY) {
+                        reader.beginArray();
+                        while (reader.hasNext()) {
+                            toasts.add(readSingleToast(reader));
+                        }
+                        reader.endArray();
+                    } else {
+                        reader.skipValue();
+                    }
+                }
+                reader.endObject();
+            }
+        }
+    }
+
+    private static RawNotificationItem readSingleNotification(JsonReader reader) throws Exception {
+        RawNotificationItem item = new RawNotificationItem();
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (reader.peek() == JsonToken.NULL) {
+                reader.nextNull();
+                continue;
+            }
+            switch (name) {
+                case "packageName": item.packageName = reader.nextString(); break;
+                case "appName": item.appName = reader.nextString(); break;
+                case "title": item.title = reader.nextString(); break;
+                case "text": item.text = reader.nextString(); break;
+                case "bigText": item.bigText = reader.nextString(); break;
+                case "timestamp": item.timestamp = reader.nextLong(); break;
+                case "isRead": item.isRead = reader.nextInt() == 1; break;
+                case "isFavorite": item.isFavorite = reader.nextInt() == 1; break;
+                case "imagePath": item.imagePath = reader.nextString(); break;
+                default: reader.skipValue(); break;
+            }
+        }
+        reader.endObject();
+        return item;
+    }
+
+    private static RawToastItem readSingleToast(JsonReader reader) throws Exception {
+        RawToastItem item = new RawToastItem();
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (reader.peek() == JsonToken.NULL) {
+                reader.nextNull();
+                continue;
+            }
+            switch (name) {
+                case "packageName": item.packageName = reader.nextString(); break;
+                case "appName": item.appName = reader.nextString(); break;
+                case "text": item.text = reader.nextString(); break;
+                case "timestamp": item.timestamp = reader.nextLong(); break;
+                default: reader.skipValue(); break;
+            }
+        }
+        reader.endObject();
+        return item;
     }
 }
