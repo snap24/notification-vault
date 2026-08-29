@@ -12,13 +12,18 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="?attr/colorSurface"
+        app:liftOnScroll="false"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Toast Logs"
+            android:background="?attr/colorSurface"
+            app:elevation="0dp"
+            app:title="@string/toast_logs_title"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:navigationIcon="?attr/homeAsUpIndicator">
 
@@ -28,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
-                android:text="Source"
+                android:text="@string/source"
                 style="@style/Widget.Material3.Button.TextButton"
                 app:icon="@drawable/ic_code"
                 app:iconPadding="4dp"
@@ -64,15 +69,29 @@
                 android:layout_weight="1"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 android:textColor="?attr/colorSecondary"
-                android:text="Showing all toasts" />
+                android:text="@string/showing_all_toasts" />
+
+            <!-- Decryption progress indicator -->
+            <TextView
+                android:id="@+id/tv_load_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="Decrypting... 45%" />
 
             <ImageButton
                 android:id="@+id/btn_open_calendar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_button_square_ripple"
                 android:src="@drawable/ic_calendar"
-                android:contentDescription="Select Date"
+                android:contentDescription="@string/desc_select_date"
                 app:tint="?attr/colorPrimary" />
 
             <!-- Reload/Show All Button -->
@@ -81,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Show All"
+                android:text="@string/show_all"
                 android:visibility="gone"
                 style="@style/Widget.Material3.Button.TextButton"
                 app:icon="@drawable/ic_close" />
@@ -131,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="No Toasts Recorded"
+                    android:text="@string/empty_toasts_title"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOutline" />
 
@@ -141,7 +160,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="Turn on Accessibility access to log background toasts."
+                    android:text="@string/empty_toasts_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOutlineVariant" />
 
@@ -150,12 +169,57 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Enable in Settings"
+                    android:text="@string/enable_in_settings"
                     app:icon="@drawable/ic_settings" />
 
             </LinearLayout>
 
         </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- Biometric Lock Overlay Screen -->
+    <LinearLayout
+        android:id="@+id/layout_lock_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="10dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_lock"
+            app:tint="?attr/colorPrimary"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lock_overlay_title"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auth_access_toast_logs"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_unlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unlock"
+            android:layout_marginTop="24dp"
+            app:icon="@drawable/ic_lock" />
 
     </LinearLayout>
 

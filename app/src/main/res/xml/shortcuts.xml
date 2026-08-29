@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="shortcut_toast_logs"
+        android:enabled="true"
+        android:icon="@drawable/ic_toast_bread"
+        android:shortcutShortLabel="@string/shortcut_toast_logs_short"
+        android:shortcutLongLabel="@string/shortcut_toast_logs_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.zygisk_enc.notivault"
+            android:targetClass="com.zygisk_enc.notivault.ToastHistoryActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_favorites"
+        android:enabled="true"
+        android:icon="@drawable/ic_star"
+        android:shortcutShortLabel="@string/shortcut_favorites_short"
+        android:shortcutLongLabel="@string/shortcut_favorites_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.zygisk_enc.notivault"
+            android:targetClass="com.zygisk_enc.notivault.MainActivity">
+            <extra android:name="shortcut_action" android:value="open_favorites" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_search"
+        android:enabled="true"
+        android:icon="@drawable/ic_search"
+        android:shortcutShortLabel="@string/shortcut_search_short"
+        android:shortcutLongLabel="@string/shortcut_search_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.zygisk_enc.notivault"
+            android:targetClass="com.zygisk_enc.notivault.MainActivity">
+            <extra android:name="shortcut_action" android:value="open_search" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_toggle_capture"
+        android:enabled="true"
+        android:icon="@drawable/ic_pause"
+        android:shortcutShortLabel="@string/shortcut_pause_capture"
+        android:shortcutLongLabel="@string/shortcut_toggle_capture_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.zygisk_enc.notivault"
+            android:targetClass="com.zygisk_enc.notivault.util.AuthActionActivity">
+            <extra android:name="auth_action" android:value="toggle_capture" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>

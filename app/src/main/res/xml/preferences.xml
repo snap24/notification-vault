@@ -51,10 +51,32 @@
             app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreferenceCompat
+            app:key="flag_secure"
+            app:title="@string/pref_flag_secure_title"
+            app:summary="@string/pref_flag_secure_summary"
+            app:defaultValue="true"
+            app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            app:key="show_read_unread_status"
+            app:title="@string/pref_show_read_unread_title"
+            app:summary="@string/pref_show_read_unread_summary"
+            app:defaultValue="true"
+            app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
         <Preference
             app:key="favorites_list"
             app:title="@string/pref_favorites_title"
             app:summary="@string/pref_favorites_summary"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pin_shortcuts"
+            app:title="@string/pref_pin_shortcuts_title"
+            app:summary="@string/pref_pin_shortcuts_summary"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>
@@ -68,6 +90,21 @@
             app:entries="@array/auto_delete_entries"
             app:entryValues="@array/auto_delete_values"
             app:defaultValue="0"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="auto_delete_mode"
+            app:title="@string/pref_auto_delete_mode_title"
+            app:summary="@string/pref_auto_delete_mode_summary"
+            app:entries="@array/auto_delete_mode_entries"
+            app:entryValues="@array/auto_delete_mode_values"
+            app:defaultValue="all"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="manage_per_app_auto_delete"
+            app:title="@string/pref_manage_per_app_auto_delete_title"
+            app:summary="@string/pref_manage_per_app_auto_delete_summary"
             app:iconSpaceReserved="false" />
 
         <Preference

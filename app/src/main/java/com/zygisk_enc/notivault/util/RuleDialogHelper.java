@@ -105,26 +105,29 @@ public class RuleDialogHelper {
     public static void showRulesListDialog(Context context, LifecycleOwner lifecycleOwner, NotificationViewModel viewModel) {
         PackageManager pm = context.getPackageManager();
         AppExecutor.execute(() -> {
-            List<android.content.pm.ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-            List<AppInfoItem> appItems = new java.util.ArrayList<>();
+            List<android.content.pm.ApplicationInfo> packages = pm.getInstalledApplications(0);
+            List<AppInfoItem> userAppItems = new java.util.ArrayList<>();
+            List<AppInfoItem> systemAppItems = new java.util.ArrayList<>();
+
             for (android.content.pm.ApplicationInfo info : packages) {
                 if (info.packageName.equals(context.getPackageName())) {
                     continue;
                 }
                 
-                boolean isSystem = (info.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0;
-                boolean isUpdatedSystem = (info.flags & android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
-                boolean hasLaunch = pm.getLaunchIntentForPackage(info.packageName) != null;
-                if (!hasLaunch && (isSystem || isUpdatedSystem)) {
-                    continue; // Skip background system services
-                }
+                boolean isSystem = (info.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                        || (info.flags & android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
                 
                 AppInfoItem item = new AppInfoItem();
                 item.packageName = info.packageName;
-                item.appName = info.loadLabel(pm).toString();
-                item.icon = info.loadIcon(pm);
+                item.appName = pm.getApplicationLabel(info).toString();
                 item.isCaptureEnabled = true;
-                appItems.add(item);
+                item.isSystemApp = isSystem;
+
+                if (isSystem) {
+                    systemAppItems.add(item);
+                } else {
+                    userAppItems.add(item);
+                }
             }
             
             com.zygisk_enc.notivault.database.AppDatabase db = com.zygisk_enc.notivault.database.AppDatabase.getInstance(context);
@@ -137,7 +140,18 @@ public class RuleDialogHelper {
                 }
             }
             
-            for (AppInfoItem item : appItems) {
+            for (AppInfoItem item : userAppItems) {
+                AppRuleEntity rule = ruleMap.get(item.packageName);
+                if (rule != null) {
+                    item.rule = rule;
+                    item.isCaptureEnabled = !rule.blockAll;
+                } else {
+                    item.rule = null;
+                    item.isCaptureEnabled = true;
+                }
+            }
+
+            for (AppInfoItem item : systemAppItems) {
                 AppRuleEntity rule = ruleMap.get(item.packageName);
                 if (rule != null) {
                     item.rule = rule;
@@ -148,26 +162,36 @@ public class RuleDialogHelper {
                 }
             }
             
-            appItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
+            userAppItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
+            systemAppItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
             
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                showRulesManagerDialog(context, lifecycleOwner, appItems, viewModel);
+                showRulesManagerDialog(context, lifecycleOwner, userAppItems, systemAppItems, viewModel);
             });
         });
     }
 
-    private static void showRulesManagerDialog(Context context, LifecycleOwner lifecycleOwner, List<AppInfoItem> appItems, NotificationViewModel viewModel) {
+    private static void showRulesManagerDialog(Context context, LifecycleOwner lifecycleOwner, 
+                                               List<AppInfoItem> userAppItems, 
+                                               List<AppInfoItem> systemAppItems, 
+                                               NotificationViewModel viewModel) {
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_rules_manager, null);
         RecyclerView rv = view.findViewById(R.id.rv_apps_list);
         TextInputEditText etSearch = view.findViewById(R.id.et_search_apps);
         MaterialSwitch switchToggleAll = view.findViewById(R.id.switch_toggle_all);
+        TextView tvToggleAllTitle = view.findViewById(R.id.tv_toggle_all_title);
+        TextView tvToggleAllDesc = view.findViewById(R.id.tv_toggle_all_desc);
         
+        final boolean[] isShowingSystem = {false};
+        final List<AppInfoItem>[] currentListHolder = new List[]{userAppItems};
+
         CompoundButton.OnCheckedChangeListener toggleAllListener = (btn, isChecked) -> {
+            List<AppInfoItem> currentList = currentListHolder[0];
             AppExecutor.execute(() -> {
                 com.zygisk_enc.notivault.database.AppDatabase db = com.zygisk_enc.notivault.database.AppDatabase.getInstance(context);
                 if (isChecked) {
-                    // Enable capture for all apps -> delete block rules
-                    for (AppInfoItem item : appItems) {
+                    // Enable capture for all apps in current view -> delete block rules
+                    for (AppInfoItem item : currentList) {
                         item.isCaptureEnabled = true;
                         if (item.rule != null) {
                             if (item.rule.blockKeywords.isEmpty() && item.rule.allowKeywords.isEmpty()) {
@@ -180,8 +204,8 @@ public class RuleDialogHelper {
                         }
                     }
                 } else {
-                    // Disable capture for all apps -> block all
-                    for (AppInfoItem item : appItems) {
+                    // Disable capture for all apps in current view -> block all
+                    for (AppInfoItem item : currentList) {
                         item.isCaptureEnabled = false;
                         if (item.rule == null) {
                             item.rule = new AppRuleEntity(item.packageName, item.appName, true, "", "", true);
@@ -200,8 +224,8 @@ public class RuleDialogHelper {
             });
         };
 
-        RulesAdapter adapter = new RulesAdapter(context, lifecycleOwner, appItems, viewModel, () -> {
-            updateToggleAllState(switchToggleAll, appItems, toggleAllListener);
+        RulesAdapter adapter = new RulesAdapter(context, lifecycleOwner, userAppItems, viewModel, () -> {
+            updateToggleAllState(switchToggleAll, currentListHolder[0], toggleAllListener);
         });
         
         rv.setLayoutManager(new LinearLayoutManager(context));
@@ -219,13 +243,41 @@ public class RuleDialogHelper {
         });
 
         // Set initial toggle all state
-        updateToggleAllState(switchToggleAll, appItems, toggleAllListener);
+        updateToggleAllState(switchToggleAll, userAppItems, toggleAllListener);
 
-        new MaterialAlertDialogBuilder(context)
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.dialog_rules_list_title)
                 .setView(view)
                 .setNegativeButton(R.string.close, null)
-                .show();
+                .setNeutralButton("System Apps", null)
+                .create();
+
+        dialog.setOnShowListener(d -> {
+            android.widget.Button neutralBtn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEUTRAL);
+            if (neutralBtn != null) {
+                neutralBtn.setOnClickListener(v -> {
+                    isShowingSystem[0] = !isShowingSystem[0];
+                    if (isShowingSystem[0]) {
+                        currentListHolder[0] = systemAppItems;
+                        neutralBtn.setText("User Apps");
+                        dialog.setTitle("System App Capture Rules");
+                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText("Capture all system apps");
+                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText("Enable or disable recording for all system apps.");
+                    } else {
+                        currentListHolder[0] = userAppItems;
+                        neutralBtn.setText("System Apps");
+                        dialog.setTitle(R.string.dialog_rules_list_title);
+                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText("Capture all user apps");
+                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText("Enable or disable notification recording globally.");
+                    }
+                    etSearch.setText("");
+                    adapter.setList(currentListHolder[0]);
+                    updateToggleAllState(switchToggleAll, currentListHolder[0], toggleAllListener);
+                });
+            }
+        });
+
+        dialog.show();
     }
 
     private static void updateToggleAllState(MaterialSwitch switchToggleAll, List<AppInfoItem> appItems, CompoundButton.OnCheckedChangeListener listener) {
@@ -244,12 +296,15 @@ public class RuleDialogHelper {
     static class AppInfoItem {
         String packageName;
         String appName;
-        Drawable icon;
         boolean isCaptureEnabled;
+        boolean isSystemApp;
         AppRuleEntity rule;
     }
 
     static class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.ViewHolder> {
+        private static final java.util.Map<String, Drawable> iconCache = new java.util.concurrent.ConcurrentHashMap<>();
+        private final java.util.concurrent.ExecutorService iconExecutor = java.util.concurrent.Executors.newFixedThreadPool(3);
+
         private final List<AppInfoItem> fullList;
         private List<AppInfoItem> filteredList;
         private final NotificationViewModel viewModel;
@@ -260,10 +315,16 @@ public class RuleDialogHelper {
         RulesAdapter(Context context, LifecycleOwner lifecycleOwner, List<AppInfoItem> list, NotificationViewModel viewModel, Runnable onStateChanged) {
             this.context = context;
             this.lifecycleOwner = lifecycleOwner;
-            this.fullList = list;
+            this.fullList = new java.util.ArrayList<>(list);
             this.filteredList = new java.util.ArrayList<>(list);
             this.viewModel = viewModel;
             this.onStateChanged = onStateChanged;
+        }
+
+        void setList(List<AppInfoItem> list) {
+            this.fullList.clear();
+            this.fullList.addAll(list);
+            filter("");
         }
 
         void filter(String query) {
@@ -291,8 +352,27 @@ public class RuleDialogHelper {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             AppInfoItem item = filteredList.get(position);
-            holder.ivIcon.setImageDrawable(item.icon);
             holder.tvName.setText(item.appName);
+
+            // Asynchronously load and cache icon
+            holder.ivIcon.setTag(item.packageName);
+            Drawable cachedIcon = iconCache.get(item.packageName);
+            if (cachedIcon != null) {
+                holder.ivIcon.setImageDrawable(cachedIcon);
+            } else {
+                holder.ivIcon.setImageResource(R.drawable.ic_code);
+                iconExecutor.execute(() -> {
+                    try {
+                        Drawable icon = context.getPackageManager().getApplicationIcon(item.packageName);
+                        iconCache.put(item.packageName, icon);
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                            if (item.packageName.equals(holder.ivIcon.getTag())) {
+                                holder.ivIcon.setImageDrawable(icon);
+                            }
+                        });
+                    } catch (Exception ignored) {}
+                });
+            }
             
             // Determine status text and background color dynamically
             int statusColorAttr;

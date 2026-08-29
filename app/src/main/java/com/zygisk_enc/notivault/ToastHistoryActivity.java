@@ -58,6 +58,11 @@ public class ToastHistoryActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(
+                    savedInstanceState.getBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked())
+            );
+        }
         binding = ActivityToastHistoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -91,6 +96,26 @@ public class ToastHistoryActivity extends AppCompatActivity {
         viewModel.getToasts().observe(this, toasts -> updateUI());
         viewModel.getIsLoading().observe(this, loading -> updateUI());
 
+        viewModel.getLoadProgress().observe(this, progress -> {
+            if (progress == null || progress < 0) {
+                binding.tvLoadProgress.setVisibility(View.GONE);
+            } else {
+                binding.tvLoadProgress.setVisibility(View.VISIBLE);
+                binding.tvLoadProgress.setText("Decrypting... " + progress + "%");
+            }
+        });
+
+        viewModel.getScrollToTopEvent().observe(this, scroll -> {
+            if (scroll != null && scroll) {
+                LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                if (lm != null) {
+                    lm.scrollToPositionWithOffset(0, 0);
+                } else {
+                    binding.recyclerView.scrollToPosition(0);
+                }
+            }
+        });
+
         // Observe oldest toast timestamp for calendar picker constraints
         viewModel.getOldestTimestamp().observe(this, timestamp -> {
             oldestToastTimestamp = timestamp;
@@ -109,22 +134,33 @@ public class ToastHistoryActivity extends AppCompatActivity {
             binding.emptyState.setVisibility(View.VISIBLE);
             
             if (!isAccessibilityEnabled) {
-                binding.tvEmptyTitle.setText("No Toasts Recorded");
-                binding.tvAccessibilityHint.setText("Turn on Accessibility access to log background toasts.");
+                binding.tvEmptyTitle.setText(R.string.empty_toasts_title);
+                binding.tvAccessibilityHint.setText(R.string.empty_toasts_desc);
                 binding.btnGrantAccessibility.setVisibility(View.VISIBLE);
             } else if (isLoading) {
-                binding.tvEmptyTitle.setText("Loading Toasts...");
-                binding.tvAccessibilityHint.setText("Please wait while we decrypt your secure log.");
+                binding.tvEmptyTitle.setText(R.string.loading_toasts);
+                binding.tvAccessibilityHint.setText(R.string.decrypting_secure_log);
                 binding.btnGrantAccessibility.setVisibility(View.GONE);
             } else {
-                binding.tvEmptyTitle.setText("No Toasts Recorded");
-                binding.tvAccessibilityHint.setText("Toasts will appear here as they are shown on screen.");
+                binding.tvEmptyTitle.setText(R.string.empty_toasts_title);
+                binding.tvAccessibilityHint.setText(R.string.toasts_active_desc);
                 binding.btnGrantAccessibility.setVisibility(View.GONE);
             }
         } else {
             binding.recyclerView.setVisibility(View.VISIBLE);
             binding.emptyState.setVisibility(View.GONE);
-            adapter.submitList(toasts);
+            adapter.submitList(toasts, () -> {
+                Boolean scroll = viewModel.getScrollToTopEvent().getValue();
+                if (scroll != null && scroll) {
+                    viewModel.clearScrollToTopEvent();
+                    LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                    if (lm != null) {
+                        lm.scrollToPositionWithOffset(0, 0);
+                    } else {
+                        binding.recyclerView.scrollToPosition(0);
+                    }
+                }
+            });
         }
     }
 
@@ -137,7 +173,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
     private void setupDatePicker() {
         binding.btnOpenCalendar.setOnClickListener(v -> {
             MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-            builder.setTitleText("Select Date");
+            builder.setTitleText(R.string.desc_select_date);
 
             CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
             long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
@@ -162,6 +198,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
             validators.add(DateValidatorPointForward.from(startUtc - 1));
             constraintsBuilder.setValidator(CompositeDateValidator.allOf(validators));
             
+            constraintsBuilder.setOpenAt(todayUtc);
             builder.setCalendarConstraints(constraintsBuilder.build());
 
             MaterialDatePicker<Long> picker = builder.build();
@@ -169,18 +206,17 @@ public class ToastHistoryActivity extends AppCompatActivity {
                 Calendar utc = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
                 utc.setTimeInMillis(selection);
                 
-                Calendar local = Calendar.getInstance();
-                local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                local.set(Calendar.MILLISECOND, 0);
-                long start = local.getTimeInMillis();
-                local.add(Calendar.DAY_OF_YEAR, 1);
-                long end = local.getTimeInMillis() - 1;
-                
-                viewModel.setDateFilter(start, end);
-                binding.tvActiveFilters.setText("Date: " + 
-                        (utc.get(Calendar.MONTH) + 1) + "/" + 
-                        utc.get(Calendar.DAY_OF_MONTH) + "/" + 
-                        utc.get(Calendar.YEAR));
+                Calendar startCal = Calendar.getInstance();
+                startCal.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                startCal.set(Calendar.MILLISECOND, 0);
+
+                Calendar endCal = Calendar.getInstance();
+                endCal.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
+                endCal.set(Calendar.MILLISECOND, 999);
+
+                viewModel.setDateFilter(startCal.getTimeInMillis(), endCal.getTimeInMillis());
+                String dateStr = (utc.get(Calendar.MONTH) + 1) + "/" + utc.get(Calendar.DAY_OF_MONTH) + "/" + utc.get(Calendar.YEAR);
+                binding.tvActiveFilters.setText(getString(R.string.date_filter_format, dateStr));
                 binding.btnReloadAll.setVisibility(View.VISIBLE);
             });
             picker.show(getSupportFragmentManager(), "DATE_PICKER");
@@ -189,16 +225,16 @@ public class ToastHistoryActivity extends AppCompatActivity {
         // Setup reload button click to clear filter
         binding.btnReloadAll.setOnClickListener(v -> {
             viewModel.setDateFilter(null, null);
-            binding.tvActiveFilters.setText("Showing all toasts");
+            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
             binding.btnReloadAll.setVisibility(View.GONE);
-            Snackbar.make(binding.getRoot(), "Filters reset", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), R.string.filters_reset, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnOpenCalendar.setOnLongClickListener(v -> {
             viewModel.setDateFilter(null, null);
-            binding.tvActiveFilters.setText("Showing all toasts");
+            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
             binding.btnReloadAll.setVisibility(View.GONE);
-            Snackbar.make(binding.getRoot(), "Date filter cleared", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT).show();
             return true;
         });
     }
@@ -207,12 +243,12 @@ public class ToastHistoryActivity extends AppCompatActivity {
         binding.btnClearAll.setOnClickListener(v -> {
             Runnable proceedToClear = () -> {
                 new MaterialAlertDialogBuilder(ToastHistoryActivity.this)
-                        .setTitle("Clear Toast History")
-                        .setMessage("Are you sure you want to clear all recorded toasts? This cannot be undone.")
+                        .setTitle(R.string.clear_toast_history_title)
+                        .setMessage(R.string.clear_toast_history_desc)
                         .setNegativeButton(R.string.cancel, null)
                         .setPositiveButton(R.string.clear, (dialog, which) -> {
                             viewModel.clearAllToasts();
-                            Toast.makeText(ToastHistoryActivity.this, "Toast history cleared", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ToastHistoryActivity.this, R.string.toast_history_cleared, Toast.LENGTH_SHORT).show();
                         })
                         .show();
             };
@@ -220,7 +256,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedToClear, "Confirm authentication to clear all toasts");
+                verifyBiometricsToProceed(proceedToClear, getString(R.string.auth_clear_toasts));
             } else {
                 proceedToClear.run();
             }
@@ -279,9 +315,55 @@ public class ToastHistoryActivity extends AppCompatActivity {
         return false;
     }
 
+    private void checkBiometricLock() {
+        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("biometric_lock", false);
+
+        if (isBiometricEnabled && !com.zygisk_enc.notivault.util.AppLockManager.isUnlocked()) {
+            binding.layoutLockOverlay.setVisibility(View.VISIBLE);
+            binding.btnUnlock.setOnClickListener(v -> showBiometricPrompt());
+            showBiometricPrompt();
+        } else {
+            binding.layoutLockOverlay.setVisibility(View.GONE);
+        }
+    }
+
+    private void showBiometricPrompt() {
+        Executor executor = ContextCompat.getMainExecutor(this);
+        BiometricPrompt biometricPrompt = new BiometricPrompt(this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(true);
+                binding.layoutLockOverlay.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Notification Vault Lock")
+                .setSubtitle("Confirm biometric authentication to unlock")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
+                                          BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        checkBiometricLock();
         if (adapter != null && adapter.getItemCount() == 0) {
             if (isAccessibilityServiceEnabled()) {
                 binding.tvAccessibilityHint.setText("Toasts will appear here as they are shown on screen.");
@@ -291,5 +373,11 @@ public class ToastHistoryActivity extends AppCompatActivity {
                 binding.btnGrantAccessibility.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked());
     }
 }

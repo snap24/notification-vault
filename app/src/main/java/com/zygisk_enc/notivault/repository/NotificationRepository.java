@@ -14,11 +14,13 @@ import java.util.concurrent.Executors;
 
 public class NotificationRepository {
 
+    private final Application application;
     private final NotificationDao dao;
     private final AppRuleDao ruleDao;
     private final ExecutorService executor;
 
     public NotificationRepository(Application application) {
+        this.application = application;
         AppDatabase db = AppDatabase.getInstance(application);
         dao = db.notificationDao();
         ruleDao = db.appRuleDao();
@@ -26,13 +28,17 @@ public class NotificationRepository {
     }
 
     public void insert(NotificationEntity entity) {
-        executor.execute(() -> dao.insert(entity));
+        executor.execute(() -> {
+            dao.insert(entity);
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+        });
     }
 
     public void delete(NotificationEntity entity) {
         executor.execute(() -> {
             deleteNotificationImage(entity.imagePath);
             dao.delete(entity);
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
 
@@ -42,6 +48,7 @@ public class NotificationRepository {
             if (entity != null) {
                 deleteNotificationImage(entity.imagePath);
                 dao.delete(entity);
+                com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
             }
         });
     }
@@ -55,6 +62,7 @@ public class NotificationRepository {
                 }
             }
             dao.deleteAll();
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
 
@@ -67,20 +75,81 @@ public class NotificationRepository {
                 }
             }
             dao.deleteOlderThan(timestamp);
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+        });
+    }
+
+    public void deleteOlderThanForPackages(long timestamp, List<String> packages) {
+        executor.execute(() -> {
+            if (packages == null || packages.isEmpty()) return;
+            List<String> imagePaths = dao.getOldImagePathsForPackages(timestamp, packages);
+            if (imagePaths != null) {
+                for (String path : imagePaths) {
+                    deleteNotificationImage(path);
+                }
+            }
+            dao.deleteOlderThanForPackages(timestamp, packages);
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+        });
+    }
+
+    public void deleteByDateRange(long startTime, long endTime) {
+        executor.execute(() -> {
+            dao.deleteByDateRange(startTime, endTime);
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+        });
+    }
+
+    public void deleteByDays(java.util.Collection<Long> daysUtc) {
+        executor.execute(() -> {
+            for (Long dayUtc : daysUtc) {
+                java.util.Calendar utc = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+                utc.setTimeInMillis(dayUtc);
+                java.util.Calendar local = java.util.Calendar.getInstance();
+                local.set(utc.get(java.util.Calendar.YEAR), utc.get(java.util.Calendar.MONTH), utc.get(java.util.Calendar.DAY_OF_MONTH), 0, 0, 0);
+                local.set(java.util.Calendar.MILLISECOND, 0);
+                long start = local.getTimeInMillis();
+                local.add(java.util.Calendar.DAY_OF_YEAR, 1);
+                long end = local.getTimeInMillis() - 1;
+                dao.deleteByDateRange(start, end);
+            }
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
 
     private void deleteNotificationImage(String imagePath) {
         if (imagePath != null && !imagePath.isEmpty()) {
-            try {
-                java.io.File file = new java.io.File(imagePath);
-                if (file.exists()) {
-                    file.delete();
+            String[] paths = imagePath.split("\\|");
+            for (String p : paths) {
+                if (p != null && !p.trim().isEmpty()) {
+                    try {
+                        java.io.File file = new java.io.File(p.trim());
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+            }
+        }
+    }
+
+    public void deleteByPackages(java.util.List<String> packages) {
+        executor.execute(() -> {
+            try {
+                java.util.List<String> imagePaths = dao.getImagePathsForPackages(packages);
+                if (imagePaths != null) {
+                    for (String path : imagePaths) {
+                        deleteNotificationImage(path);
+                    }
+                }
+                dao.deleteByPackages(packages);
+                com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        });
     }
 
     public void markAsRead(long id) {

@@ -9,12 +9,56 @@ import androidx.preference.PreferenceManager;
 public class PreferenceUtil {
 
     private static final String KEY_AUTO_DELETE_DAYS = "auto_delete_days";
+    private static final String KEY_AUTO_DELETE_MODE = "auto_delete_mode";
+    private static final String KEY_AUTO_DELETE_PACKAGES = "auto_delete_packages";
     private static final String KEY_CAPTURE_ENABLED = "capture_enabled";
     private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
 
     public static int getAutoDeleteDays(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return Integer.parseInt(prefs.getString(KEY_AUTO_DELETE_DAYS, "0"));
+        String val = prefs.getString(KEY_AUTO_DELETE_DAYS, "0");
+        try {
+            return Integer.parseInt(val);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static void setAutoDeleteDays(Context context, int days) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putString(KEY_AUTO_DELETE_DAYS, String.valueOf(days)).apply();
+    }
+
+    public static String getAutoDeleteMode(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(KEY_AUTO_DELETE_MODE, "all");
+    }
+
+    public static void setAutoDeleteMode(Context context, String mode) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putString(KEY_AUTO_DELETE_MODE, mode).apply();
+    }
+
+    public static java.util.Set<String> getAutoDeletePackages(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getStringSet(KEY_AUTO_DELETE_PACKAGES, new java.util.HashSet<>());
+    }
+
+    public static void setAutoDeletePackages(Context context, java.util.Set<String> packages) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putStringSet(KEY_AUTO_DELETE_PACKAGES, packages).apply();
+    }
+
+    private static final String KEY_SHOW_READ_UNREAD = "show_read_unread_status";
+
+    public static boolean isShowReadUnreadEnabled(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(KEY_SHOW_READ_UNREAD, true);
+    }
+
+    public static void setShowReadUnreadEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putBoolean(KEY_SHOW_READ_UNREAD, enabled).apply();
     }
 
     public static boolean isCaptureEnabled(Context context) {
@@ -92,5 +136,17 @@ public class PreferenceUtil {
     public static void setCloudBackupIncludeMedia(Context context, boolean include) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit().putBoolean("cloud_backup_include_media", include).apply();
+    }
+
+    // ── Widget Feed Filter Preferences ──────────────────────────────────────
+
+    public static String getWidgetFeedPackage(Context context, int appWidgetId) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("widget_feed_filter_pkg_" + appWidgetId, null);
+    }
+
+    public static void setWidgetFeedPackage(Context context, int appWidgetId, String packageName) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putString("widget_feed_filter_pkg_" + appWidgetId, packageName).apply();
     }
 }

@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="2dp"
+    android:paddingTop="0dp"
     android:paddingHorizontal="16dp"
-    android:paddingBottom="16dp">
+    android:paddingBottom="0dp">
 
 
         <!-- Header Search Bar & Actions Container -->
@@ -18,7 +18,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical|start"
             android:layout_marginTop="0dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="6dp">
 
             <!-- Search Expand Container (hidden by default) -->
             <LinearLayout
@@ -28,6 +28,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:layout_marginTop="2dp"
                 android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -59,7 +60,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/bg_button_square_ripple"
                     android:src="@drawable/ic_close"
                     android:contentDescription="Close Search"
                     app:tint="?attr/colorPrimary" />
@@ -69,8 +70,9 @@
             <!-- Search Collapsed Container (visible by default) -->
             <HorizontalScrollView
                 android:id="@+id/layout_search_collapsed"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="0dp"
                 android:scrollbars="none"
                 android:overScrollMode="never"
                 android:visibility="visible">
@@ -83,87 +85,84 @@
 
                     <ImageButton
                         android:id="@+id/btn_open_search"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_search"
                         android:contentDescription="Search"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
                         android:id="@+id/btn_open_calendar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="4dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_calendar"
                         android:contentDescription="Select Date"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
                         android:id="@+id/btn_app_rules"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="4dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_rules"
                         android:contentDescription="App Rules"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
                         android:id="@+id/btn_clear_all"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="4dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_delete_sweep"
                         android:contentDescription="Clear All"
                         app:tint="?attr/colorPrimary" />
 
-                    <FrameLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_toasts_history"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="4dp">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_toasts_history"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="Toasts"
-                            style="@style/Widget.Material3.Button.TextButton"
-                            app:icon="@drawable/ic_toast_bread"
-                            app:iconGravity="textEnd" />
-
-                        <TextView
-                            android:id="@+id/tv_load_progress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="?attr/colorPrimary"
-                            android:textStyle="bold"
-                            android:visibility="invisible"
-                            tools:text="Loading... 45%" />
-
-                    </FrameLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:paddingHorizontal="4dp"
+                        android:minWidth="0dp"
+                        android:text="Toasts"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        app:icon="@drawable/ic_toast_bread"
+                        app:iconGravity="textEnd" />
 
                     <!-- Cloud / Drive Backup Button -->
                     <ImageButton
                         android:id="@+id/btn_cloud_backup"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="4dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="2dp"
+                        android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_cloud_upload"
                         android:contentDescription="Cloud Backup"
                         app:tint="?attr/colorPrimary" />
 
+                    <!-- Decryption progress indicator (shown to the right of cloud button) -->
+                    <TextView
+                        android:id="@+id/tv_load_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="8dp"
+                        android:singleLine="true"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="Decrypting... 45%" />
+
                 </LinearLayout>
 
             </HorizontalScrollView>
-
-
 
         </LinearLayout>
 
@@ -172,6 +171,7 @@
             android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1">
 
             <FrameLayout

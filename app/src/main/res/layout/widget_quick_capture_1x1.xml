@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- Top: 1-Tap Toggle Button / Icon -->
+    <ImageButton
+        android:id="@+id/btn_widget_toggle_capture"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/bg_widget_pill"
+        android:src="@drawable/ic_pause"
+        android:contentDescription="Toggle Capture"
+        android:padding="8dp"
+        android:scaleType="fitCenter" />
+
+    <!-- Middle: Big Bold Count -->
+    <TextView
+        android:id="@+id/tv_widget_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textColor="@color/widget_text_primary"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:layout_marginTop="3dp" />
+
+    <!-- Bottom: Status with Dot in vertical alignment -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="1dp">
+
+        <ImageView
+            android:id="@+id/iv_status_dot"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:src="@drawable/ic_circle_status"
+            android:contentDescription="Status" />
+
+        <TextView
+            android:id="@+id/tv_widget_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Active"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

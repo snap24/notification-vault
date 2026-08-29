@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".NotiVaultApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -31,6 +32,40 @@
             android:name=".ToastHistoryActivity"
             android:exported="false"
             android:label="Toast Logs" />
+
+        <activity
+            android:name=".util.AuthActionActivity"
+            android:theme="@style/Theme.NotiVault.Transparent"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true" />
+
+        <activity
+            android:name=".widget.WidgetFilterActivity"
+            android:exported="false"
+            android:label="Filter Feed" />
+
+        <activity
+            android:name=".AppRulesActivity"
+            android:exported="false"
+            android:label="App Capture Rules" />
+
+        <activity
+            android:name=".AppRuleEditActivity"
+            android:exported="false"
+            android:label="Edit Capture Rule"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".widget.WidgetConfigAuthActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NotiVault.Transparent"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".service.NotiVaultService"
@@ -74,6 +109,53 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <!-- Option A: Quick Capture Widget -->
+        <receiver
+            android:name=".widget.CaptureWidgetProvider"
+            android:exported="true"
+            android:label="Quick Capture">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.notivault.widget.ACTION_TOGGLE_CAPTURE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_capture_info" />
+        </receiver>
+
+        <!-- Option B: Notification Feed Widget -->
+        <receiver
+            android:name=".widget.NotificationFeedWidgetProvider"
+            android:exported="true"
+            android:label="Recent Notifications">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.notivault.widget.ACTION_REFRESH_FEED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_notification_feed_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.NotificationFeedService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="true" />
+
+        <!-- Option C: Vault Dashboard Widget -->
+        <receiver
+            android:name=".widget.VaultDashboardWidgetProvider"
+            android:exported="true"
+            android:label="Vault Dashboard">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zygisk_enc.notivault.widget.ACTION_TOGGLE_CAPTURE_DASHBOARD" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_vault_dashboard_info" />
+        </receiver>
 
     </application>
 

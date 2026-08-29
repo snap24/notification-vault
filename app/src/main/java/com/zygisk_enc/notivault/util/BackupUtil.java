@@ -131,16 +131,24 @@ public class BackupUtil {
 
                     // If including media, decrypt file using local Keystore to put raw bytes in Zip
                     if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
-                        File imgFile = new File(notif.imagePath);
-                        if (imgFile.exists()) {
-                            byte[] decryptedImageBytes = EncryptionHelper.decryptFile(imgFile);
-                            if (decryptedImageBytes != null) {
-                                String fileName = imgFile.getName();
-                                mediaFiles.put(fileName, decryptedImageBytes);
-                                obj.put("imagePath", fileName); // Store filename as key
-                            } else {
-                                obj.put("imagePath", JSONObject.NULL);
+                        String[] paths = notif.imagePath.split("\\|");
+                        StringBuilder savedFileNames = new StringBuilder();
+                        for (String p : paths) {
+                            if (p != null && !p.trim().isEmpty()) {
+                                File imgFile = new File(p.trim());
+                                if (imgFile.exists()) {
+                                    byte[] decryptedImageBytes = EncryptionHelper.decryptFile(imgFile);
+                                    if (decryptedImageBytes != null) {
+                                        String fileName = imgFile.getName();
+                                        mediaFiles.put(fileName, decryptedImageBytes);
+                                        if (savedFileNames.length() > 0) savedFileNames.append("|");
+                                        savedFileNames.append(fileName);
+                                    }
+                                }
                             }
+                        }
+                        if (savedFileNames.length() > 0) {
+                            obj.put("imagePath", savedFileNames.toString());
                         } else {
                             obj.put("imagePath", JSONObject.NULL);
                         }
@@ -328,8 +336,17 @@ public class BackupUtil {
                         notif.isFavorite = obj.optInt("isFavorite", 0) == 1;
 
                         String exportedFileName = obj.isNull("imagePath") ? null : obj.optString("imagePath");
-                        if (exportedFileName != null && mediaPathMap.containsKey(exportedFileName)) {
-                            notif.imagePath = mediaPathMap.get(exportedFileName);
+                        if (exportedFileName != null) {
+                            String[] parts = exportedFileName.split("\\|");
+                            StringBuilder restoredPaths = new StringBuilder();
+                            for (String part : parts) {
+                                String localPath = mediaPathMap.get(part.trim());
+                                if (localPath != null) {
+                                    if (restoredPaths.length() > 0) restoredPaths.append("|");
+                                    restoredPaths.append(localPath);
+                                }
+                            }
+                            notif.imagePath = restoredPaths.length() > 0 ? restoredPaths.toString() : null;
                         } else {
                             notif.imagePath = null;
                         }

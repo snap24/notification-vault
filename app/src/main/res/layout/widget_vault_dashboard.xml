@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_dashboard_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Top Header Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/widget_vault_title"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- Status Pill -->
+        <LinearLayout
+            android:id="@+id/layout_dashboard_status_pill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_widget_pill"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp">
+
+            <ImageView
+                android:id="@+id/iv_dashboard_status_dot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:src="@drawable/ic_circle_status"
+                android:contentDescription="@string/shortcut_toggle_capture_short" />
+
+            <TextView
+                android:id="@+id/tv_dashboard_status_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/status_recording_active"
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Expanded Middle Stats Row (Fills vertical space completely) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <!-- Notifications Stat Card -->
+        <LinearLayout
+            android:id="@+id/tile_dashboard_notifications"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginEnd="4dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_notification"
+                    android:contentDescription="@string/widget_notifications_title" />
+
+                <TextView
+                    android:id="@+id/tv_dashboard_notif_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="0"
+                    android:textColor="@color/widget_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_notifications_title"
+                android:textColor="@color/widget_text_tertiary"
+                android:textSize="11sp"
+                android:singleLine="true"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Toasts Stat Card -->
+        <LinearLayout
+            android:id="@+id/tile_dashboard_toasts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginStart="4dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_toast_bread"
+                    android:contentDescription="@string/widget_toasts_title" />
+
+                <TextView
+                    android:id="@+id/tv_dashboard_toast_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="0"
+                    android:textColor="@color/widget_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_toasts_title"
+                android:textColor="@color/widget_text_tertiary"
+                android:textSize="11sp"
+                android:singleLine="true"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bottom Quick Action Launchers Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/btn_action_history"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_history"
+            android:contentDescription="@string/nav_history"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_favorites"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_star"
+            android:contentDescription="@string/shortcut_favorites_short"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:layout_marginHorizontal="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_toasts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_toast_bread"
+            android:contentDescription="@string/widget_toasts_title"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:layout_marginHorizontal="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_toggle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_pause"
+            android:contentDescription="@string/shortcut_toggle_capture_short"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:layout_marginStart="3dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

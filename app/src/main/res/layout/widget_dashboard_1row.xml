@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_dashboard_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="8dp">
+
+    <!-- Stat 1: Notifications -->
+    <LinearLayout
+        android:id="@+id/tile_dashboard_notifications"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/bg_widget_action"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingHorizontal="6dp"
+        android:layout_marginEnd="3dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_notification"
+            android:contentDescription="@string/widget_notifications_title" />
+
+        <TextView
+            android:id="@+id/tv_dashboard_notif_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="0"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Stat 2: Toasts -->
+    <LinearLayout
+        android:id="@+id/tile_dashboard_toasts"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/bg_widget_action"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingHorizontal="6dp"
+        android:layout_marginHorizontal="3dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_toast_bread"
+            android:contentDescription="@string/widget_toasts_title" />
+
+        <TextView
+            android:id="@+id/tv_dashboard_toast_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="0"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Quick Actions -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginStart="3dp">
+
+        <ImageButton
+            android:id="@+id/btn_action_history"
+            android:layout_width="34dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_history"
+            android:contentDescription="@string/nav_history"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_favorites"
+            android:layout_width="34dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_star"
+            android:contentDescription="@string/shortcut_favorites_short"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_toasts"
+            android:layout_width="34dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_toast_bread"
+            android:contentDescription="@string/widget_toasts_title"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="3dp" />
+
+        <ImageButton
+            android:id="@+id/btn_action_toggle"
+            android:layout_width="34dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_widget_action"
+            android:src="@drawable/ic_pause"
+            android:contentDescription="@string/shortcut_toggle_capture_short"
+            android:padding="6dp"
+            android:scaleType="fitCenter" />
+
+    </LinearLayout>
+
+</LinearLayout>

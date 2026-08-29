@@ -11,6 +11,17 @@
         <item name="android:switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
     </style>
 
+    <!-- Transparent Theme for Biometric Action Activities -->
+    <style name="Theme.NotiVault.Transparent" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
     <!-- Purple Theme (Default) -->
     <style name="Theme.NotiVault.Purple" parent="Theme.NotiVault">
         <item name="colorPrimary">@color/purple_light_primary</item>

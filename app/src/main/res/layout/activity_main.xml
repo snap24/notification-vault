@@ -10,12 +10,17 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="?attr/colorSurface"
+        app:liftOnScroll="false"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
+            app:elevation="0dp"
             app:title="@string/app_name"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
 
@@ -31,6 +36,18 @@
                 app:iconPadding="4dp"
                 app:iconTint="?attr/colorPrimary"
                 android:textColor="?attr/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/btn_delete_apps"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_button_square_ripple"
+                android:src="@drawable/ic_delete_sweep"
+                android:contentDescription="Delete App Logs"
+                app:tint="?attr/colorPrimary"
+                android:visibility="gone" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -50,20 +67,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        android:layout_marginHorizontal="52dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="100dp"
+        app:cardElevation="10dp"
         app:strokeWidth="1dp"
         app:strokeColor="?attr/colorOutlineVariant"
-        app:cardBackgroundColor="?attr/colorSurface">
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="58dp"
+            android:minHeight="58dp"
             android:background="@android:color/transparent"
+            android:paddingVertical="2dp"
+            android:paddingHorizontal="4dp"
             app:elevation="0dp"
+            app:itemPaddingTop="4dp"
+            app:itemPaddingBottom="4dp"
+            app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu"
             style="@style/Widget.Material3.BottomNavigationView" />
 

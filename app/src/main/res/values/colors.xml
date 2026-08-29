@@ -205,4 +205,14 @@
     <color name="black_dark_surfaceVariant">#1A1A1A</color>
     <color name="black_dark_outline">#333333</color>
     <color name="black_dark_outlineVariant">#222222</color>
+
+    <!-- Widget Modern Glass Colors -->
+    <color name="widget_card_bg">#E61E1F22</color>
+    <color name="widget_card_stroke">#2AFFFFFF</color>
+    <color name="widget_inner_bg">#18FFFFFF</color>
+    <color name="widget_status_active">#4CAF50</color>
+    <color name="widget_status_paused">#FF9800</color>
+    <color name="widget_text_primary">#FFFFFF</color>
+    <color name="widget_text_secondary">#B3FFFFFF</color>
+    <color name="widget_text_tertiary">#80FFFFFF</color>
 </resources>

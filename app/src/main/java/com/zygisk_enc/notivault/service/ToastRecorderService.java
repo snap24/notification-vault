@@ -47,6 +47,7 @@ public class ToastRecorderService extends AccessibilityService {
                 
                 ToastEntity toast = new ToastEntity(packageName, appName, encryptedText, System.currentTimeMillis());
                 AppDatabase.getInstance(this).toastDao().insert(toast);
+                com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(ToastRecorderService.this);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -21,6 +21,7 @@ public class NotificationViewModel extends AndroidViewModel {
     private final MutableLiveData<Long> filterDateStart = new MutableLiveData<>(null);
     private final MutableLiveData<Long> filterDateEnd = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> scrollToTopEvent = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> openSearchEvent = new MutableLiveData<>(false);
     private final MediatorLiveData<List<NotificationEntity>> notifications = new MediatorLiveData<>();
     private LiveData<List<NotificationEntity>> currentSource = null;
     private final LiveData<List<AppSummary>> appSummaries;
@@ -325,6 +326,18 @@ public class NotificationViewModel extends AndroidViewModel {
         scrollToTopEvent.setValue(false);
     }
 
+    public LiveData<Boolean> getOpenSearchEvent() {
+        return openSearchEvent;
+    }
+
+    public void requestOpenSearch() {
+        openSearchEvent.setValue(true);
+    }
+
+    public void clearOpenSearchEvent() {
+        openSearchEvent.setValue(false);
+    }
+
     public void markAsRead(long id) {
         repository.markAsRead(id);
     }
@@ -337,8 +350,20 @@ public class NotificationViewModel extends AndroidViewModel {
         repository.deleteById(id);
     }
 
+    public void insert(NotificationEntity entity) {
+        repository.insert(entity);
+    }
+
     public void deleteAll() {
         repository.deleteAll();
+    }
+
+    public void deleteByDateRange(long startTime, long endTime) {
+        repository.deleteByDateRange(startTime, endTime);
+    }
+
+    public void deleteByDays(java.util.Collection<Long> daysUtc) {
+        repository.deleteByDays(daysUtc);
     }
 
     public void deleteOlderThan(long timestamp) {
@@ -374,6 +399,14 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public LiveData<Long> getOldestTimestamp() {
         return repository.getOldestTimestamp();
+    }
+
+    public void deleteByPackages(List<String> packages) {
+        repository.deleteByPackages(packages);
+    }
+
+    public void deleteOlderThanForPackages(long timestamp, List<String> packages) {
+        repository.deleteOlderThanForPackages(timestamp, packages);
     }
 
     public void insertRule(AppRuleEntity rule) {

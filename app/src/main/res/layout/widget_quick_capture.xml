@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="14dp"
+    android:paddingVertical="10dp">
+
+    <!-- App Icon / Vault Logo -->
+    <ImageView
+        android:id="@+id/iv_widget_logo"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@mipmap/ic_launcher"
+        android:contentDescription="@string/app_name" />
+
+    <!-- Content: Clean 2-Row Horizontal Group -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="10dp">
+
+        <!-- Line 1: Status Dot + Status Text + App Name -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_status_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:src="@drawable/ic_circle_status"
+                android:contentDescription="@string/shortcut_toggle_capture_short" />
+
+            <TextView
+                android:id="@+id/tv_widget_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="@string/status_recording_active"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Line 2: Notification Count Subtitle -->
+        <TextView
+            android:id="@+id/tv_widget_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 notifications today"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
+    <!-- 1-Tap Toggle Button -->
+    <ImageButton
+        android:id="@+id/btn_widget_toggle_capture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_widget_pill"
+        android:src="@drawable/ic_pause"
+        android:contentDescription="@string/shortcut_toggle_capture_short"
+        android:padding="9dp"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>

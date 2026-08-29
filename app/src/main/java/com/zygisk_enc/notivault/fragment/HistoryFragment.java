@@ -12,6 +12,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.CompositeDateValidator;
+import androidx.core.util.Pair;
 
 import android.view.ViewGroup;
 import androidx.activity.result.ActivityResultLauncher;
@@ -69,6 +71,7 @@ public class HistoryFragment extends Fragment {
     private int lockedPosition = -1;
     private int lockedOffset = 0;
     private boolean isViewingMessage = false;
+    private androidx.activity.OnBackPressedCallback searchBackPressedCallback;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -105,7 +108,8 @@ public class HistoryFragment extends Fragment {
         observeNotifications();
 
         binding.btnAppRules.setOnClickListener(v -> {
-            RuleDialogHelper.showRulesListDialog(requireContext(), getViewLifecycleOwner(), viewModel);
+            Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.AppRulesActivity.class);
+            startActivity(intent);
         });
 
         binding.btnToastsHistory.setOnClickListener(v -> {
@@ -164,20 +168,20 @@ public class HistoryFragment extends Fragment {
             viewModel.setFilterPackage(null);
             viewModel.setFilterFavorites(false);
             viewModel.setDateFilter(null, null);
-            viewModel.setSearchQuery("");
-            binding.etSearch.setText("");
-            binding.layoutSearchExpanded.setVisibility(View.GONE);
-            binding.layoutSearchCollapsed.setVisibility(View.VISIBLE);
+            closeSearchBox();
             binding.recyclerView.scrollToPosition(0);
 
             binding.swipeRefresh.postDelayed(() -> {
-                binding.swipeRefresh.setRefreshing(false);
+                if (binding != null) {
+                    binding.swipeRefresh.setRefreshing(false);
+                }
             }, 800);
         });
     }
 
     private void setupRecyclerView() {
         adapter = new NotificationAdapter();
+        adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(adapter);
 
@@ -203,7 +207,7 @@ public class HistoryFragment extends Fragment {
                         requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("notification", content);
                 clipboard.setPrimaryClip(clip);
-                Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT).show();
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
             }
 
             @Override
@@ -283,32 +287,31 @@ public class HistoryFragment extends Fragment {
         binding.btnOpenCalendar.setOnLongClickListener(v -> {
             if (viewModel.getFilterDateStart().getValue() != null) {
                 viewModel.setDateFilter(null, null);
-                Snackbar.make(binding.getRoot(), "Date filter cleared", Snackbar.LENGTH_SHORT).show();
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Date filter cleared", Snackbar.LENGTH_SHORT));
             } else {
-                Snackbar.make(binding.getRoot(), "Long press to clear date filter", Snackbar.LENGTH_SHORT).show();
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Long press to clear date filter", Snackbar.LENGTH_SHORT));
             }
             return true;
         });
 
-        binding.btnOpenSearch.setOnClickListener(v -> {
-            binding.layoutSearchCollapsed.setVisibility(View.GONE);
-            binding.layoutSearchExpanded.setVisibility(View.VISIBLE);
-            binding.etSearch.requestFocus();
-            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
+        searchBackPressedCallback = new androidx.activity.OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                closeSearchBox();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), searchBackPressedCallback);
+
+        binding.btnOpenSearch.setOnClickListener(v -> openSearchBox());
+
+        viewModel.getOpenSearchEvent().observe(getViewLifecycleOwner(), open -> {
+            if (open != null && open) {
+                viewModel.clearOpenSearchEvent();
+                binding.getRoot().post(this::openSearchBox);
             }
         });
 
-        binding.btnCloseSearch.setOnClickListener(v -> {
-            binding.etSearch.setText("");
-            binding.layoutSearchExpanded.setVisibility(View.GONE);
-            binding.layoutSearchCollapsed.setVisibility(View.VISIBLE);
-            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
-            }
-        });
+        binding.btnCloseSearch.setOnClickListener(v -> closeSearchBox());
 
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -320,23 +323,171 @@ public class HistoryFragment extends Fragment {
         });
 
         binding.btnClearAll.setOnClickListener(v -> {
-            Runnable proceedToClear = () -> {
+            showDeleteCalendar();
+        });
+    }
+
+    private void openSearchBox() {
+        if (binding == null || !isAdded()) return;
+        binding.layoutSearchCollapsed.setVisibility(View.GONE);
+        binding.layoutSearchExpanded.setVisibility(View.VISIBLE);
+        if (searchBackPressedCallback != null) {
+            searchBackPressedCallback.setEnabled(true);
+        }
+        binding.etSearch.requestFocus();
+        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    private void closeSearchBox() {
+        if (binding == null) return;
+        binding.etSearch.setText("");
+        binding.layoutSearchExpanded.setVisibility(View.GONE);
+        binding.layoutSearchCollapsed.setVisibility(View.VISIBLE);
+        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
+        }
+        if (searchBackPressedCallback != null) {
+            searchBackPressedCallback.setEnabled(false);
+        }
+    }
+
+    private void showDeleteCalendar() {
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+        builder.setTitleText("Select Date to Delete Logs");
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
+        constraintsBuilder.setEnd(todayUtc);
+
+        long startUtc = todayUtc;
+        if (oldestNotificationTimestamp != null && oldestNotificationTimestamp > 0) {
+            Calendar c = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+            Calendar localOld = Calendar.getInstance();
+            localOld.setTimeInMillis(oldestNotificationTimestamp);
+            c.set(localOld.get(Calendar.YEAR), localOld.get(Calendar.MONTH), localOld.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            startUtc = c.getTimeInMillis();
+        }
+        if (startUtc > todayUtc) startUtc = todayUtc;
+        constraintsBuilder.setStart(startUtc);
+
+        java.util.List<CalendarConstraints.DateValidator> validators = new java.util.ArrayList<>();
+        validators.add(DateValidatorPointBackward.before(todayUtc + 1));
+        validators.add(DateValidatorPointForward.from(startUtc - 1));
+        constraintsBuilder.setValidator(CompositeDateValidator.allOf(validators));
+
+        builder.setCalendarConstraints(constraintsBuilder.build());
+
+        MaterialDatePicker<Long> picker = builder.build();
+
+        // Inject "Delete All" button beside Cancel button on bottom-left
+        getParentFragmentManager().registerFragmentLifecycleCallbacks(new androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentViewCreated(@NonNull androidx.fragment.app.FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
+                if (f == picker) {
+                    fm.unregisterFragmentLifecycleCallbacks(this);
+                    View cancelButton = v.findViewById(com.google.android.material.R.id.cancel_button);
+                    if (cancelButton != null && cancelButton.getParent() instanceof ViewGroup) {
+                        ViewGroup buttonContainer = (ViewGroup) cancelButton.getParent();
+                        
+                        com.google.android.material.button.MaterialButton btnDeleteAll = 
+                                new com.google.android.material.button.MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle);
+                        btnDeleteAll.setText("Delete All");
+                        int errorColor = com.google.android.material.color.MaterialColors.getColor(
+                                requireContext(), com.google.android.material.R.attr.colorError, android.graphics.Color.RED);
+                        btnDeleteAll.setTextColor(errorColor);
+                        
+                        android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                        lp.gravity = android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL;
+                        btnDeleteAll.setLayoutParams(lp);
+                        
+                        btnDeleteAll.setOnClickListener(delView -> {
+                            picker.dismiss();
+                            confirmDeleteAll();
+                        });
+                        
+                        buttonContainer.addView(btnDeleteAll, 0);
+                    }
+                }
+            }
+        }, false);
+
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection == null) return;
+            Calendar utc = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+            utc.setTimeInMillis(selection);
+            
+            Calendar local = Calendar.getInstance();
+            local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            local.set(Calendar.MILLISECOND, 0);
+            long start = local.getTimeInMillis();
+            local.add(Calendar.DAY_OF_YEAR, 1);
+            long end = local.getTimeInMillis() - 1;
+
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM d, yyyy", java.util.Locale.getDefault());
+            String formattedDate = sdf.format(new java.util.Date(start));
+
+            Runnable proceedToDeleteDate = () -> {
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.clear_all_title)
-                        .setMessage(R.string.clear_all_message)
+                        .setTitle("Delete Logs for " + formattedDate)
+                        .setMessage("Are you sure you want to delete all notifications recorded on " + formattedDate + "? Favorites will be preserved.")
                         .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.clear, (dialog, which) -> viewModel.deleteAll())
+                        .setPositiveButton(R.string.clear, (d, w) -> {
+                            viewModel.deleteByDateRange(start, end);
+                            showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Logs deleted for " + formattedDate, Snackbar.LENGTH_SHORT));
+                        })
                         .show();
             };
 
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedToClear, "Confirm authentication to clear all notifications");
+                verifyBiometricsToProceed(proceedToDeleteDate, "Confirm authentication to delete notifications");
             } else {
-                proceedToClear.run();
+                proceedToDeleteDate.run();
             }
         });
+
+        picker.show(getParentFragmentManager(), "DELETE_CALENDAR_PICKER");
+    }
+
+    private void confirmDeleteAll() {
+        Runnable proceedToClear = () -> {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.clear_all_title)
+                    .setMessage(R.string.clear_all_message)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.clear, (dialog, which) -> {
+                        viewModel.deleteAll();
+                        showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "All notifications cleared", Snackbar.LENGTH_SHORT));
+                    })
+                    .show();
+        };
+
+        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("biometric_lock", false);
+        if (isBiometricEnabled) {
+            verifyBiometricsToProceed(proceedToClear, "Confirm authentication to clear all notifications");
+        } else {
+            proceedToClear.run();
+        }
+    }
+
+    private void showAnchoredSnackbar(Snackbar snackbar) {
+        if (getActivity() != null) {
+            View navCard = getActivity().findViewById(R.id.bottom_navigation_card);
+            if (navCard != null) {
+                snackbar.setAnchorView(navCard);
+            }
+        }
+        snackbar.show();
     }
 
     private void setupSwipeToDelete() {
@@ -355,12 +506,13 @@ public class HistoryFragment extends Fragment {
                 if (item.type == NotificationAdapter.ListItem.TYPE_NOTIFICATION && item.entity != null) {
                     NotificationEntity entity = item.entity;
                     viewModel.deleteById(entity.id);
-                    Snackbar.make(binding.getRoot(), R.string.notification_deleted, Snackbar.LENGTH_LONG)
+                    Snackbar snackbar = Snackbar.make(binding.getRoot(), R.string.notification_deleted, Snackbar.LENGTH_LONG)
                             .setAction(R.string.undo, v -> {
-                                // Re-insert: we need the entity back
-                                // This is simplified - in production, save the entity before deleting
-                            })
-                            .show();
+                                if (entity != null) {
+                                    viewModel.insert(entity);
+                                }
+                            });
+                    showAnchoredSnackbar(snackbar);
                 }
             }
 
@@ -416,12 +568,10 @@ public class HistoryFragment extends Fragment {
 
         viewModel.getLoadProgress().observe(getViewLifecycleOwner(), progress -> {
             if (progress == null || progress < 0) {
-                binding.tvLoadProgress.setVisibility(View.INVISIBLE);
-                binding.btnToastsHistory.setVisibility(View.VISIBLE);
+                binding.tvLoadProgress.setVisibility(View.GONE);
             } else {
                 binding.tvLoadProgress.setVisibility(View.VISIBLE);
                 binding.tvLoadProgress.setText("Decrypting... " + progress + "%");
-                binding.btnToastsHistory.setVisibility(View.INVISIBLE);
             }
         });
         
@@ -491,38 +641,46 @@ public class HistoryFragment extends Fragment {
         layout.addView(textView);
 
         if (entity.imagePath != null && !entity.imagePath.isEmpty()) {
-            try {
-                java.io.File file = new java.io.File(entity.imagePath);
-                byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
-                if (decryptedBytes != null) {
-                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
-                    if (bitmap != null) {
-                        android.widget.ImageView imageView = new android.widget.ImageView(requireContext());
-                        android.widget.LinearLayout.LayoutParams imgLp = new android.widget.LinearLayout.LayoutParams(
-                                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                                (int) (240 * requireContext().getResources().getDisplayMetrics().density)
-                        );
-                        imgLp.topMargin = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
-                        imageView.setLayoutParams(imgLp);
-                        imageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-                        imageView.setImageBitmap(bitmap);
-                        layout.addView(imageView);
+            String[] imagePaths = entity.imagePath.split("\\|");
+            int imgIndex = 1;
+            for (String imgPath : imagePaths) {
+                if (imgPath == null || imgPath.trim().isEmpty()) continue;
+                final String currentPath = imgPath.trim();
+                try {
+                    java.io.File file = new java.io.File(currentPath);
+                    byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
+                    if (decryptedBytes != null) {
+                        android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
+                        if (bitmap != null) {
+                            android.widget.ImageView imageView = new android.widget.ImageView(requireContext());
+                            android.widget.LinearLayout.LayoutParams imgLp = new android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                    (int) (240 * requireContext().getResources().getDisplayMetrics().density)
+                            );
+                            imgLp.topMargin = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
+                            imageView.setLayoutParams(imgLp);
+                            imageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+                            imageView.setImageBitmap(bitmap);
+                            layout.addView(imageView);
 
-                        com.google.android.material.button.MaterialButton btnSave = new com.google.android.material.button.MaterialButton(requireContext());
-                        android.widget.LinearLayout.LayoutParams btnLp = new android.widget.LinearLayout.LayoutParams(
-                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        btnLp.topMargin = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
-                        btnLp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
-                        btnSave.setLayoutParams(btnLp);
-                        btnSave.setText("Save Image");
-                        btnSave.setOnClickListener(v -> saveImageToPublicDirectory(entity.imagePath, entity.appName));
-                        layout.addView(btnSave);
+                            com.google.android.material.button.MaterialButton btnSave = new com.google.android.material.button.MaterialButton(requireContext());
+                            android.widget.LinearLayout.LayoutParams btnLp = new android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            btnLp.topMargin = (int) (8 * requireContext().getResources().getDisplayMetrics().density);
+                            btnLp.bottomMargin = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
+                            btnLp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+                            btnSave.setLayoutParams(btnLp);
+                            btnSave.setText("Save");
+                            btnSave.setOnClickListener(v -> saveImageToPublicDirectory(currentPath, entity.appName));
+                            layout.addView(btnSave);
+                            imgIndex++;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
@@ -537,7 +695,7 @@ public class HistoryFragment extends Fragment {
                     ClipboardManager clipboard = (ClipboardManager)
                             requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setPrimaryClip(ClipData.newPlainText("notification", text));
-                    Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT).show();
+                    showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
                 })
                 .show();
     }
@@ -547,7 +705,7 @@ public class HistoryFragment extends Fragment {
             java.io.File file = new java.io.File(encImagePath);
             byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
             if (decryptedBytes == null) {
-                android.widget.Toast.makeText(requireContext(), "Failed to decrypt image", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(requireContext(), R.string.toast_decrypt_image_failed, android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -570,15 +728,15 @@ public class HistoryFragment extends Fragment {
                     values.clear();
                     values.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0);
                     requireContext().getContentResolver().update(imageUri, values, null, null);
-                    android.widget.Toast.makeText(requireContext(), "Image saved to Pictures/notivault image record", android.widget.Toast.LENGTH_LONG).show();
+                    android.widget.Toast.makeText(requireContext(), getString(R.string.toast_image_saved, "Pictures/notivault image record"), android.widget.Toast.LENGTH_LONG).show();
                 } else {
-                    android.widget.Toast.makeText(requireContext(), "Failed to save image", android.widget.Toast.LENGTH_SHORT).show();
+                    android.widget.Toast.makeText(requireContext(), R.string.toast_save_image_failed, android.widget.Toast.LENGTH_SHORT).show();
                 }
             } else {
                 java.io.File picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES);
                 java.io.File targetDir = new java.io.File(picturesDir, "notivault image record");
                 if (!targetDir.exists() && !targetDir.mkdirs()) {
-                    android.widget.Toast.makeText(requireContext(), "Failed to create directory", android.widget.Toast.LENGTH_SHORT).show();
+                    android.widget.Toast.makeText(requireContext(), R.string.toast_create_dir_failed, android.widget.Toast.LENGTH_SHORT).show();
                     return;
                 }
                 java.io.File targetFile = new java.io.File(targetDir, filename);
@@ -588,11 +746,11 @@ public class HistoryFragment extends Fragment {
                 android.media.MediaScannerConnection.scanFile(requireContext(),
                         new String[]{targetFile.getAbsolutePath()},
                         new String[]{"image/jpeg"}, null);
-                android.widget.Toast.makeText(requireContext(), "Image saved to " + targetFile.getAbsolutePath(), android.widget.Toast.LENGTH_LONG).show();
+                android.widget.Toast.makeText(requireContext(), getString(R.string.toast_image_saved, targetFile.getAbsolutePath()), android.widget.Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            android.widget.Toast.makeText(requireContext(), "Error saving image: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(requireContext(), getString(R.string.toast_error_saving_image, e.getMessage()), android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -675,9 +833,9 @@ public class HistoryFragment extends Fragment {
             androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
                     .setTitle("Cloud / Drive Backup Setup")
                     .setView(scrollView)
-                    .setPositiveButton("Pick Folder (3s)", null)
+                    .setPositiveButton("Pick Folder (2s)", null)
                     .setNegativeButton("Cancel", null)
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .create();
 
             dialog.setOnShowListener(dialogInterface -> {
@@ -688,8 +846,8 @@ public class HistoryFragment extends Fragment {
                     dialog.dismiss();
                 });
 
-                // 3 seconds countdown handler
-                final int[] count = {3};
+                // 2 seconds countdown handler
+                final int[] count = {2};
                 final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
                 Runnable runnable = new Runnable() {
                     @Override
@@ -830,18 +988,18 @@ public class HistoryFragment extends Fragment {
         layout.addView(switchMedia);
 
         androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
-                .setTitle("Cloud / Drive Backup")
+                .setTitle(R.string.cloud_backup_dialog_title)
                 .setView(layout)
-                .setPositiveButton("Save & Backup Now", null) // handled below
-                .setNeutralButton("Change Folder", (d, w) -> folderPickerLauncher.launch(null))
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(R.string.save_backup_now, null) // handled below
+                .setNeutralButton(R.string.change_folder, (d, w) -> folderPickerLauncher.launch(null))
+                .setNegativeButton(R.string.cancel, null)
                 .create();
 
         dialog.setOnShowListener(d -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String password = etPass.getText() != null ? etPass.getText().toString().trim() : "";
                 if (password.isEmpty()) {
-                    Toast.makeText(ctx, "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int selectedIdx = spinner.getSelectedItemPosition();
@@ -883,7 +1041,7 @@ public class HistoryFragment extends Fragment {
         String password     = PreferenceUtil.getCloudBackupPassword(ctx);
 
         if (folderUriStr == null || password == null || password.isEmpty()) {
-            Toast.makeText(ctx, "Backup folder or password not set.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, R.string.toast_backup_folder_not_set, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -892,7 +1050,7 @@ public class HistoryFragment extends Fragment {
                 androidx.documentfile.provider.DocumentFile.fromTreeUri(ctx, folderUri);
 
         if (folder == null || !folder.exists() || !folder.canWrite()) {
-            Toast.makeText(ctx, "Cannot access the backup folder. Please re-pick it.", Toast.LENGTH_LONG).show();
+            Toast.makeText(ctx, R.string.toast_backup_folder_inaccessible, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -903,11 +1061,11 @@ public class HistoryFragment extends Fragment {
         androidx.documentfile.provider.DocumentFile newFile =
                 folder.createFile("application/octet-stream", filename);
         if (newFile == null) {
-            Toast.makeText(ctx, "Could not create file in the backup folder.", Toast.LENGTH_LONG).show();
+            Toast.makeText(ctx, R.string.toast_backup_create_file_failed, Toast.LENGTH_LONG).show();
             return;
         }
 
-        Toast.makeText(ctx, "Backup started…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctx, R.string.toast_backup_started, Toast.LENGTH_SHORT).show();
 
         BackupUtil.exportBackup(ctx, newFile.getUri(), password, includeMedia, new BackupUtil.BackupProgressListener() {
             @Override public void onProgress(int progress) {}
@@ -918,7 +1076,7 @@ public class HistoryFragment extends Fragment {
                         .edit().putLong("cloud_backup_last_run", System.currentTimeMillis()).apply();
                 if (isAdded() && getActivity() != null) {
                     getActivity().runOnUiThread(() ->
-                            Toast.makeText(ctx, "✓ Backup saved to " + filename, Toast.LENGTH_LONG).show());
+                            Toast.makeText(ctx, getString(R.string.toast_backup_saved, filename), Toast.LENGTH_LONG).show());
                 }
             }
 
@@ -927,13 +1085,21 @@ public class HistoryFragment extends Fragment {
                 try { newFile.delete(); } catch (Exception ignored) {}
                 if (isAdded() && getActivity() != null) {
                     getActivity().runOnUiThread(() ->
-                            Toast.makeText(ctx, "Backup failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            Toast.makeText(ctx, getString(R.string.toast_backup_failed, e.getMessage()), Toast.LENGTH_LONG).show());
                 }
             }
         });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null && getContext() != null) {
+            adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
+        }
+    }
 
     @Override
     public void onDestroyView() {

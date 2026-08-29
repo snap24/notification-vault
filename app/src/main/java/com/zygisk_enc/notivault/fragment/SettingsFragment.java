@@ -209,7 +209,43 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         // Auto-delete preference summary
         ListPreference autoDeletePref = findPreference("auto_delete_days");
         if (autoDeletePref != null) {
-            autoDeletePref.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
+            autoDeletePref.setSummaryProvider(preference -> {
+                int days = PreferenceUtil.getAutoDeleteDays(requireContext());
+                if (days == 0) return getString(R.string.never);
+                if (days == 1) return getString(R.string.after_1_day);
+                return getString(R.string.after_x_days, days);
+            });
+        }
+
+        // Auto-delete scope / mode preference summary
+        ListPreference autoDeleteModePref = findPreference("auto_delete_mode");
+        Preference managePerAppPref = findPreference("manage_per_app_auto_delete");
+        if (autoDeleteModePref != null) {
+            autoDeleteModePref.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
+            if (managePerAppPref != null) {
+                managePerAppPref.setVisible("per_app".equals(autoDeleteModePref.getValue()));
+            }
+            autoDeleteModePref.setOnPreferenceChangeListener((pref, newValue) -> {
+                if (managePerAppPref != null) {
+                    managePerAppPref.setVisible("per_app".equals(newValue));
+                }
+                return true;
+            });
+        }
+
+        if (managePerAppPref != null) {
+            managePerAppPref.setOnPreferenceClickListener(pref -> {
+                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .getBoolean("biometric_lock", false);
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(() -> {
+                        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
+                    }, "Confirm authentication to manage Auto Delete");
+                } else {
+                    com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
+                }
+                return true;
+            });
         }
 
         // Theme color preference summary
@@ -233,6 +269,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     return false; // Intercept: don't toggle yet
                 }
                 return true; // Let enabling proceed directly
+            });
+        }
+
+        // FLAG_SECURE switch live listener
+        Preference flagSecurePref = findPreference("flag_secure");
+        if (flagSecurePref != null) {
+            flagSecurePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabled = (boolean) newValue;
+                if (getActivity() != null) {
+                    if (enabled) {
+                        getActivity().getWindow().setFlags(
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE
+                        );
+                    } else {
+                        getActivity().getWindow().clearFlags(
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE
+                        );
+                    }
+                }
+                return true;
             });
         }
 
@@ -274,12 +331,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
+        // Home screen shortcuts click listener
+        Preference pinShortcutsPref = findPreference("pin_shortcuts");
+        if (pinShortcutsPref != null) {
+            pinShortcutsPref.setOnPreferenceClickListener(pref -> {
+                com.zygisk_enc.notivault.util.ShortcutHelper.showPinShortcutsDialog(requireContext());
+                return true;
+            });
+        }
+
         // App Rules click listener
         Preference rulesPref = findPreference("app_rules");
         if (rulesPref != null) {
             rulesPref.setOnPreferenceClickListener(pref -> {
-                NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
-                com.zygisk_enc.notivault.util.RuleDialogHelper.showRulesListDialog(requireContext(), getViewLifecycleOwner(), viewModel);
+                Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.AppRulesActivity.class);
+                startActivity(intent);
                 return true;
             });
         }
@@ -338,11 +404,44 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
+                verifyBiometricsToProceed(() -> showAutoDeleteDaysDialog(preference), "Confirm authentication to change Auto Delete settings");
+                return;
+            }
+            showAutoDeleteDaysDialog(preference);
+            return;
+        }
+        if ("auto_delete_mode".equals(preference.getKey())) {
+            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean("biometric_lock", false);
+            if (isBiometricEnabled) {
                 verifyBiometricsToProceed(() -> super.onDisplayPreferenceDialog(preference), "Confirm authentication to change Auto Delete settings");
                 return;
             }
         }
         super.onDisplayPreferenceDialog(preference);
+    }
+
+    private void showAutoDeleteDaysDialog(Preference preference) {
+        com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showCustomDaysDialog(requireContext(), () -> {
+            if (preference instanceof ListPreference) {
+                ((ListPreference) preference).setValue(String.valueOf(PreferenceUtil.getAutoDeleteDays(requireContext())));
+            }
+            // Trigger background cleanup if days > 0
+            int days = PreferenceUtil.getAutoDeleteDays(requireContext());
+            if (days > 0) {
+                long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
+                NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
+                String mode = PreferenceUtil.getAutoDeleteMode(requireContext());
+                if ("per_app".equals(mode)) {
+                    java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(requireContext());
+                    if (pkgs != null && !pkgs.isEmpty()) {
+                        viewModel.deleteOlderThanForPackages(cutoff, new java.util.ArrayList<>(pkgs));
+                    }
+                } else {
+                    viewModel.deleteOlderThan(cutoff);
+                }
+            }
+        });
     }
 
     @Override
@@ -365,12 +464,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             if (getActivity() != null) {
                 getActivity().recreate();
             }
-        } else if ("auto_delete_days".equals(key)) {
+        } else if ("auto_delete_days".equals(key) || "auto_delete_mode".equals(key)) {
             int days = PreferenceUtil.getAutoDeleteDays(requireContext());
             if (days > 0) {
                 long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
                 NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
-                viewModel.deleteOlderThan(cutoff);
+                String mode = PreferenceUtil.getAutoDeleteMode(requireContext());
+                if ("per_app".equals(mode)) {
+                    java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(requireContext());
+                    if (pkgs != null && !pkgs.isEmpty()) {
+                        viewModel.deleteOlderThanForPackages(cutoff, new java.util.ArrayList<>(pkgs));
+                    }
+                } else {
+                    viewModel.deleteOlderThan(cutoff);
+                }
             }
         } else if ("capture_enabled".equals(key)) {
             // Notify the QS tile to refresh its state from the updated preference

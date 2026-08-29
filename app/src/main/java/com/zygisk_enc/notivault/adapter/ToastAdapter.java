@@ -77,7 +77,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             tvPackageName.setText(toast.packageName);
             tvToastText.setText(toast.decryptedText != null ? toast.decryptedText : "");
 
-            // Format timestamp (if today, show only time, if yesterday, show Yesterday + time, else show date + time)
+            // Format timestamp matching system 12h/24h format (if today, show only time, if yesterday, show Yesterday + time, else show date + time)
             java.util.Calendar toastCal = java.util.Calendar.getInstance();
             toastCal.setTimeInMillis(toast.timestamp);
 
@@ -85,7 +85,9 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             java.util.Calendar yesterday = java.util.Calendar.getInstance();
             yesterday.add(java.util.Calendar.DAY_OF_YEAR, -1);
 
-            String formattedTime = timeFormat.format(new java.util.Date(toast.timestamp));
+            Context context = itemView.getContext();
+            String formattedTime = com.zygisk_enc.notivault.util.DateUtils.getTimeString(context, toast.timestamp);
+
             if (toastCal.get(java.util.Calendar.YEAR) == today.get(java.util.Calendar.YEAR) &&
                     toastCal.get(java.util.Calendar.DAY_OF_YEAR) == today.get(java.util.Calendar.DAY_OF_YEAR)) {
                 tvTimestamp.setText(formattedTime);
@@ -93,7 +95,8 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
                     toastCal.get(java.util.Calendar.DAY_OF_YEAR) == yesterday.get(java.util.Calendar.DAY_OF_YEAR)) {
                 tvTimestamp.setText("Yesterday, " + formattedTime);
             } else {
-                tvTimestamp.setText(dateFormat.format(new java.util.Date(toast.timestamp)));
+                SimpleDateFormat datePrefix = new SimpleDateFormat("MMM dd, ", Locale.getDefault());
+                tvTimestamp.setText(datePrefix.format(new java.util.Date(toast.timestamp)) + formattedTime);
             }
 
             // Load and cache App Icon asynchronously
@@ -105,7 +108,6 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
                 ivAppIcon.setImageResource(R.drawable.ic_code); // Default placeholder
                 iconExecutor.execute(() -> {
                     try {
-                        Context context = itemView.getContext();
                         Drawable icon = context.getPackageManager().getApplicationIcon(toast.packageName);
                         iconCache.put(toast.packageName, icon);
                         

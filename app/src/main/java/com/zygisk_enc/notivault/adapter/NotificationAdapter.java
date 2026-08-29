@@ -57,6 +57,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private final androidx.recyclerview.widget.AsyncListDiffer<ListItem> differ;
     private OnItemClickListener listener;
+    private boolean showReadUnreadStatus = true;
+
+    public void setShowReadUnreadStatus(boolean enabled) {
+        if (this.showReadUnreadStatus != enabled) {
+            this.showReadUnreadStatus = enabled;
+            notifyDataSetChanged();
+        }
+    }
 
     private static final DiffUtil.ItemCallback<ListItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<ListItem>() {
         @Override
@@ -133,7 +141,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).bind(item.header);
         } else if (holder instanceof NotificationViewHolder) {
-            ((NotificationViewHolder) holder).bind(item.entity, listener);
+            ((NotificationViewHolder) holder).bind(item.entity, listener, showReadUnreadStatus);
         }
     }
 
@@ -181,7 +189,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             btnFavorite = itemView.findViewById(R.id.btn_favorite);
         }
 
-        void bind(NotificationEntity entity, OnItemClickListener listener) {
+        void bind(NotificationEntity entity, OnItemClickListener listener, boolean showReadUnreadStatus) {
             Context context = itemView.getContext();
 
             // App icon caching
@@ -226,10 +234,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             // Bind image (if any) asynchronously
             if (entity.imagePath != null && !entity.imagePath.isEmpty()) {
                 ivNotificationImage.setVisibility(View.VISIBLE);
-                final String path = entity.imagePath;
-                ivNotificationImage.setTag(path);
+                final String firstPath = entity.imagePath.contains("|") 
+                        ? entity.imagePath.split("\\|")[0].trim() 
+                        : entity.imagePath.trim();
+                ivNotificationImage.setTag(firstPath);
 
-                Bitmap cachedBitmap = imageCache.get(path);
+                Bitmap cachedBitmap = imageCache.get(firstPath);
                 if (cachedBitmap != null) {
                     ivNotificationImage.setImageBitmap(cachedBitmap);
                 } else {
@@ -237,15 +247,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     
                     imageExecutor.execute(() -> {
                         try {
-                            java.io.File file = new java.io.File(path);
+                            java.io.File file = new java.io.File(firstPath);
                             byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
                             if (decryptedBytes != null) {
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
                                 if (bitmap != null) {
-                                    imageCache.put(path, bitmap);
+                                    imageCache.put(firstPath, bitmap);
                                     
                                     new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                                        if (path.equals(ivNotificationImage.getTag())) {
+                                        if (firstPath.equals(ivNotificationImage.getTag())) {
                                             ivNotificationImage.setImageBitmap(bitmap);
                                         }
                                     });
@@ -271,8 +281,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
 
             // Visual difference for read/unread
-            card.setStrokeWidth(entity.isRead ? 0 : 3);
-            tvTitle.setAlpha(entity.isRead ? 0.7f : 1.0f);
+            if (showReadUnreadStatus) {
+                card.setStrokeWidth(entity.isRead ? 0 : 3);
+                tvTitle.setAlpha(entity.isRead ? 0.7f : 1.0f);
+            } else {
+                card.setStrokeWidth(0);
+                tvTitle.setAlpha(1.0f);
+            }
 
             // Bind Favorite Icon
             if (entity.isFavorite) {

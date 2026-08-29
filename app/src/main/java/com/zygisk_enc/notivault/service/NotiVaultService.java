@@ -20,6 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.util.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -116,51 +117,21 @@ public class NotiVaultService extends NotificationListenerService {
 
         // Extract picture attachments (if any)
         Uri imageUri = null;
-        long imageMsgTime = 0;
-        Bitmap chatPictureFallback = null;
         Bitmap mainPicture = null;
 
+        // For MessagingStyle (e.g. WhatsApp, Telegram, Signal):
+        // Only extract image if the CURRENT newest message is actually an image or sticker!
         if (messages != null && messages.length > 0) {
-            // Find the newest message that contains an image
-            for (int i = messages.length - 1; i >= 0; i--) {
-                Parcelable msgParcel = messages[i];
-                if (msgParcel instanceof Bundle) {
-                    Bundle msgBundle = (Bundle) msgParcel;
-                    String mimeType = msgBundle.getString("type");
-                    if (mimeType != null && mimeType.startsWith("image/")) {
-                        // Get the URI and timestamp
-                        imageUri = msgBundle.getParcelable("uri");
-                        imageMsgTime = msgBundle.getLong("time");
-
-                        // Extract fallbacks on the main thread in case URI decoding fails
-                        if (extras.containsKey(Notification.EXTRA_PICTURE)) {
-                            Object picture = extras.get(Notification.EXTRA_PICTURE);
-                            if (picture instanceof Bitmap) {
-                                chatPictureFallback = (Bitmap) picture;
-                            } else if (picture instanceof Icon) {
-                                chatPictureFallback = getBitmapFromIcon((Icon) picture);
-                            }
-                        }
-                        if (chatPictureFallback == null && extras.containsKey("android.pictureIcon")) {
-                            Object pictureIconObj = extras.get("android.pictureIcon");
-                            if (pictureIconObj instanceof Icon) {
-                                chatPictureFallback = getBitmapFromIcon((Icon) pictureIconObj);
-                            }
-                        }
-                        if (chatPictureFallback == null && extras.containsKey(Notification.EXTRA_LARGE_ICON)) {
-                            Object largeIconObj = extras.get(Notification.EXTRA_LARGE_ICON);
-                            if (largeIconObj instanceof Bitmap) {
-                                chatPictureFallback = (Bitmap) largeIconObj;
-                            } else if (largeIconObj instanceof Icon) {
-                                chatPictureFallback = getBitmapFromIcon((Icon) largeIconObj);
-                            }
-                        }
-                        break;
-                    }
+            Parcelable lastMsgParcel = messages[messages.length - 1];
+            if (lastMsgParcel instanceof Bundle) {
+                Bundle msgBundle = (Bundle) lastMsgParcel;
+                String mimeType = msgBundle.getString("type");
+                if (mimeType != null && (mimeType.startsWith("image/") || mimeType.startsWith("sticker/"))) {
+                    imageUri = msgBundle.getParcelable("uri");
                 }
             }
         } else {
-            // Non-chat notification fallback: extract directly from picture extras
+            // For standard single notifications (e.g. Screenshots, Instagram posts, MMS, etc.)
             if (extras.containsKey(Notification.EXTRA_PICTURE)) {
                 Object picture = extras.get(Notification.EXTRA_PICTURE);
                 if (picture instanceof Bitmap) {
@@ -193,8 +164,6 @@ public class NotiVaultService extends NotificationListenerService {
         final String finalBigText = bigText;
 
         final Uri finalImageUri = imageUri;
-        final long finalImageMsgTime = imageMsgTime;
-        final Bitmap finalChatPictureFallback = chatPictureFallback;
         final Bitmap finalMainPicture = mainPicture;
 
         executor.execute(() -> {
@@ -242,25 +211,36 @@ public class NotiVaultService extends NotificationListenerService {
             // Check for duplicate consecutive notifications from the same app (within 10 minutes)
             NotificationEntity lastNotif = db.notificationDao().getLastNotificationForPackage(entity.packageName);
             
-            // Background thread image extraction & timestamp validation
+            // Background thread image extraction
+            // Background thread image extraction
             Bitmap finalBitmap = null;
             if (finalImageUri != null) {
-                boolean isNewImage = true;
-                if (lastNotif != null && finalImageMsgTime > 0 && finalImageMsgTime <= lastNotif.timestamp) {
-                    isNewImage = false; // Already recorded this image in a previous notification update
-                }
-                if (isNewImage) {
-                    finalBitmap = getBitmapFromUri(finalImageUri);
-                    if (finalBitmap == null) {
-                        finalBitmap = finalChatPictureFallback;
-                    }
-                }
-            } else if (finalMainPicture != null) {
+                finalBitmap = getBitmapFromUri(finalImageUri);
+            }
+            if (finalBitmap == null && finalMainPicture != null) {
                 finalBitmap = finalMainPicture;
+            }
+
+            byte[] incomingPlainBytes = null;
+            if (finalBitmap != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                incomingPlainBytes = baos.toByteArray();
+            }
+
+            // Suppress duplicate image if identical to last notification's saved image (3-tier: Size, URI, SHA-256)
+            if (incomingPlainBytes != null && lastNotif != null && lastNotif.imagePath != null) {
+                if (isDuplicateImage(incomingPlainBytes, lastNotif.imagePath)) {
+                    incomingPlainBytes = null;
+                    finalBitmap = null;
+                }
             }
 
             boolean isDuplicate = false;
             boolean isPhotoSessionCoalesced = false;
+            boolean isIncomingImage = (incomingPlainBytes != null);
+            boolean lastIsImage = (lastNotif != null && lastNotif.imagePath != null && !lastNotif.imagePath.isEmpty());
+            boolean isMediaEvent = isIncomingImage || isPhotoMessageText(finalText) || isPhotoMessageText(finalBigText);
 
             if (lastNotif != null) {
                 // Decrypt last recorded values to compare plain texts
@@ -269,42 +249,58 @@ public class NotiVaultService extends NotificationListenerService {
                 
                 boolean titleMatches = (finalTitle == null && lastTitle == null) || (finalTitle != null && finalTitle.equals(lastTitle));
                 boolean textMatches = (finalText == null && lastText == null) || (finalText != null && finalText.equals(lastText));
-                boolean timeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 10 * 60 * 1000L;
-                boolean photoTimeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 20 * 1000L;
+                boolean timeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 15 * 1000L;
+                boolean photoTimeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 15 * 1000L;
 
-                // Photo Session Coalescing: consecutive photo notifications within 20 seconds (ONLY IF NO NEW IMAGE IS EXTRACTED)
-                if (finalBitmap == null && titleMatches && photoTimeMatches && isPhotoMessageText(finalText) && isPhotoMessageText(lastText)) {
-                    // Ignore exact timestamp matches only if the text is also identical (indicates an OS re-post)
-                    if (entity.timestamp == lastNotif.timestamp && finalText != null && finalText.equals(lastText)) {
-                        return;
-                    }
-                    
-                    String newImagePath = lastNotif.imagePath;
-                    // Update existing record in-place
-                    db.notificationDao().updatePhotoSession(lastNotif.id, entity.text, entity.timestamp, newImagePath, lastNotif.duplicateCount + 1);
-                    isPhotoSessionCoalesced = true;
-                } else if (titleMatches && textMatches) {
-                    // Ignore exact timestamp matches (OS re-post)
-                    if (entity.timestamp == lastNotif.timestamp) {
-                        return;
-                    }
-                    
-                    // If containing an image but not consecutive bulk photos, log separately
-                    if (finalBitmap != null) {
-                        isDuplicate = false;
-                    } else {
-                        if (timeMatches) {
-                            isDuplicate = true;
-                            db.notificationDao().updateDuplicate(lastNotif.id, lastNotif.duplicateCount + 1, entity.timestamp);
+                // 1. IMAGE SESSION COALESCING: Group if previous is an active image card within 15s and current is media/photo update
+                if (lastIsImage && titleMatches && photoTimeMatches && (isIncomingImage || isMediaEvent)) {
+                    String updatedImagePath = lastNotif.imagePath;
+                    int newCount = lastNotif.duplicateCount;
+
+                    if (incomingPlainBytes != null) {
+                        String newImagePath = saveEncryptedBytesToFile(incomingPlainBytes, entity.packageName);
+                        if (newImagePath != null) {
+                            if (updatedImagePath == null || updatedImagePath.isEmpty()) {
+                                updatedImagePath = newImagePath;
+                                newCount = 1;
+                            } else if (!updatedImagePath.contains(newImagePath)) {
+                                updatedImagePath = updatedImagePath + "|" + newImagePath;
+                                newCount = updatedImagePath.split("\\|").length;
+                            }
                         }
+                    } else if (updatedImagePath != null && !updatedImagePath.isEmpty()) {
+                        newCount = updatedImagePath.split("\\|").length;
                     }
+
+                    // Format text to show the aggregate count: "📷 X photos" (or preserve user caption if present)
+                    String displayText;
+                    if (finalBigText != null && !isGenericPhotoText(finalBigText)) {
+                        displayText = finalBigText;
+                    } else if (finalText != null && !isGenericPhotoText(finalText)) {
+                        displayText = finalText;
+                    } else {
+                        displayText = (newCount > 1 ? "📷 " + newCount + " photos" : "📷 Photo");
+                    }
+
+                    String encDisplay = EncryptionHelper.encrypt(displayText);
+                    db.notificationDao().updatePhotoSession(lastNotif.id, encDisplay, encDisplay, entity.timestamp, updatedImagePath, newCount);
+                    isPhotoSessionCoalesced = true;
+
+                // 2. TEXT DUPLICATE MERGING: Only group if BOTH current & previous entries are text
+                } else if (!isIncomingImage && !lastIsImage && !isMediaEvent && titleMatches && textMatches && timeMatches) {
+                    isDuplicate = true;
+                    db.notificationDao().updateDuplicate(lastNotif.id, lastNotif.duplicateCount + 1, entity.timestamp);
                 }
             }
 
             if (!isDuplicate && !isPhotoSessionCoalesced) {
                 // Save bitmap to file in background (which will encrypt it)
-                if (finalBitmap != null) {
-                    entity.imagePath = saveBitmapToFile(finalBitmap, entity.packageName);
+                if (incomingPlainBytes != null) {
+                    entity.imagePath = saveEncryptedBytesToFile(incomingPlainBytes, entity.packageName);
+                    if (isGenericPhotoText(finalText) && (finalBigText == null || isGenericPhotoText(finalBigText))) {
+                        entity.text = EncryptionHelper.encrypt("📷 Photo");
+                        entity.bigText = EncryptionHelper.encrypt("📷 Photo");
+                    }
                 }
                 db.notificationDao().insert(entity);
             }
@@ -316,11 +312,44 @@ public class NotiVaultService extends NotificationListenerService {
                 int days = PreferenceUtil.getAutoDeleteDays(this);
                 if (days > 0) {
                     long cutoff = now - (days * 24L * 60L * 60L * 1000L);
-                    db.notificationDao().deleteOlderThan(cutoff);
+                    String mode = PreferenceUtil.getAutoDeleteMode(this);
+                    if ("per_app".equals(mode)) {
+                        java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(this);
+                        if (pkgs != null && !pkgs.isEmpty()) {
+                            java.util.List<String> pkgList = new java.util.ArrayList<>(pkgs);
+                            java.util.List<String> imagePaths = db.notificationDao().getOldImagePathsForPackages(cutoff, pkgList);
+                            if (imagePaths != null) {
+                                for (String p : imagePaths) deleteEncryptedFile(p);
+                            }
+                            db.notificationDao().deleteOlderThanForPackages(cutoff, pkgList);
+                        }
+                    } else {
+                        java.util.List<String> imagePaths = db.notificationDao().getOldImagePaths(cutoff);
+                        if (imagePaths != null) {
+                            for (String p : imagePaths) deleteEncryptedFile(p);
+                        }
+                        db.notificationDao().deleteOlderThan(cutoff);
+                    }
                 }
                 PreferenceUtil.setLastAutoDeleteTime(this, now);
             }
+
+            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(NotiVaultService.this);
         });
+    }
+
+    private void deleteEncryptedFile(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            String[] paths = imagePath.split("\\|");
+            for (String p : paths) {
+                if (p != null && !p.trim().isEmpty()) {
+                    try {
+                        java.io.File f = new java.io.File(p.trim());
+                        if (f.exists()) f.delete();
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 
     private String getAppName(String packageName) {
@@ -368,20 +397,28 @@ public class NotiVaultService extends NotificationListenerService {
         return null;
     }
 
-    private String saveBitmapToFile(Bitmap bitmap, String packageName) {
-        if (bitmap == null) return null;
+    private String saveEncryptedBytesToFile(byte[] plainBytes, String packageName) {
+        if (plainBytes == null || plainBytes.length == 0) return null;
         try {
             String filename = "img_" + packageName + "_" + System.currentTimeMillis() + ".jpg";
             java.io.File file = new java.io.File(getFilesDir(), filename);
-            
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
-            byte[] plainBytes = baos.toByteArray();
-            
             boolean success = EncryptionHelper.encryptFile(plainBytes, file);
             if (success) {
                 return file.getAbsolutePath();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String saveBitmapToFile(Bitmap bitmap, String packageName) {
+        if (bitmap == null) return null;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+            byte[] plainBytes = baos.toByteArray();
+            return saveEncryptedBytesToFile(plainBytes, packageName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -403,9 +440,70 @@ public class NotiVaultService extends NotificationListenerService {
         return null;
     }
 
+    private boolean isGenericPhotoText(String text) {
+        if (text == null || text.trim().isEmpty()) return true;
+        String t = text.trim().toLowerCase();
+        return t.equals("📷 photo") || t.equals("photo") || t.equals("📷 photos") 
+                || t.equals("photos") || t.equals("📷 image") || t.equals("image")
+                || t.equals("📷 sticker") || t.equals("sticker") || t.equals("📷 video")
+                || t.equals("video") || t.matches(".*\\d+\\s*(new\\s*)?(photos?|images?|videos?).*")
+                || t.matches("📷\\s*\\d+\\s*(photos?|images?|videos?).*")
+                || t.matches(".*\\d+\\s*new\\s*messages?.*");
+    }
+
     private boolean isPhotoMessageText(String text) {
         if (text == null) return false;
         String t = text.trim().toLowerCase();
-        return t.startsWith("📷") || t.contains("photo") || t.contains("photos") || t.contains("image") || t.contains("images");
+        return t.startsWith("📷") || t.contains("photo") || t.contains("photos") 
+                || t.contains("image") || t.contains("images") || t.contains("sticker") 
+                || t.contains("stickers") || t.contains("gif") || t.contains("media") 
+                || t.contains("picture") || t.contains("video");
+    }
+
+    private static String computeSha256(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) return null;
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(bytes);
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isDuplicateImage(byte[] incomingBytes, String existingImagePaths) {
+        if (incomingBytes == null || existingImagePaths == null || existingImagePaths.isEmpty()) return false;
+        try {
+            String incomingHash = computeSha256(incomingBytes);
+            if (incomingHash == null) return false;
+
+            String[] paths = existingImagePaths.split("\\|");
+            for (String p : paths) {
+                if (p == null || p.trim().isEmpty()) continue;
+                java.io.File file = new java.io.File(p.trim());
+                if (!file.exists()) continue;
+
+                byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
+                if (decryptedBytes == null) continue;
+
+                // Step 1: Byte Length Check (0 CPU time)
+                if (incomingBytes.length != decryptedBytes.length) {
+                    continue; // Sizes differ -> different images
+                }
+
+                // Step 2 & 3: Fast SHA-256 Hash Matching
+                String savedHash = computeSha256(decryptedBytes);
+                if (incomingHash.equals(savedHash)) {
+                    return true; // 100% Identical duplicate image!
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

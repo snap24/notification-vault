@@ -20,6 +20,9 @@ public interface ToastDao {
     @Query("DELETE FROM toasts")
     void deleteAll();
 
+    @Query("SELECT COUNT(*) FROM toasts WHERE timestamp >= :startTimestamp")
+    int getCountSinceSync(long startTimestamp);
+
     @Query("SELECT MIN(timestamp) FROM toasts")
     androidx.lifecycle.LiveData<Long> getOldestTimestamp();
 }

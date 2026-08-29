@@ -10,10 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.database.AppSummary;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppViewHolder> {
 
@@ -21,13 +24,63 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
         void onAppClick(AppSummary summary);
     }
 
+    public interface OnSelectionChangedListener {
+        void onSelectionChanged(int selectedCount, int totalCount);
+    }
+
     private List<AppSummary> fullList = new ArrayList<>();
     private List<AppSummary> filteredList = new ArrayList<>();
+    private final Set<String> selectedPackages = new HashSet<>();
+    private boolean isSelectionMode = false;
     private OnAppClickListener listener;
+    private OnSelectionChangedListener selectionListener;
     private String currentQuery = "";
 
     public void setOnAppClickListener(OnAppClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnSelectionChangedListener(OnSelectionChangedListener listener) {
+        this.selectionListener = listener;
+    }
+
+    public boolean isSelectionMode() {
+        return isSelectionMode;
+    }
+
+    public void setSelectionMode(boolean enabled) {
+        if (this.isSelectionMode != enabled) {
+            this.isSelectionMode = enabled;
+            if (!enabled) {
+                selectedPackages.clear();
+            }
+            notifyDataSetChanged();
+            if (selectionListener != null) {
+                selectionListener.onSelectionChanged(selectedPackages.size(), filteredList.size());
+            }
+        }
+    }
+
+    public void selectAll() {
+        for (AppSummary summary : filteredList) {
+            selectedPackages.add(summary.packageName);
+        }
+        notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onSelectionChanged(selectedPackages.size(), filteredList.size());
+        }
+    }
+
+    public void deselectAll() {
+        selectedPackages.clear();
+        notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onSelectionChanged(0, filteredList.size());
+        }
+    }
+
+    public Set<String> getSelectedPackages() {
+        return new HashSet<>(selectedPackages);
     }
 
     public void submitList(List<AppSummary> newItems) {
@@ -50,6 +103,9 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
             }
         }
         notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onSelectionChanged(selectedPackages.size(), filteredList.size());
+        }
     }
 
     @NonNull
@@ -61,7 +117,18 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
 
     @Override
     public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
-        holder.bind(filteredList.get(position), listener);
+        AppSummary summary = filteredList.get(position);
+        holder.bind(summary, isSelectionMode, selectedPackages.contains(summary.packageName), listener, () -> {
+            if (selectedPackages.contains(summary.packageName)) {
+                selectedPackages.remove(summary.packageName);
+            } else {
+                selectedPackages.add(summary.packageName);
+            }
+            notifyItemChanged(position);
+            if (selectionListener != null) {
+                selectionListener.onSelectionChanged(selectedPackages.size(), filteredList.size());
+            }
+        });
     }
 
     @Override
@@ -70,6 +137,7 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
     }
 
     static class AppViewHolder extends RecyclerView.ViewHolder {
+        private final MaterialCheckBox cbSelect;
         private final ImageView ivIcon;
         private final TextView tvName;
         private final TextView tvPackage;
@@ -77,13 +145,14 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
 
         AppViewHolder(@NonNull View itemView) {
             super(itemView);
+            cbSelect = itemView.findViewById(R.id.cb_select_app);
             ivIcon = itemView.findViewById(R.id.iv_app_icon);
             tvName = itemView.findViewById(R.id.tv_app_name);
             tvPackage = itemView.findViewById(R.id.tv_app_package);
             tvCount = itemView.findViewById(R.id.tv_notification_count);
         }
 
-        void bind(AppSummary summary, OnAppClickListener listener) {
+        void bind(AppSummary summary, boolean selectionMode, boolean isSelected, OnAppClickListener listener, Runnable onToggle) {
             Context context = itemView.getContext();
             PackageManager pm = context.getPackageManager();
             try {
@@ -95,7 +164,15 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
             tvName.setText(summary.appName != null ? summary.appName : summary.packageName);
             tvPackage.setText(summary.packageName);
             tvCount.setText(String.valueOf(summary.count));
-            itemView.setOnClickListener(v -> { if (listener != null) listener.onAppClick(summary); });
+
+            if (selectionMode) {
+                cbSelect.setVisibility(View.VISIBLE);
+                cbSelect.setChecked(isSelected);
+                itemView.setOnClickListener(v -> onToggle.run());
+            } else {
+                cbSelect.setVisibility(View.GONE);
+                itemView.setOnClickListener(v -> { if (listener != null) listener.onAppClick(summary); });
+            }
         }
     }
 }

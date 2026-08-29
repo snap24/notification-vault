@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_custom_days_desc"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Stepper Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <!-- Minus Button -->
+            <ImageButton
+                android:id="@+id/btn_minus_days"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_button_square_ripple"
+                android:src="@drawable/ic_remove"
+                android:contentDescription="Decrease days"
+                app:tint="?attr/colorPrimary" />
+
+            <!-- Days Input Container -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginHorizontal="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_custom_days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:text="15"
+                    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_custom_days_unit"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+            </LinearLayout>
+
+            <!-- Plus Button -->
+            <ImageButton
+                android:id="@+id/btn_plus_days"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_button_square_ripple"
+                android:src="@drawable/ic_add"
+                android:contentDescription="Increase days"
+                app:tint="?attr/colorPrimary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Quick Preset Chips -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quick Presets"
+        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_presets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_never"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Never"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="7 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="60 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_90"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="90 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_180"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="180 Days"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+</LinearLayout>

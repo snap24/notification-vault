@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            isAuthenticated = savedInstanceState.getBoolean("is_authenticated", false);
+            com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(savedInstanceState.getBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked()));
         }
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -106,6 +107,14 @@ public class MainActivity extends AppCompatActivity {
                     vm.requestScrollToTop();
                 }
             });
+
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                if (destination.getId() == R.id.navigation_apps) {
+                    binding.btnDeleteApps.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    binding.btnDeleteApps.setVisibility(android.view.View.GONE);
+                }
+            });
         }
 
         // Make the bottom navigation card translucent glass-like
@@ -117,6 +126,10 @@ public class MainActivity extends AppCompatActivity {
         int glassBorderColor = androidx.core.graphics.ColorUtils.setAlphaComponent(outlineColor, 64); // 25% opacity
         binding.bottomNavigationCard.setStrokeColor(android.content.res.ColorStateList.valueOf(glassBorderColor));
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+        }
+
         // Hide bottom navigation card when keyboard is open to prevent UI layout constraints overlapping search
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
@@ -126,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             int bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
             androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp = 
                     (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.bottomNavigationCard.getLayoutParams();
-            lp.bottomMargin = bottomInset + (int)(16 * getResources().getDisplayMetrics().density);
+            lp.bottomMargin = Math.max(bottomInset, (int)(12 * getResources().getDisplayMetrics().density));
             binding.bottomNavigationCard.setLayoutParams(lp);
             
             return insets;
@@ -152,24 +165,100 @@ public class MainActivity extends AppCompatActivity {
 
         // Trigger auto-delete cleanup on startup
         runAutoDeleteCleanup();
+
+        // Initialize dynamic launcher shortcuts
+        com.zygisk_enc.notivault.util.ShortcutHelper.updateDynamicShortcuts(this);
+
+        // Handle launcher shortcut action if any
+        handleShortcutIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleShortcutIntent(intent);
+    }
+
+    private void handleShortcutIntent(Intent intent) {
+        if (intent == null) return;
+        String action = intent.getStringExtra("shortcut_action");
+        if (action == null) return;
+
+        if ("open_favorites".equals(action)) {
+            if (navController != null) {
+                navController.navigate(R.id.navigation_history);
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                        new androidx.lifecycle.ViewModelProvider(this)
+                        .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                vm.setFilterPackage(null);
+                vm.setFilterFavorites(true);
+                vm.setDateFilter(null, null);
+                vm.requestScrollToTop();
+            }
+        } else if ("open_search".equals(action)) {
+            if (navController != null) {
+                navController.navigate(R.id.navigation_history);
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                        new androidx.lifecycle.ViewModelProvider(this)
+                        .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                vm.requestOpenSearch();
+            }
+        } else if ("toggle_capture".equals(action)) {
+            Intent authIntent = new Intent(this, com.zygisk_enc.notivault.util.AuthActionActivity.class);
+            authIntent.putExtra(com.zygisk_enc.notivault.util.AuthActionActivity.EXTRA_ACTION,
+                    com.zygisk_enc.notivault.util.AuthActionActivity.ACTION_TOGGLE_CAPTURE);
+            startActivity(authIntent);
+        }
     }
 
     private void runAutoDeleteCleanup() {
         int days = PreferenceUtil.getAutoDeleteDays(this);
         if (days > 0) {
             long cutoff = System.currentTimeMillis() - (days * 24L * 60L * 60L * 1000L);
-            com.zygisk_enc.notivault.util.AppExecutor.execute(() -> AppDatabase.getInstance(MainActivity.this)
-                    .notificationDao().deleteOlderThan(cutoff));
+            String mode = PreferenceUtil.getAutoDeleteMode(this);
+            com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+                AppDatabase db = AppDatabase.getInstance(MainActivity.this);
+                if ("per_app".equals(mode)) {
+                    java.util.Set<String> pkgs = PreferenceUtil.getAutoDeletePackages(MainActivity.this);
+                    if (pkgs != null && !pkgs.isEmpty()) {
+                        java.util.List<String> pkgList = new java.util.ArrayList<>(pkgs);
+                        java.util.List<String> imagePaths = db.notificationDao().getOldImagePathsForPackages(cutoff, pkgList);
+                        if (imagePaths != null) {
+                            for (String p : imagePaths) deleteEncryptedImage(p);
+                        }
+                        db.notificationDao().deleteOlderThanForPackages(cutoff, pkgList);
+                    }
+                } else {
+                    java.util.List<String> imagePaths = db.notificationDao().getOldImagePaths(cutoff);
+                    if (imagePaths != null) {
+                        for (String p : imagePaths) deleteEncryptedImage(p);
+                    }
+                    db.notificationDao().deleteOlderThan(cutoff);
+                }
+            });
         }
     }
 
-    private boolean isAuthenticated = false;
+    private void deleteEncryptedImage(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            String[] paths = imagePath.split("\\|");
+            for (String p : paths) {
+                if (p != null && !p.trim().isEmpty()) {
+                    try {
+                        java.io.File f = new java.io.File(p.trim());
+                        if (f.exists()) f.delete();
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
+    }
 
     private void checkBiometricLock() {
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("biometric_lock", false);
         
-        if (isBiometricEnabled && !isAuthenticated) {
+        if (isBiometricEnabled && !com.zygisk_enc.notivault.util.AppLockManager.isUnlocked()) {
             binding.layoutLockOverlay.setVisibility(android.view.View.VISIBLE);
             binding.btnUnlock.setOnClickListener(v -> showBiometricPrompt());
             showBiometricPrompt();
@@ -190,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                isAuthenticated = true;
+                com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(true);
                 binding.layoutLockOverlay.setVisibility(android.view.View.GONE);
             }
 
@@ -215,14 +304,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkBiometricLock();
         checkPermissionsSequence();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChangingConfigurations()) {
-            isAuthenticated = false;
-        }
     }
 
     private boolean isNotificationServiceEnabled() {
@@ -297,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         activePermissionDialog.setOnShowListener(d -> {
             android.widget.Button positiveButton = activePermissionDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
             positiveButton.setEnabled(false);
-            new android.os.CountDownTimer(8000, 1000) {
+            new android.os.CountDownTimer(3000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     positiveButton.setText(getString(R.string.grant_access) + " (" + ((millisUntilFinished / 1000) + 1) + "s)");
@@ -335,10 +416,16 @@ public class MainActivity extends AppCompatActivity {
         activePermissionDialog.show();
     }
 
+    public void setOnDeleteAppsClickListener(android.view.View.OnClickListener listener) {
+        if (binding != null && binding.btnDeleteApps != null) {
+            binding.btnDeleteApps.setOnClickListener(listener);
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("is_authenticated", isAuthenticated);
+        outState.putBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked());
     }
 
     @Override
