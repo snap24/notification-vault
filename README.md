@@ -4,7 +4,7 @@
   <img src=".github/assets/icon.png" width="128" height="128" />
   <br><br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v2.1.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v2.1.0-9575CD? style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-26%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat&logo=gnu&logoColor=white)](LICENSE)
@@ -22,7 +22,7 @@
 *   **v2.1.0 (Current Release)**
     *   **Decryption & Logic Fixes:** Fixed decryption loops and rendering/pagination layout logics.
     *   **Easy Cloud Sync:** Added a clean way to perform automated scheduled and manual encrypted backups to cloud services (Google Drive, Nextcloud, etc.) using persistent System Access Framework (SAF) folders.
-    *   **Quick Settings (QS) Toggle:** Added a Quick Settings tile to pause/resume notification recording directly from the phone's status bar, with a settings toggle to hide/show the tile.
+    *   **Quick Settings (QS) Toggle:** Added a Quick Settings tile to pause/resume notification recording directly  from the phone's status bar, with a settings toggle to hide/show the tile.
 *   **v2.0.1**
     *   **Critical Migration Fix:** Adds Room database migration (`MIGRATION_1_8`) to resolve crashes when upgrading from v1.0.0. **Users are strongly advised to install v2.0.1 directly and skip v2.0.0.**
     *   **On-Device Encryption:** Full database encryption (AES-256-GCM) protecting notification strings.
