@@ -239,22 +239,29 @@ public class NotificationViewModel extends AndroidViewModel {
                                         chunkResults[chunkIndex].add(entity);
                                     }
 
-                                    // Progressive milestone publishing at 10%, 20%, 30%... or every 80ms
-                                    int milestone = progress / 10;
-                                    long now = System.currentTimeMillis();
-                                    boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
-                                    boolean timeTrigger = (now - lastPublishTime.get() >= 80);
+                                    // Progressive list streaming enabled for:
+                                    // 1) Search mode (entire search dataset)
+                                    // 2) Initial feed batch (0 - 500 items)
+                                    // For subsequent scroll batches (501+), toolbar pill shows progress while list appends once at 100%
+                                    final boolean allowProgressiveListStreaming = searchingMode || (limit <= 500);
 
-                                    if ((milestoneTrigger || timeTrigger) && runToken == currentRunToken) {
-                                        lastPublishTime.set(now);
-                                        java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
-                                        for (int k = 0; k < numChunks; k++) {
-                                            synchronized (chunkResults[k]) {
-                                                snapshot.addAll(chunkResults[k]);
+                                    if (allowProgressiveListStreaming) {
+                                        int milestone = progress / 10;
+                                        long now = System.currentTimeMillis();
+                                        boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
+                                        boolean timeTrigger = (now - lastPublishTime.get() >= 80);
+
+                                        if ((milestoneTrigger || timeTrigger) && runToken == currentRunToken) {
+                                            lastPublishTime.set(now);
+                                            java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
+                                            for (int k = 0; k < numChunks; k++) {
+                                                synchronized (chunkResults[k]) {
+                                                    snapshot.addAll(chunkResults[k]);
+                                                }
                                             }
-                                        }
-                                        if (!snapshot.isEmpty() && runToken == currentRunToken) {
-                                            notifications.postValue(snapshot);
+                                            if (!snapshot.isEmpty() && runToken == currentRunToken) {
+                                                notifications.postValue(snapshot);
+                                            }
                                         }
                                     }
                                 }
