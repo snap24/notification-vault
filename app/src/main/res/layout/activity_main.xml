@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="20dp"
                 app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
