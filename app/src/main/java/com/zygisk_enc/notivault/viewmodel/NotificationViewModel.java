@@ -177,6 +177,12 @@ public class NotificationViewModel extends AndroidViewModel {
                     java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numChunks);
                     @SuppressWarnings("unchecked")
                     final java.util.List<NotificationEntity>[] chunkResults = new java.util.List[numChunks];
+                    for (int c = 0; c < numChunks; c++) {
+                        chunkResults[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+                    }
+
+                    final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
+                    final java.util.concurrent.atomic.AtomicLong lastPublishTime = new java.util.concurrent.atomic.AtomicLong(System.currentTimeMillis());
 
                     for (int c = 0; c < numChunks; c++) {
                         final int chunkIndex = c;
@@ -184,7 +190,6 @@ public class NotificationViewModel extends AndroidViewModel {
                         final int endIdx = Math.min(total, startIdx + chunkSize);
 
                         parallelDecryptionPool.execute(() -> {
-                            java.util.List<NotificationEntity> localFiltered = new java.util.ArrayList<>();
                             try {
                                 for (int i = startIdx; i < endIdx; i++) {
                                     if (runToken != currentRunToken) return;
@@ -210,13 +215,15 @@ public class NotificationViewModel extends AndroidViewModel {
                                     }
 
                                     int processed = processedCount.incrementAndGet();
-                                    if (showProgress && (processed % 25 == 0 || processed == total)) {
-                                        int progress = (processed * 100) / total;
+                                    int progress = (processed * 100) / total;
+
+                                    if (showProgress && (processed % 15 == 0 || processed == total)) {
                                         if (runToken == currentRunToken) {
                                             loadProgress.postValue(progress);
                                         }
                                     }
 
+                                    boolean matches = true;
                                     if (searchingMode) {
                                         boolean appNameMatches = entity.appName != null && entity.appName.toLowerCase().contains(lowerQuery);
                                         boolean titleMatches = entity.decryptedTitle != null && entity.decryptedTitle.toLowerCase().contains(lowerQuery);
@@ -224,19 +231,34 @@ public class NotificationViewModel extends AndroidViewModel {
                                         boolean bigTextMatches = entity.decryptedBigText != null && entity.decryptedBigText.toLowerCase().contains(lowerQuery);
 
                                         if (!appNameMatches && !titleMatches && !textMatches && !bigTextMatches) {
-                                            continue;
+                                            matches = false;
                                         }
                                     }
 
-                                    localFiltered.add(entity);
+                                    if (matches) {
+                                        chunkResults[chunkIndex].add(entity);
+                                    }
 
-                                    // Progressive update from the first chunk (top most recent items)
-                                    if (chunkIndex == 0 && searchingMode && localFiltered.size() == 1 && runToken == currentRunToken) {
-                                        notifications.postValue(new java.util.ArrayList<>(localFiltered));
+                                    // Progressive milestone publishing at 10%, 20%, 30%... or every 80ms
+                                    int milestone = progress / 10;
+                                    long now = System.currentTimeMillis();
+                                    boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
+                                    boolean timeTrigger = (now - lastPublishTime.get() >= 80);
+
+                                    if ((milestoneTrigger || timeTrigger) && runToken == currentRunToken) {
+                                        lastPublishTime.set(now);
+                                        java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
+                                        for (int k = 0; k < numChunks; k++) {
+                                            synchronized (chunkResults[k]) {
+                                                snapshot.addAll(chunkResults[k]);
+                                            }
+                                        }
+                                        if (!snapshot.isEmpty() && runToken == currentRunToken) {
+                                            notifications.postValue(snapshot);
+                                        }
                                     }
                                 }
                             } finally {
-                                chunkResults[chunkIndex] = localFiltered;
                                 latch.countDown();
                             }
                         });
@@ -247,16 +269,16 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     if (runToken != currentRunToken) return;
 
-                    // Merge results in strict chronological order
-                    java.util.List<NotificationEntity> mergedList = new java.util.ArrayList<>(total);
-                    for (int c = 0; c < numChunks; c++) {
-                        if (chunkResults[c] != null) {
-                            mergedList.addAll(chunkResults[c]);
+                    // Final complete list in strict chronological order
+                    java.util.List<NotificationEntity> finalMerged = new java.util.ArrayList<>(total);
+                    for (int k = 0; k < numChunks; k++) {
+                        synchronized (chunkResults[k]) {
+                            finalMerged.addAll(chunkResults[k]);
                         }
                     }
 
                     if (runToken == currentRunToken) {
-                        notifications.postValue(mergedList);
+                        notifications.postValue(finalMerged);
                     }
 
                     if (showProgress) {
