@@ -28,6 +28,15 @@ public class AppsFragment extends Fragment {
     private AppFilterAdapter adapter;
     private OnBackPressedCallback backPressedCallback;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setEnterTransition(new com.google.android.material.transition.MaterialFadeThrough());
+        setExitTransition(new com.google.android.material.transition.MaterialFadeThrough());
+        setReenterTransition(new com.google.android.material.transition.MaterialFadeThrough());
+        setReturnTransition(new com.google.android.material.transition.MaterialFadeThrough());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
