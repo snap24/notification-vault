@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Authentifizieren, um dieses Widget zum Startbildschirm hinzuzufügen</string>
     <string name="auth_toggle_capture_subtitle">Authentifizierung bestätigen, um die Aufzeichnung umzuschalten</string>
     <string name="auth_disable_lock">Authentifizierung bestätigen, um die App-Sperre zu deaktivieren</string>
+    <string name="auth_toggle_flag_secure">Authentifizierung bestätigen, um den Screenshot-Schutz zu ändern</string>
     <string name="auth_export_backup">Authentifizierung bestätigen, um ein Backup zu exportieren</string>
     <string name="auth_access_toast_logs">Authentifizieren, um auf Toast-Protokolle zuzugreifen</string>
     <string name="auth_delete_notifications">Authentifizierung bestätigen, um Benachrichtigungen zu löschen</string>

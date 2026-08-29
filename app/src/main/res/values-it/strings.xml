@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Autenticati per aggiungere questo widget alla schermata iniziale</string>
     <string name="auth_toggle_capture_subtitle">Conferma l\'autenticazione per attivare/disattivare la registrazione</string>
     <string name="auth_disable_lock">Conferma l\'autenticazione per disattivare il blocco app</string>
+    <string name="auth_toggle_flag_secure">Conferma l\'autenticazione per modificare la protezione da screenshot</string>
     <string name="auth_export_backup">Conferma l\'autenticazione per esportare il backup</string>
     <string name="auth_access_toast_logs">Autenticati per accedere ai registri toast</string>
     <string name="auth_delete_notifications">Conferma l\'autenticazione per eliminare le notifiche</string>

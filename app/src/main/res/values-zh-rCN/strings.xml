@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">验证身份以将此微件添加到主屏幕</string>
     <string name="auth_toggle_capture_subtitle">验证身份以切换录制状态</string>
     <string name="auth_disable_lock">验证身份以关闭应用锁</string>
+    <string name="auth_toggle_flag_secure">验证身份以更改防截屏录屏保护设置</string>
     <string name="auth_export_backup">验证身份以导出备份</string>
     <string name="auth_access_toast_logs">验证身份以访问 Toast 日志</string>
     <string name="auth_delete_notifications">验证身份以删除通知</string>

@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Potwierdź tożsamość, aby dodać ten widżet do ekranu głównego</string>
     <string name="auth_toggle_capture_subtitle">Potwierdź tożsamość, aby przełączyć rejestrowanie</string>
     <string name="auth_disable_lock">Potwierdź tożsamość, aby wyłączyć blokadę aplikacji</string>
+    <string name="auth_toggle_flag_secure">Potwierdź tożsamość, aby zmienić ochronę przed zrzutami ekranu</string>
     <string name="auth_export_backup">Potwierdź tożsamość, aby wyeksportować kopię zapasową</string>
     <string name="auth_access_toast_logs">Potwierdź tożsamość, aby uzyskać dostęp do dziennika dymków Toast</string>
     <string name="auth_delete_notifications">Potwierdź tożsamość, aby usunąć powiadomienia</string>

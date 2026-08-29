@@ -320,24 +320,54 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
-        // FLAG_SECURE switch live listener
+        // FLAG_SECURE switch live listener with biometric authentication
         Preference flagSecurePref = findPreference("flag_secure");
         if (flagSecurePref != null) {
             flagSecurePref.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean enabled = (boolean) newValue;
-                if (getActivity() != null) {
-                    if (enabled) {
-                        getActivity().getWindow().setFlags(
-                                android.view.WindowManager.LayoutParams.FLAG_SECURE,
-                                android.view.WindowManager.LayoutParams.FLAG_SECURE
-                        );
-                    } else {
-                        getActivity().getWindow().clearFlags(
-                                android.view.WindowManager.LayoutParams.FLAG_SECURE
-                        );
+                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .getBoolean("biometric_lock", false);
+
+                Runnable applyChange = () -> {
+                    if (preference instanceof SwitchPreferenceCompat) {
+                        ((SwitchPreferenceCompat) preference).setChecked(enabled);
                     }
+                    PreferenceManager.getDefaultSharedPreferences(requireContext())
+                            .edit()
+                            .putBoolean("flag_secure", enabled)
+                            .apply();
+                    if (getActivity() != null) {
+                        if (enabled) {
+                            getActivity().getWindow().setFlags(
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
+                            );
+                        } else {
+                            getActivity().getWindow().clearFlags(
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
+                            );
+                        }
+                    }
+                };
+
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(applyChange, getString(R.string.auth_toggle_flag_secure));
+                    return false;
+                } else {
+                    if (getActivity() != null) {
+                        if (enabled) {
+                            getActivity().getWindow().setFlags(
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
+                            );
+                        } else {
+                            getActivity().getWindow().clearFlags(
+                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
+                            );
+                        }
+                    }
+                    return true;
                 }
-                return true;
             });
         }
 

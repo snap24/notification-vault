@@ -72,6 +72,7 @@
     <string name="auth_widget_add_subtitle">Authenticate to add this widget to your home screen</string>
     <string name="auth_toggle_capture_subtitle">Confirm authentication to toggle recording</string>
     <string name="auth_disable_lock">Confirm authentication to disable App Lock</string>
+    <string name="auth_toggle_flag_secure">Confirm authentication to change screenshot protection</string>
     <string name="auth_export_backup">Confirm authentication to export backup</string>
     <string name="auth_access_toast_logs">Authenticate to access your toast logs</string>
     <string name="auth_delete_notifications">Confirm authentication to delete notifications</string>

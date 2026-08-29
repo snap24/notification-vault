@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Подтвердите личность для добавления виджета на главный экран</string>
     <string name="auth_toggle_capture_subtitle">Подтвердите личность для переключения записи</string>
     <string name="auth_disable_lock">Подтвердите личность для отключения блокировки приложения</string>
+    <string name="auth_toggle_flag_secure">Подтвердите личность для изменения защиты от снимков экрана</string>
     <string name="auth_export_backup">Подтвердите личность для экспорта резервной копии</string>
     <string name="auth_access_toast_logs">Подтвердите личность для доступа к журналу всплывающих окон</string>
     <string name="auth_delete_notifications">Подтвердите личность для удаления уведомлений</string>

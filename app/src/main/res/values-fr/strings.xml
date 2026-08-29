@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Authentifiez-vous pour ajouter ce widget à votre écran d\'accueil</string>
     <string name="auth_toggle_capture_subtitle">Confirmez l\'authentification pour basculer l\'enregistrement</string>
     <string name="auth_disable_lock">Confirmez l\'authentification pour désactiver le verrouillage de l\'application</string>
+    <string name="auth_toggle_flag_secure">Confirmez l\'authentification pour modifier la protection contre les captures d\'écran</string>
     <string name="auth_export_backup">Confirmez l\'authentification pour exporter la sauvegarde</string>
     <string name="auth_access_toast_logs">Authentifiez-vous pour accéder à vos journaux de toasts</string>
     <string name="auth_delete_notifications">Confirmez l\'authentification pour supprimer les notifications</string>

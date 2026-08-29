@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">このウィジェットをホーム画面に追加するには認証してください</string>
     <string name="auth_toggle_capture_subtitle">記録状態を切り替えるには認証してください</string>
     <string name="auth_disable_lock">アプリロックを無効化するには認証してください</string>
+    <string name="auth_toggle_flag_secure">スクリーンショット保護設定を変更するには認証してください</string>
     <string name="auth_export_backup">バックアップをエクスポートするには認証してください</string>
     <string name="auth_access_toast_logs">トーストログにアクセスするには認証してください</string>
     <string name="auth_delete_notifications">通知を削除するには認証してください</string>

@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">Autentikasi untuk menambahkan widget ini ke layar utama</string>
     <string name="auth_toggle_capture_subtitle">Konfirmasi autentikasi untuk beralih perekaman</string>
     <string name="auth_disable_lock">Konfirmasi autentikasi untuk menonaktifkan Kunci Aplikasi</string>
+    <string name="auth_toggle_flag_secure">Konfirmasi autentikasi untuk mengubah perlindungan tangkapan layar</string>
     <string name="auth_export_backup">Konfirmasi autentikasi untuk mengekspor cadangan</string>
     <string name="auth_access_toast_logs">Autentikasi untuk mengakses log toast Anda</string>
     <string name="auth_delete_notifications">Konfirmasi autentikasi untuk menghapus notifikasi</string>

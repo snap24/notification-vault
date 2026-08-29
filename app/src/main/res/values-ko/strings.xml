@@ -60,6 +60,7 @@
     <string name="auth_widget_add_subtitle">홈 화면에 위젯을 추가하려면 인증하세요</string>
     <string name="auth_toggle_capture_subtitle">기록 상태를 변경하려면 인증하세요</string>
     <string name="auth_disable_lock">앱 잠금을 해제하려면 인증하세요</string>
+    <string name="auth_toggle_flag_secure">화면 캡처 보호 설정을 변경하려면 본인 인증을 진행하세요</string>
     <string name="auth_export_backup">백업을 내보내려면 인증하세요</string>
     <string name="auth_access_toast_logs">토스트 로그에 접근하려면 인증하세요</string>
     <string name="auth_delete_notifications">알림을 삭제하려면 인증하세요</string>
