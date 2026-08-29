@@ -88,6 +88,8 @@
     <string name="pref_capture_enabled_summary">Eingehende Benachrichtigungen erfassen</string>
     <string name="pref_qs_tile_title">Kachel für Schnelleinstellungen anzeigen</string>
     <string name="pref_qs_tile_summary">Einen Schnellschalter zum Pausieren/Fortsetzen der Aufnahme im Benachrichtigungsfeld Ihres Telefons hinzufügen.</string>
+    <string name="pref_language_title">App-Sprache</string>
+    <string name="pref_language_summary">Sprache für NotiVault auswählen</string>
     <string name="pref_theme_color_title">Designfarbe</string>
     <string name="pref_theme_color_summary">Basisdesignfarbe der App auswählen</string>
     <string name="pref_pitch_black_title">Tiefschwarz</string>

@@ -20,10 +20,19 @@
 
         <SwitchPreferenceCompat
             app:key="qs_tile_enabled"
-            app:title="Show Quick Settings Tile"
-            app:summary="Add a quick toggle to pause/resume recording from your phone's notifications panel."
+            app:title="@string/pref_qs_tile_title"
+            app:summary="@string/pref_qs_tile_summary"
             app:defaultValue="true"
             app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="app_language"
+            app:title="@string/pref_language_title"
+            app:summary="@string/pref_language_summary"
+            app:entries="@array/language_entries"
+            app:entryValues="@array/language_values"
+            app:defaultValue="system"
             app:iconSpaceReserved="false" />
 
         <ListPreference

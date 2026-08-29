@@ -88,6 +88,8 @@
     <string name="pref_capture_enabled_summary">Capturar notificações recebidas</string>
     <string name="pref_qs_tile_title">Mostrar bloco nas Configurações Rápidas</string>
     <string name="pref_qs_tile_summary">Adicione um botão rápido para pausar/retomar a gravação no painel de notificações.</string>
+    <string name="pref_language_title">Idioma do aplicativo</string>
+    <string name="pref_language_summary">Selecione o idioma para o NotiVault</string>
     <string name="pref_theme_color_title">Cor do tema</string>
     <string name="pref_theme_color_summary">Escolha a cor principal do aplicativo</string>
     <string name="pref_pitch_black_title">Preto absoluto (Pitch Black)</string>

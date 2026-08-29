@@ -88,6 +88,8 @@
     <string name="pref_capture_enabled_summary">Capturer les notifications entrantes</string>
     <string name="pref_qs_tile_title">Afficher la tuile des paramètres rapides</string>
     <string name="pref_qs_tile_summary">Ajouter un bouton rapide pour suspendre/reprendre l\'enregistrement depuis le volet des notifications de votre téléphone.</string>
+    <string name="pref_language_title">Langue de l\'application</string>
+    <string name="pref_language_summary">Sélectionner la langue pour NotiVault</string>
     <string name="pref_theme_color_title">Couleur du thème</string>
     <string name="pref_theme_color_summary">Choisir la couleur de base de l\'application</string>
     <string name="pref_pitch_black_title">Noir absolu</string>

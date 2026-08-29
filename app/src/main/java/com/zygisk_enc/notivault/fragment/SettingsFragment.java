@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
@@ -252,6 +254,36 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     }, getString(R.string.auth_manage_auto_delete));
                 } else {
                     com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
+                }
+                return true;
+            });
+        }
+
+        // App language preference
+        ListPreference languagePref = findPreference("app_language");
+        if (languagePref != null) {
+            LocaleListCompat currentLocales = AppCompatDelegate.getApplicationLocales();
+            if (currentLocales.isEmpty()) {
+                languagePref.setValue("system");
+            } else {
+                String tag = currentLocales.get(0).toLanguageTag();
+                if (tag.startsWith("de")) languagePref.setValue("de");
+                else if (tag.startsWith("es")) languagePref.setValue("es");
+                else if (tag.startsWith("fr")) languagePref.setValue("fr");
+                else if (tag.startsWith("ru")) languagePref.setValue("ru");
+                else if (tag.startsWith("pt")) languagePref.setValue("pt-BR");
+                else if (tag.startsWith("zh")) languagePref.setValue("zh-CN");
+                else if (tag.startsWith("en")) languagePref.setValue("en");
+                else languagePref.setValue("system");
+            }
+
+            languagePref.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
+            languagePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                String langTag = (String) newValue;
+                if ("system".equals(langTag)) {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
+                } else {
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(langTag));
                 }
                 return true;
             });

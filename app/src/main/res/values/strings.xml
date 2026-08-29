@@ -105,6 +105,8 @@
     <string name="pref_capture_enabled_summary">Capture incoming notifications</string>
     <string name="pref_qs_tile_title">Show Quick Settings Tile</string>
     <string name="pref_qs_tile_summary">Add a quick toggle to pause/resume recording from your phone\'s notifications panel.</string>
+    <string name="pref_language_title">App Language</string>
+    <string name="pref_language_summary">Select language for NotiVault</string>
     <string name="pref_theme_color_title">Theme Color</string>
     <string name="pref_theme_color_summary">Choose application base theme color</string>
     <string name="pref_pitch_black_title">Pitch Black</string>

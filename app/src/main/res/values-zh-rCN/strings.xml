@@ -88,6 +88,8 @@
     <string name="pref_capture_enabled_summary">捕获接收到的新通知</string>
     <string name="pref_qs_tile_title">显示快捷设置磁贴</string>
     <string name="pref_qs_tile_summary">在手机通知栏快捷开关中添加磁贴以快速暂停/恢复记录。</string>
+    <string name="pref_language_title">应用语言</string>
+    <string name="pref_language_summary">选择 NotiVault 的界面语言</string>
     <string name="pref_theme_color_title">主题颜色</string>
     <string name="pref_theme_color_summary">选择应用程序的基础主题色</string>
     <string name="pref_pitch_black_title">纯黑模式 (Pitch Black)</string>

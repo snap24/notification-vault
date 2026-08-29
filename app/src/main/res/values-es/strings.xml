@@ -88,6 +88,8 @@
     <string name="pref_capture_enabled_summary">Capturar notificaciones entrantes</string>
     <string name="pref_qs_tile_title">Mostrar mosaico en Ajustes rápidos</string>
     <string name="pref_qs_tile_summary">Añade un interruptor rápido para pausar/reanudar la grabación desde el panel de notificaciones.</string>
+    <string name="pref_language_title">Idioma de la aplicación</string>
+    <string name="pref_language_summary">Selecciona el idioma para NotiVault</string>
     <string name="pref_theme_color_title">Color del tema</string>
     <string name="pref_theme_color_summary">Elige el color base del tema de la app</string>
     <string name="pref_pitch_black_title">Negro puro (Pitch Black)</string>
