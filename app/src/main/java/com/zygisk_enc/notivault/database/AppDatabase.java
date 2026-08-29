@@ -5,7 +5,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 9, exportSchema = false)
+@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 10, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -42,7 +42,8 @@ public abstract class AppDatabase extends RoomDatabase {
                     "`packageName` TEXT, " +
                     "`appName` TEXT, " +
                     "`text` TEXT, " +
-                    "`timestamp` INTEGER NOT NULL)");
+                    "`timestamp` INTEGER NOT NULL, " +
+                    "`duplicateCount` INTEGER NOT NULL DEFAULT 1)");
 
             // 5. Create the indexes for the 'toasts' table
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_toasts_packageName` ON `toasts` (`packageName`)");
@@ -76,6 +77,13 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    public static final androidx.room.migration.Migration MIGRATION_9_10 = new androidx.room.migration.Migration(9, 10) {
+        @Override
+        public void migrate(@androidx.annotation.NonNull androidx.sqlite.db.SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE `toasts` ADD COLUMN `duplicateCount` INTEGER NOT NULL DEFAULT 1");
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -85,7 +93,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "notivault_database"
                     )
-                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9)
+                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                     .build();
                 }
             }

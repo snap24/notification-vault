@@ -38,6 +38,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             public boolean areContentsTheSame(@NonNull ToastEntity oldItem, @NonNull ToastEntity newItem) {
                 return oldItem.id == newItem.id
                         && oldItem.timestamp == newItem.timestamp
+                        && oldItem.duplicateCount == newItem.duplicateCount
                         && java.util.Objects.equals(oldItem.packageName, newItem.packageName)
                         && java.util.Objects.equals(oldItem.appName, newItem.appName)
                         && java.util.Objects.equals(oldItem.decryptedText, newItem.decryptedText);
@@ -62,6 +63,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
         private final TextView tvAppName;
         private final TextView tvPackageName;
         private final TextView tvTimestamp;
+        private final TextView tvDuplicateCount;
         private final TextView tvToastText;
 
         public ViewHolder(@NonNull View itemView) {
@@ -70,6 +72,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             tvAppName = itemView.findViewById(R.id.tv_app_name);
             tvPackageName = itemView.findViewById(R.id.tv_package_name);
             tvTimestamp = itemView.findViewById(R.id.tv_timestamp);
+            tvDuplicateCount = itemView.findViewById(R.id.tv_duplicate_count);
             tvToastText = itemView.findViewById(R.id.tv_toast_text);
         }
 
@@ -77,6 +80,13 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             tvAppName.setText(toast.appName);
             tvPackageName.setText(toast.packageName);
             tvToastText.setText(toast.decryptedText != null ? toast.decryptedText : "");
+
+            if (toast.duplicateCount > 1) {
+                tvDuplicateCount.setVisibility(View.VISIBLE);
+                tvDuplicateCount.setText("x" + toast.duplicateCount);
+            } else {
+                tvDuplicateCount.setVisibility(View.GONE);
+            }
 
             // Format timestamp matching system 12h/24h format (if today, show only time, if yesterday, show Yesterday + time, else show date + time)
             java.util.Calendar toastCal = java.util.Calendar.getInstance();

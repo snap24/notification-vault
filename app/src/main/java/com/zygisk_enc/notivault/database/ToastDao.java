@@ -37,4 +37,10 @@ public interface ToastDao {
 
     @Query("SELECT packageName, appName, COUNT(*) as count FROM toasts GROUP BY packageName ORDER BY count DESC")
     List<AppSummary> getToastAppSummariesSync();
+
+    @Query("SELECT * FROM toasts WHERE packageName = :packageName ORDER BY timestamp DESC LIMIT 1")
+    ToastEntity getLastToastForPackageSync(String packageName);
+
+    @Query("UPDATE toasts SET duplicateCount = :count, timestamp = :timestamp WHERE id = :id")
+    void updateDuplicate(long id, int count, long timestamp);
 }

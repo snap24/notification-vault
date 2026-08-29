@@ -18,6 +18,7 @@ public class ToastEntity {
     public String appName;
     public String text; // encrypted
     public long timestamp;
+    public int duplicateCount;
 
     @Ignore
     public String decryptedText;
@@ -27,5 +28,6 @@ public class ToastEntity {
         this.appName = appName;
         this.text = text;
         this.timestamp = timestamp;
+        this.duplicateCount = 1;
     }
 }

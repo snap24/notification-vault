@@ -39,14 +39,35 @@ public class ToastRecorderService extends AccessibilityService {
     private void saveToast(String packageName, String text) {
         com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
             try {
-                // Encrypt the toast text using our local Keystore
-                String encryptedText = EncryptionHelper.encrypt(text);
-                
-                // Get app name from package name
-                String appName = getAppName(packageName);
-                
-                ToastEntity toast = new ToastEntity(packageName, appName, encryptedText, System.currentTimeMillis());
-                AppDatabase.getInstance(this).toastDao().insert(toast);
+                AppDatabase db = AppDatabase.getInstance(this);
+                long now = System.currentTimeMillis();
+                ToastEntity lastToast = db.toastDao().getLastToastForPackageSync(packageName);
+
+                boolean isDuplicate = false;
+                if (lastToast != null) {
+                    boolean timeMatches = Math.abs(now - lastToast.timestamp) <= 30 * 1000L;
+                    if (timeMatches) {
+                        String lastDecrypted = EncryptionHelper.decrypt(lastToast.text);
+                        if (text.equals(lastDecrypted)) {
+                            isDuplicate = true;
+                            int newCount = Math.max(1, lastToast.duplicateCount) + 1;
+                            db.toastDao().updateDuplicate(lastToast.id, newCount, now);
+                        }
+                    }
+                }
+
+                if (!isDuplicate) {
+                    // Encrypt the toast text using our local Keystore
+                    String encryptedText = EncryptionHelper.encrypt(text);
+
+                    // Get app name from package name
+                    String appName = getAppName(packageName);
+
+                    ToastEntity toast = new ToastEntity(packageName, appName, encryptedText, now);
+                    toast.duplicateCount = 1;
+                    db.toastDao().insert(toast);
+                }
+
                 com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(ToastRecorderService.this);
             } catch (Exception e) {
                 e.printStackTrace();
