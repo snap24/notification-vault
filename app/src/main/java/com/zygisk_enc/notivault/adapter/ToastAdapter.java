@@ -25,6 +25,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
 
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault());
+    private final SimpleDateFormat datePrefixFormat = new SimpleDateFormat("MMM dd, ", Locale.getDefault());
 
     public ToastAdapter() {
         super(new DiffUtil.ItemCallback<ToastEntity>() {
@@ -35,9 +36,11 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
 
             @Override
             public boolean areContentsTheSame(@NonNull ToastEntity oldItem, @NonNull ToastEntity newItem) {
-                return oldItem.text.equals(newItem.text) 
+                return oldItem.id == newItem.id
                         && oldItem.timestamp == newItem.timestamp
-                        && oldItem.packageName.equals(newItem.packageName);
+                        && java.util.Objects.equals(oldItem.packageName, newItem.packageName)
+                        && java.util.Objects.equals(oldItem.appName, newItem.appName)
+                        && java.util.Objects.equals(oldItem.decryptedText, newItem.decryptedText);
             }
         });
     }
@@ -93,8 +96,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
                     toastCal.get(java.util.Calendar.DAY_OF_YEAR) == yesterday.get(java.util.Calendar.DAY_OF_YEAR)) {
                 tvTimestamp.setText(context.getString(R.string.time_yesterday_format, formattedTime));
             } else {
-                SimpleDateFormat datePrefix = new SimpleDateFormat("MMM dd, ", Locale.getDefault());
-                tvTimestamp.setText(datePrefix.format(new java.util.Date(toast.timestamp)) + formattedTime);
+                tvTimestamp.setText(datePrefixFormat.format(new java.util.Date(toast.timestamp)) + formattedTime);
             }
 
             // Load and cache App Icon asynchronously using memory-safe AppIconLoader

@@ -150,8 +150,8 @@ public class ToastViewModel extends AndroidViewModel {
                 final Long dateEnd = filterDateEnd.getValue();
                 final String filterPkg = filterPackage.getValue();
 
-                // Slicing across parallel multi-core threads
-                int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 49) / 50));
+                // Aggressive multi-core slicing across all available CPU cores (up to 8 threads)
+                int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 7) / 8));
                 int chunkSize = (total + numChunks - 1) / numChunks;
 
                 java.util.concurrent.atomic.AtomicInteger processedCount = new java.util.concurrent.atomic.AtomicInteger(0);
