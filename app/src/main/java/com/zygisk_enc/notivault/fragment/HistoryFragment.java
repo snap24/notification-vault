@@ -73,6 +73,8 @@ public class HistoryFragment extends Fragment {
     private int lockedOffset = 0;
     private boolean isViewingMessage = false;
     private androidx.activity.OnBackPressedCallback searchBackPressedCallback;
+    private final android.os.Handler searchDebounceHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable searchDebounceRunnable;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -279,10 +281,20 @@ public class HistoryFragment extends Fragment {
             @Override public void afterTextChanged(Editable s) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s != null ? s.toString() : "";
-                viewModel.setSearchQuery(query);
+                String query = s != null ? s.toString().trim() : "";
                 if (searchBackPressedCallback != null) {
                     searchBackPressedCallback.setEnabled(!query.isEmpty());
+                }
+
+                if (searchDebounceRunnable != null) {
+                    searchDebounceHandler.removeCallbacks(searchDebounceRunnable);
+                }
+
+                if (query.isEmpty()) {
+                    viewModel.setSearchQuery(null);
+                } else {
+                    searchDebounceRunnable = () -> viewModel.setSearchQuery(query);
+                    searchDebounceHandler.postDelayed(searchDebounceRunnable, 250);
                 }
             }
         });
@@ -373,8 +385,12 @@ public class HistoryFragment extends Fragment {
     }
 
     private void closeSearchBox() {
+        if (searchDebounceRunnable != null) {
+            searchDebounceHandler.removeCallbacks(searchDebounceRunnable);
+        }
         if (binding == null) return;
         binding.etSearch.setText("");
+        viewModel.setSearchQuery(null);
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
@@ -1134,6 +1150,9 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (searchDebounceRunnable != null) {
+            searchDebounceHandler.removeCallbacks(searchDebounceRunnable);
+        }
         if (binding != null) {
             binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
             binding.swipeRefresh.setRefreshing(false);
