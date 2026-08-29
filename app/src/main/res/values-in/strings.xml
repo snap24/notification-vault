@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d notifikasi hari ini</string>
     <string name="widget_notif_today_plural">%d notifikasi hari ini</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Aturan Hapus Otomatis</string>
     <string name="global_auto_delete_section">Periode Retensi Default</string>
     <string name="global_auto_delete_section_desc">Diterapkan ke semua aplikasi kecuali ada pengecualian di bawah</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Filter aplikasi dihapus</string>
     <string name="app_filter_format">Aplikasi: %s</string>
     <string name="app_and_date_filter_format">Aplikasi: %1$s  |  Tanggal: %2$s</string>
+    <string name="apps_header_summary_format">%1$d ट्रैक किए गए ऐप्स</string>
+    <string name="total_notifications_badge_format">%1$d कुल अलर्ट</string>
+    <string name="zero_tracked_apps">0 ट्रैक किए गए ऐप्स</string>
+    <string name="zero_alerts">0 अलर्ट</string>
+    <string name="action_view_all_notifications">सभी सूचनाएं देखें</string>
+    <string name="action_configure_rules">कैप्चर नियम और फ़िल्टर कॉन्फ़िगर करें</string>
+    <string name="action_set_auto_delete">स्वतः-हटाने की अवधारण सेट करें</string>
+    <string name="action_clear_app_logs">इस ऐप के सभी लॉग साफ़ करें</string>
+    <string name="retention_dialog_title_format">अवधारण: %1$s</string>
+    <string name="retention_use_global_default">वैश्विक डिफ़ॉल्ट का उपयोग करें (%1$s)</string>
+    <string name="retention_after_1_day">1 दिन बाद</string>
+    <string name="retention_after_1_day_otp">1 दिन बाद (उदा. ओटीपी / बैंकिंग)</string>
+    <string name="retention_after_x_days">%1$d दिनों के बाद</string>
+    <string name="retention_never_delete">कभी स्वतः न हटाएं (हमेशा रखें)</string>
+    <string name="retention_custom_days">कस्टम दिन...</string>
+    <string name="toast_using_global_default">वैश्विक डिफ़ॉल्ट का उपयोग किया जा रहा है</string>
+    <string name="toast_auto_delete_set_1_day">स्वतः-हटाना 1 दिन पर सेट किया गया</string>
+    <string name="toast_auto_delete_set_x_days">स्वतः-हटाना %1$d दिनों पर सेट किया गया</string>
+    <string name="toast_never_auto_delete">कभी स्वतः न हटाएं</string>
+    <string name="toast_cleared_logs_for_app">%1$s के लिए लॉग साफ़ किए गए</string>
+    <string name="confirm_delete_app_logs_message">क्या आप वाकई %2$s के लिए रिकॉर्ड की गई सभी %1$d सूचनाएं हटाना चाहते हैं?</string>
+    <string name="auto_delete_global_disabled">वैश्विक स्वतः-हटाना अक्षम है (कभी न हटाएं)</string>
+    <string name="auto_delete_default_1_day">डिफ़ॉल्ट: 1 दिन से पुरानी सूचनाएं हटाएं</string>
+    <string name="auto_delete_default_x_days">डिफ़ॉल्ट: %1$d दिनों से पुरानी सूचनाएं हटाएं</string>
+    <string name="chip_rule_never_delete">कभी न हटाएं</string>
+    <string name="chip_rule_1_day">1 दिन</string>
+    <string name="chip_rule_x_days">%1$d दिन</string>
+    <string name="chip_rule_global_format">वैश्विक (%1$s)</string>
+    <string name="stats_captured_last_7_days">पिछले 7 दिनों में कैप्चर किया गया</string>
+    <string name="stats_captured_last_30_days">पिछले 30 दिनों में कैप्चर किया गया</string>
+    <string name="stats_captured_all_time">अब तक कैप्चर किया गया</string>
+    <string name="stats_tap_bar_to_inspect">निरीक्षण करने के लिए बार पर टैप करें</string>
+    <string name="time_yesterday_format">कल, %1$s</string>
 </resources>

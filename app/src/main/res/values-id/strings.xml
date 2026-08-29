@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d notifikasi hari ini</string>
     <string name="widget_notif_today_plural">%d notifikasi hari ini</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Aturan Hapus Otomatis</string>
     <string name="global_auto_delete_section">Periode Retensi Default</string>
     <string name="global_auto_delete_section_desc">Diterapkan ke semua aplikasi kecuali ada pengecualian di bawah</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Filter aplikasi dihapus</string>
     <string name="app_filter_format">Aplikasi: %s</string>
     <string name="app_and_date_filter_format">Aplikasi: %1$s  |  Tanggal: %2$s</string>
+    <string name="apps_header_summary_format">%1$d Aplikasi Dilacak</string>
+    <string name="total_notifications_badge_format">%1$d total pemberitahuan</string>
+    <string name="zero_tracked_apps">0 Aplikasi Dilacak</string>
+    <string name="zero_alerts">0 pemberitahuan</string>
+    <string name="action_view_all_notifications">Lihat Semua Notifikasi</string>
+    <string name="action_configure_rules">Konfigurasi Aturan &amp; Filter Perekaman</string>
+    <string name="action_set_auto_delete">Atur Retensi Hapus Otomatis</string>
+    <string name="action_clear_app_logs">Hapus Semua Log untuk Aplikasi Ini</string>
+    <string name="retention_dialog_title_format">Retensi: %1$s</string>
+    <string name="retention_use_global_default">Gunakan Default Global (%1$s)</string>
+    <string name="retention_after_1_day">Setelah 1 hari</string>
+    <string name="retention_after_1_day_otp">Setelah 1 hari (cth. OTP / Perbankan)</string>
+    <string name="retention_after_x_days">Setelah %1$d hari</string>
+    <string name="retention_never_delete">Jangan Pernah Hapus Otomatis (Simpan selamanya)</string>
+    <string name="retention_custom_days">Hari kustom...</string>
+    <string name="toast_using_global_default">Menggunakan default global</string>
+    <string name="toast_auto_delete_set_1_day">Hapus otomatis diatur ke 1 hari</string>
+    <string name="toast_auto_delete_set_x_days">Hapus otomatis diatur ke %1$d hari</string>
+    <string name="toast_never_auto_delete">Jangan pernah hapus otomatis</string>
+    <string name="toast_cleared_logs_for_app">Log dihapus untuk %1$s</string>
+    <string name="confirm_delete_app_logs_message">Apakah Anda yakin ingin menghapus semua %1$d notifikasi yang dicatat untuk %2$s?</string>
+    <string name="auto_delete_global_disabled">Hapus otomatis global dinonaktifkan (Jangan pernah hapus)</string>
+    <string name="auto_delete_default_1_day">Default: Hapus notifikasi yang lebih lama dari 1 hari</string>
+    <string name="auto_delete_default_x_days">Default: Hapus notifikasi yang lebih lama dari %1$d hari</string>
+    <string name="chip_rule_never_delete">Jangan Pernah Hapus</string>
+    <string name="chip_rule_1_day">1 hari</string>
+    <string name="chip_rule_x_days">%1$d hari</string>
+    <string name="chip_rule_global_format">Global (%1$s)</string>
+    <string name="stats_captured_last_7_days">Ditangkap dalam 7 Hari Terakhir</string>
+    <string name="stats_captured_last_30_days">Ditangkap dalam 30 Hari Terakhir</string>
+    <string name="stats_captured_all_time">Ditangkap Sepanjang Waktu</string>
+    <string name="stats_tap_bar_to_inspect">Ketuk bilah untuk memeriksa</string>
+    <string name="time_yesterday_format">Kemarin, %1$s</string>
 </resources>

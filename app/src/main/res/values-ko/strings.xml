@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">오늘 알림 %d건</string>
     <string name="widget_notif_today_plural">오늘 알림 %d건</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">자동 삭제 규칙</string>
     <string name="global_auto_delete_section">기본 보관 기간</string>
     <string name="global_auto_delete_section_desc">아래에서 개별 설정을 지정하지 않는 한 모든 앱에 적용됩니다</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">앱 필터 초기화됨</string>
     <string name="app_filter_format">앱: %s</string>
     <string name="app_and_date_filter_format">앱: %1$s  |  날짜: %2$s</string>
+    <string name="apps_header_summary_format">추적된 앱 %1$d개</string>
+    <string name="total_notifications_badge_format">총 %1$d개 알림</string>
+    <string name="zero_tracked_apps">추적된 앱 0개</string>
+    <string name="zero_alerts">알림 0개</string>
+    <string name="action_view_all_notifications">모든 알림 보기</string>
+    <string name="action_configure_rules">캡처 규칙 및 필터 설정</string>
+    <string name="action_set_auto_delete">자동 삭제 보관 기간 설정</string>
+    <string name="action_clear_app_logs">이 앱의 모든 로그 지우기</string>
+    <string name="retention_dialog_title_format">보관 기간: %1$s</string>
+    <string name="retention_use_global_default">글로벌 기본값 사용 (%1$s)</string>
+    <string name="retention_after_1_day">1일 후</string>
+    <string name="retention_after_1_day_otp">1일 후 (예: OTP / 뱅킹)</string>
+    <string name="retention_after_x_days">%1$d일 후</string>
+    <string name="retention_never_delete">자동 삭제 안 함 (영구 보관)</string>
+    <string name="retention_custom_days">직접 일수 입력...</string>
+    <string name="toast_using_global_default">글로벌 기본값 사용 중</string>
+    <string name="toast_auto_delete_set_1_day">자동 삭제가 1일로 설정됨</string>
+    <string name="toast_auto_delete_set_x_days">자동 삭제가 %1$d일로 설정됨</string>
+    <string name="toast_never_auto_delete">자동 삭제 안 함</string>
+    <string name="toast_cleared_logs_for_app">%1$s 로그 삭제됨</string>
+    <string name="confirm_delete_app_logs_message">%2$s에 기록된 모든 %1$d개 알림을 삭제하시겠습니까?</string>
+    <string name="auto_delete_global_disabled">글로벌 자동 삭제 비활성화됨 (삭제 안 함)</string>
+    <string name="auto_delete_default_1_day">기본값: 1일 이상 지난 알림 삭제</string>
+    <string name="auto_delete_default_x_days">기본값: %1$d일 이상 지난 알림 삭제</string>
+    <string name="chip_rule_never_delete">삭제 안 함</string>
+    <string name="chip_rule_1_day">1일</string>
+    <string name="chip_rule_x_days">%1$d일</string>
+    <string name="chip_rule_global_format">글로벌 (%1$s)</string>
+    <string name="stats_captured_last_7_days">지난 7일 동안 캡처됨</string>
+    <string name="stats_captured_last_30_days">지난 30일 동안 캡처됨</string>
+    <string name="stats_captured_all_time">전체 기간 캡처됨</string>
+    <string name="stats_tap_bar_to_inspect">막대를 탭하여 세부 정보 확인</string>
+    <string name="time_yesterday_format">어제, %1$s</string>
 </resources>

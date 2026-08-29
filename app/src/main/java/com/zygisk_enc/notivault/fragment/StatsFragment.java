@@ -114,15 +114,15 @@ public class StatsFragment extends Fragment {
                 break;
             case DAYS_7:
                 targetChipId = R.id.chip_period_7days;
-                binding.tvHeroPeriodLabel.setText("Captured in Last 7 Days");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_last_7_days);
                 break;
             case DAYS_30:
                 targetChipId = R.id.chip_period_30days;
-                binding.tvHeroPeriodLabel.setText("Captured in Last 30 Days");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_last_30_days);
                 break;
             case ALL:
                 targetChipId = R.id.chip_period_all;
-                binding.tvHeroPeriodLabel.setText("All-Time Captured");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_all_time);
                 break;
             case TODAY:
             default:
@@ -145,13 +145,13 @@ public class StatsFragment extends Fragment {
                 binding.tvHeroPeriodLabel.setText(R.string.stats_logged_yesterday);
             } else if (checkedId == R.id.chip_period_7days) {
                 currentPeriod = Period.DAYS_7;
-                binding.tvHeroPeriodLabel.setText("Captured in Last 7 Days");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_last_7_days);
             } else if (checkedId == R.id.chip_period_30days) {
                 currentPeriod = Period.DAYS_30;
-                binding.tvHeroPeriodLabel.setText("Captured in Last 30 Days");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_last_30_days);
             } else if (checkedId == R.id.chip_period_all) {
                 currentPeriod = Period.ALL;
-                binding.tvHeroPeriodLabel.setText("All-Time Captured");
+                binding.tvHeroPeriodLabel.setText(R.string.stats_captured_all_time);
             }
 
             if (getContext() != null) {
@@ -416,7 +416,7 @@ public class StatsFragment extends Fragment {
 
         // Chart
         binding.tvChartSubtitle.setText(data.chartSubtitle);
-        binding.tvChartInspector.setText("Tap bar to inspect");
+        binding.tvChartInspector.setText(R.string.stats_tap_bar_to_inspect);
         binding.chartDistribution.setData(data.chartBars);
 
         // Time of Day Daypart Breakdown

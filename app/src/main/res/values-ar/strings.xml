@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d إشعار اليوم</string>
     <string name="widget_notif_today_plural">%d إشعارات اليوم</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">قواعد الحذف التلقائي</string>
     <string name="global_auto_delete_section">فترة الاحتفاظ الافتراضية</string>
     <string name="global_auto_delete_section_desc">تُطبق على جميع التطبيقات ما لم يتم تعيين استثناء أدناه</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">تمت إزالة تصفية التطبيقات</string>
     <string name="app_filter_format">التطبيق: %s</string>
     <string name="app_and_date_filter_format">التطبيق: %1$s  |  التاريخ: %2$s</string>
+    <string name="apps_header_summary_format">%1$d تطبيقات متتبعة</string>
+    <string name="total_notifications_badge_format">%1$d إجمالي التنبيهات</string>
+    <string name="zero_tracked_apps">0 تطبيقات متتبعة</string>
+    <string name="zero_alerts">0 تنبيهات</string>
+    <string name="action_view_all_notifications">عرض جميع الإشعارات</string>
+    <string name="action_configure_rules">تكوين قواعد والتقاط التصفية</string>
+    <string name="action_set_auto_delete">تعيين الاحتفاظ بالحذف التلقائي</string>
+    <string name="action_clear_app_logs">مسح جميع سجلات هذا التطبيق</string>
+    <string name="retention_dialog_title_format">الاحتفاظ: %1$s</string>
+    <string name="retention_use_global_default">استخدام الإعداد الافتراضي العام (%1$s)</string>
+    <string name="retention_after_1_day">بعد يوم واحد</string>
+    <string name="retention_after_1_day_otp">بعد يوم واحد (مثل OTP / البنوك)</string>
+    <string name="retention_after_x_days">بعد %1$d أيام</string>
+    <string name="retention_never_delete">عدم الحذف التلقائي أبدًا (الاحتفاظ دائمًا)</string>
+    <string name="retention_custom_days">أيام مخصصة...</string>
+    <string name="toast_using_global_default">استخدام الإعداد الافتراضي العام</string>
+    <string name="toast_auto_delete_set_1_day">تم ضبط الحذف التلقائي على يوم واحد</string>
+    <string name="toast_auto_delete_set_x_days">تم ضبط الحذف التلقائي على %1$d أيام</string>
+    <string name="toast_never_auto_delete">عدم الحذف التلقائي أبدًا</string>
+    <string name="toast_cleared_logs_for_app">تم مسح السجلات لـ %1$s</string>
+    <string name="confirm_delete_app_logs_message">هل أنت متأكد من رغبتك في حذف جميع إشعارات %1$d المسجلة لـ %2$s؟</string>
+    <string name="auto_delete_global_disabled">الحذف التلقائي العام معطل (عدم الحذف أبدًا)</string>
+    <string name="auto_delete_default_1_day">افتراضي: حذف الإشعارات الأقدم من يوم واحد</string>
+    <string name="auto_delete_default_x_days">افتراضي: حذف الإشعارات الأقدم من %1$d أيام</string>
+    <string name="chip_rule_never_delete">عدم الحذف أبدًا</string>
+    <string name="chip_rule_1_day">يوم واحد</string>
+    <string name="chip_rule_x_days">%1$d أيام</string>
+    <string name="chip_rule_global_format">عام (%1$s)</string>
+    <string name="stats_captured_last_7_days">تم التقاطها في آخر 7 أيام</string>
+    <string name="stats_captured_last_30_days">تم التقاطها في آخر 30 يومًا</string>
+    <string name="stats_captured_all_time">تم التقاطها في جميع الأوقات</string>
+    <string name="stats_tap_bar_to_inspect">اضغط على الشريط للفحص</string>
+    <string name="time_yesterday_format">أمس، %1$s</string>
 </resources>

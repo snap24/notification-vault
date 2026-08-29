@@ -91,7 +91,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
                 tvTimestamp.setText(formattedTime);
             } else if (toastCal.get(java.util.Calendar.YEAR) == yesterday.get(java.util.Calendar.YEAR) &&
                     toastCal.get(java.util.Calendar.DAY_OF_YEAR) == yesterday.get(java.util.Calendar.DAY_OF_YEAR)) {
-                tvTimestamp.setText("Yesterday, " + formattedTime);
+                tvTimestamp.setText(context.getString(R.string.time_yesterday_format, formattedTime));
             } else {
                 SimpleDateFormat datePrefix = new SimpleDateFormat("MMM dd, ", Locale.getDefault());
                 tvTimestamp.setText(datePrefix.format(new java.util.Date(toast.timestamp)) + formattedTime);

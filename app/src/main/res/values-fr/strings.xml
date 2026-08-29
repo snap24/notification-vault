@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d notification aujourd\'hui</string>
     <string name="widget_notif_today_plural">%d notifications aujourd\'hui</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Règles de suppression automatique</string>
     <string name="global_auto_delete_section">Période de rétention par défaut</string>
     <string name="global_auto_delete_section_desc">Appliqué à toutes les applications sauf si une règle personnalisée est définie ci-dessous</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Filtre d\'application effacé</string>
     <string name="app_filter_format">App : %s</string>
     <string name="app_and_date_filter_format">App : %1$s  |  Date : %2$s</string>
+    <string name="apps_header_summary_format">%1$d applications suivies</string>
+    <string name="total_notifications_badge_format">%1$d alertes au total</string>
+    <string name="zero_tracked_apps">0 application suivie</string>
+    <string name="zero_alerts">0 alerte</string>
+    <string name="action_view_all_notifications">Afficher toutes les notifications</string>
+    <string name="action_configure_rules">Configurer les règles et filtres de capture</string>
+    <string name="action_set_auto_delete">Définir la rétention de suppression automatique</string>
+    <string name="action_clear_app_logs">Effacer tous les journaux de cette application</string>
+    <string name="retention_dialog_title_format">Rétention : %1$s</string>
+    <string name="retention_use_global_default">Utiliser la valeur globale par défaut (%1$s)</string>
+    <string name="retention_after_1_day">Après 1 jour</string>
+    <string name="retention_after_1_day_otp">Après 1 jour (ex. OTP / Banque)</string>
+    <string name="retention_after_x_days">Après %1$d jours</string>
+    <string name="retention_never_delete">Ne jamais supprimer automatiquement (Conserver)</string>
+    <string name="retention_custom_days">Jours personnalisés...</string>
+    <string name="toast_using_global_default">Valeur globale par défaut utilisée</string>
+    <string name="toast_auto_delete_set_1_day">Suppression automatique définie sur 1 jour</string>
+    <string name="toast_auto_delete_set_x_days">Suppression automatique définie sur %1$d jours</string>
+    <string name="toast_never_auto_delete">Ne jamais supprimer automatiquement</string>
+    <string name="toast_cleared_logs_for_app">Journaux effacés pour %1$s</string>
+    <string name="confirm_delete_app_logs_message">Voulez-vous vraiment supprimer toutes les %1$d notifications enregistrées pour %2$s ?</string>
+    <string name="auto_delete_global_disabled">La suppression automatique globale est désactivée (Ne jamais supprimer)</string>
+    <string name="auto_delete_default_1_day">Par défaut : Supprimer les notifications de plus d\'un jour</string>
+    <string name="auto_delete_default_x_days">Par défaut : Supprimer les notifications de plus de %1$d jours</string>
+    <string name="chip_rule_never_delete">Ne jamais supprimer</string>
+    <string name="chip_rule_1_day">1 jour</string>
+    <string name="chip_rule_x_days">%1$d jours</string>
+    <string name="chip_rule_global_format">Global (%1$s)</string>
+    <string name="stats_captured_last_7_days">Capturées au cours des 7 derniers jours</string>
+    <string name="stats_captured_last_30_days">Capturées au cours des 30 derniers jours</string>
+    <string name="stats_captured_all_time">Capturées depuis le début</string>
+    <string name="stats_tap_bar_to_inspect">Touchez la barre pour inspecter</string>
+    <string name="time_yesterday_format">Hier, %1$s</string>
 </resources>

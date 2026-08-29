@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d Benachrichtigung heute</string>
     <string name="widget_notif_today_plural">%d Benachrichtigungen heute</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Regeln für automatisches Löschen</string>
     <string name="global_auto_delete_section">Standard-Aufbewahrungszeitraum</string>
     <string name="global_auto_delete_section_desc">Gilt für alle Apps, sofern unten keine Ausnahme festgelegt ist</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">App-Filter gelöscht</string>
     <string name="app_filter_format">App: %s</string>
     <string name="app_and_date_filter_format">App: %1$s  |  Datum: %2$s</string>
+    <string name="apps_header_summary_format">%1$d getrackte Apps</string>
+    <string name="total_notifications_badge_format">%1$d Benachrichtigungen gesamt</string>
+    <string name="zero_tracked_apps">0 getrackte Apps</string>
+    <string name="zero_alerts">0 Benachrichtigungen</string>
+    <string name="action_view_all_notifications">Alle Benachrichtigungen anzeigen</string>
+    <string name="action_configure_rules">Erfassungsregeln &amp; Filter konfigurieren</string>
+    <string name="action_set_auto_delete">Automatisches Löschen festlegen</string>
+    <string name="action_clear_app_logs">Alle Protokolle für diese App löschen</string>
+    <string name="retention_dialog_title_format">Aufbewahrung: %1$s</string>
+    <string name="retention_use_global_default">Globalen Standard verwenden (%1$s)</string>
+    <string name="retention_after_1_day">Nach 1 Tag</string>
+    <string name="retention_after_1_day_otp">Nach 1 Tag (z. B. OTP / Banking)</string>
+    <string name="retention_after_x_days">Nach %1$d Tagen</string>
+    <string name="retention_never_delete">Nie automatisch löschen (Für immer behalten)</string>
+    <string name="retention_custom_days">Benutzerdefinierte Tage...</string>
+    <string name="toast_using_global_default">Globaler Standard verwendet</string>
+    <string name="toast_auto_delete_set_1_day">Automatisches Löschen auf 1 Tag festgelegt</string>
+    <string name="toast_auto_delete_set_x_days">Automatisches Löschen auf %1$d Tage festgelegt</string>
+    <string name="toast_never_auto_delete">Nie automatisch löschen</string>
+    <string name="toast_cleared_logs_for_app">Protokolle für %1$s gelöscht</string>
+    <string name="confirm_delete_app_logs_message">Möchten Sie wirklich alle %1$d aufgezeichneten Benachrichtigungen für %2$s löschen?</string>
+    <string name="auto_delete_global_disabled">Globales automatisches Löschen ist deaktiviert (Nie löschen)</string>
+    <string name="auto_delete_default_1_day">Standard: Benachrichtigungen löschen, die älter als 1 Tag sind</string>
+    <string name="auto_delete_default_x_days">Standard: Benachrichtigungen löschen, die älter als %1$d Tage sind</string>
+    <string name="chip_rule_never_delete">Nie löschen</string>
+    <string name="chip_rule_1_day">1 Tag</string>
+    <string name="chip_rule_x_days">%1$d Tage</string>
+    <string name="chip_rule_global_format">Global (%1$s)</string>
+    <string name="stats_captured_last_7_days">In den letzten 7 Tagen erfasst</string>
+    <string name="stats_captured_last_30_days">In den letzten 30 Tagen erfasst</string>
+    <string name="stats_captured_all_time">Gesamte Zeit erfasst</string>
+    <string name="stats_tap_bar_to_inspect">Balken zum Untersuchen antippen</string>
+    <string name="time_yesterday_format">Gestern, %1$s</string>
 </resources>

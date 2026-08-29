@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">今日 %d 条通知</string>
     <string name="widget_notif_today_plural">今日 %d 条通知</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">自动清理规则</string>
     <string name="global_auto_delete_section">默认保留期限</string>
     <string name="global_auto_delete_section_desc">除非在下方设置了个别应用规则，否则将应用于所有应用</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">已清除应用筛选</string>
     <string name="app_filter_format">应用: %s</string>
     <string name="app_and_date_filter_format">应用: %1$s  |  日期: %2$s</string>
+    <string name="apps_header_summary_format">%1$d 个跟踪的应用</string>
+    <string name="total_notifications_badge_format">共 %1$d 条提醒</string>
+    <string name="zero_tracked_apps">0 个跟踪的应用</string>
+    <string name="zero_alerts">0 条提醒</string>
+    <string name="action_view_all_notifications">查看所有通知</string>
+    <string name="action_configure_rules">配置捕获规则和过滤器</string>
+    <string name="action_set_auto_delete">设置自动删除保留期</string>
+    <string name="action_clear_app_logs">清除此应用的所有记录</string>
+    <string name="retention_dialog_title_format">保留期：%1$s</string>
+    <string name="retention_use_global_default">使用全局默认值 (%1$s)</string>
+    <string name="retention_after_1_day">1 天后</string>
+    <string name="retention_after_1_day_otp">1 天后（例如 OTP / 银行）</string>
+    <string name="retention_after_x_days">%1$d 天后</string>
+    <string name="retention_never_delete">从不自动删除（永久保留）</string>
+    <string name="retention_custom_days">自定义天数...</string>
+    <string name="toast_using_global_default">正在使用全局默认值</string>
+    <string name="toast_auto_delete_set_1_day">自动删除已设置为 1 天</string>
+    <string name="toast_auto_delete_set_x_days">自动删除已设置为 %1$d 天</string>
+    <string name="toast_never_auto_delete">从不自动删除</string>
+    <string name="toast_cleared_logs_for_app">已清除 %1$s 的记录</string>
+    <string name="confirm_delete_app_logs_message">您确定要删除为 %2$s 记录的所有 %1$d 条通知吗？</string>
+    <string name="auto_delete_global_disabled">全局自动删除已禁用（从不删除）</string>
+    <string name="auto_delete_default_1_day">默认：删除超过 1 天的通知</string>
+    <string name="auto_delete_default_x_days">默认：删除超过 %1$d 天的通知</string>
+    <string name="chip_rule_never_delete">从不删除</string>
+    <string name="chip_rule_1_day">1 天</string>
+    <string name="chip_rule_x_days">%1$d 天</string>
+    <string name="chip_rule_global_format">全局 (%1$s)</string>
+    <string name="stats_captured_last_7_days">过去 7 天捕获</string>
+    <string name="stats_captured_last_30_days">过去 30 天捕获</string>
+    <string name="stats_captured_all_time">历史总计捕获</string>
+    <string name="stats_tap_bar_to_inspect">点击柱状图进行查看</string>
+    <string name="time_yesterday_format">昨天，%1$s</string>
 </resources>

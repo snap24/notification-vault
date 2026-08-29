@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">本日の通知: %d件</string>
     <string name="widget_notif_today_plural">本日の通知: %d件</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">自動削除ルール</string>
     <string name="global_auto_delete_section">デフォルトの保持期間</string>
     <string name="global_auto_delete_section_desc">以下でカスタムルールを設定しない限り、すべてのアプリに適用されます</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">アプリの絞り込みを解除しました</string>
     <string name="app_filter_format">アプリ: %s</string>
     <string name="app_and_date_filter_format">アプリ: %1$s  |  日付: %2$s</string>
+    <string name="apps_header_summary_format">%1$d個の追跡対象アプリ</string>
+    <string name="total_notifications_badge_format">合計%1$d件のアラート</string>
+    <string name="zero_tracked_apps">0個の追跡対象アプリ</string>
+    <string name="zero_alerts">0件のアラート</string>
+    <string name="action_view_all_notifications">すべての通知を表示</string>
+    <string name="action_configure_rules">キャプチャルールとフィルターを設定</string>
+    <string name="action_set_auto_delete">自動削除の保持期間を設定</string>
+    <string name="action_clear_app_logs">このアプリのすべてのログを消去</string>
+    <string name="retention_dialog_title_format">保持期間: %1$s</string>
+    <string name="retention_use_global_default">グローバルデフォルトを使用 (%1$s)</string>
+    <string name="retention_after_1_day">1日後</string>
+    <string name="retention_after_1_day_otp">1日後 (例: OTP / 銀行)</string>
+    <string name="retention_after_x_days">%1$d日後</string>
+    <string name="retention_never_delete">自動削除しない (無期限保持)</string>
+    <string name="retention_custom_days">日数を指定...</string>
+    <string name="toast_using_global_default">グローバルデフォルトを使用中</string>
+    <string name="toast_auto_delete_set_1_day">自動削除を1日に設定しました</string>
+    <string name="toast_auto_delete_set_x_days">自動削除を%1$d日に設定しました</string>
+    <string name="toast_never_auto_delete">自動削除しない</string>
+    <string name="toast_cleared_logs_for_app">%1$s のログを消去しました</string>
+    <string name="confirm_delete_app_logs_message">%2$s の記録された通知全%1$d件を削除してもよろしいですか？</string>
+    <string name="auto_delete_global_disabled">グローバル自動削除は無効です (削除しない)</string>
+    <string name="auto_delete_default_1_day">デフォルト: 1日以上前の通知を削除</string>
+    <string name="auto_delete_default_x_days">デフォルト: %1$d日以上前の通知を削除</string>
+    <string name="chip_rule_never_delete">削除しない</string>
+    <string name="chip_rule_1_day">1日</string>
+    <string name="chip_rule_x_days">%1$d日</string>
+    <string name="chip_rule_global_format">グローバル (%1$s)</string>
+    <string name="stats_captured_last_7_days">過去7日間にキャプチャ</string>
+    <string name="stats_captured_last_30_days">過去30日間にキャプチャ</string>
+    <string name="stats_captured_all_time">全期間のキャプチャ</string>
+    <string name="stats_tap_bar_to_inspect">バーをタップして詳細を確認</string>
+    <string name="time_yesterday_format">昨日、%1$s</string>
 </resources>

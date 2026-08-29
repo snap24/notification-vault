@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d уведомление сегодня</string>
     <string name="widget_notif_today_plural">%d уведомлений сегодня</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Правила автоудаления</string>
     <string name="global_auto_delete_section">Срок хранения по умолчанию</string>
     <string name="global_auto_delete_section_desc">Применяется ко всем приложениям, если ниже не задано исключение</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Фильтр приложений очищен</string>
     <string name="app_filter_format">Приложение: %s</string>
     <string name="app_and_date_filter_format">Приложение: %1$s  |  Дата: %2$s</string>
+    <string name="apps_header_summary_format">%1$d отслеживаемых приложений</string>
+    <string name="total_notifications_badge_format">%1$d всего оповещений</string>
+    <string name="zero_tracked_apps">0 отслеживаемых приложений</string>
+    <string name="zero_alerts">0 оповещений</string>
+    <string name="action_view_all_notifications">Посмотреть все уведомления</string>
+    <string name="action_configure_rules">Настроить правила и фильтры захвата</string>
+    <string name="action_set_auto_delete">Настроить автоудаление</string>
+    <string name="action_clear_app_logs">Очистить все журналы для этого приложения</string>
+    <string name="retention_dialog_title_format">Хранение: %1$s</string>
+    <string name="retention_use_global_default">Использовать глобальное значение по умолчанию (%1$s)</string>
+    <string name="retention_after_1_day">Через 1 день</string>
+    <string name="retention_after_1_day_otp">Через 1 день (напр. OTP / Банки)</string>
+    <string name="retention_after_x_days">Через %1$d дней</string>
+    <string name="retention_never_delete">Никогда не удалять автоматически (Хранить всегда)</string>
+    <string name="retention_custom_days">Другое количество дней...</string>
+    <string name="toast_using_global_default">Используется глобальное значение по умолчанию</string>
+    <string name="toast_auto_delete_set_1_day">Автоудаление установлено на 1 день</string>
+    <string name="toast_auto_delete_set_x_days">Автоудаление установлено на %1$d дней</string>
+    <string name="toast_never_auto_delete">Никогда не удалять автоматически</string>
+    <string name="toast_cleared_logs_for_app">Журналы очищены для %1$s</string>
+    <string name="confirm_delete_app_logs_message">Вы уверены, что хотите удалить все %1$d уведомлений, записанных для %2$s?</string>
+    <string name="auto_delete_global_disabled">Глобальное автоудаление отключено (Никогда не удалять)</string>
+    <string name="auto_delete_default_1_day">По умолчанию: Удалять уведомления старше 1 дня</string>
+    <string name="auto_delete_default_x_days">По умолчанию: Удалять уведомления старше %1$d дней</string>
+    <string name="chip_rule_never_delete">Никогда не удалять</string>
+    <string name="chip_rule_1_day">1 день</string>
+    <string name="chip_rule_x_days">%1$d дней</string>
+    <string name="chip_rule_global_format">Глобально (%1$s)</string>
+    <string name="stats_captured_last_7_days">Захвачено за последние 7 дней</string>
+    <string name="stats_captured_last_30_days">Захвачено за последние 30 дней</string>
+    <string name="stats_captured_all_time">Захвачено за все время</string>
+    <string name="stats_tap_bar_to_inspect">Нажмите на столбец для просмотра</string>
+    <string name="time_yesterday_format">Вчера, %1$s</string>
 </resources>

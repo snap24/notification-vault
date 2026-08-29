@@ -151,8 +151,8 @@ public class AppsFragment extends Fragment {
             if (summaries == null || summaries.isEmpty()) {
                 binding.emptyState.setVisibility(View.VISIBLE);
                 binding.recyclerView.setVisibility(View.GONE);
-                binding.tvAppsHeaderSummary.setText("0 Tracked Apps");
-                binding.tvTotalNotificationsBadge.setText("0 alerts");
+                binding.tvAppsHeaderSummary.setText(R.string.zero_tracked_apps);
+                binding.tvTotalNotificationsBadge.setText(R.string.zero_alerts);
                 exitSelectionMode();
             } else {
                 binding.emptyState.setVisibility(View.GONE);
@@ -163,8 +163,8 @@ public class AppsFragment extends Fragment {
                 for (AppSummary s : summaries) {
                     totalAlerts += s.count;
                 }
-                binding.tvAppsHeaderSummary.setText(summaries.size() + " Tracked Apps");
-                binding.tvTotalNotificationsBadge.setText(totalAlerts + " total alerts");
+                binding.tvAppsHeaderSummary.setText(getString(R.string.apps_header_summary_format, summaries.size()));
+                binding.tvTotalNotificationsBadge.setText(getString(R.string.total_notifications_badge_format, totalAlerts));
             }
         });
     }
@@ -187,10 +187,10 @@ public class AppsFragment extends Fragment {
     private void showAppActionsDialog(AppSummary summary) {
         String appName = summary.appName != null ? summary.appName : summary.packageName;
         String[] options = new String[]{
-                "View All Notifications",
-                "Configure Capture Rules & Filters",
-                "Set Auto-Delete Retention",
-                "Clear All Logs for this App"
+                getString(R.string.action_view_all_notifications),
+                getString(R.string.action_configure_rules),
+                getString(R.string.action_set_auto_delete),
+                getString(R.string.action_clear_app_logs)
         };
 
         BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
@@ -222,18 +222,18 @@ public class AppsFragment extends Fragment {
 
     private void showAppAutoDeletePicker(AppSummary summary) {
         int globalDays = PreferenceUtil.getGlobalAutoDeleteDays(requireContext());
-        String globalLabel = globalDays == 0 ? "Never" : globalDays + " days";
+        String globalLabel = globalDays == 0 ? getString(R.string.chip_rule_never_delete) : getString(R.string.chip_rule_x_days, globalDays);
 
         String[] options = new String[]{
-                "Use Global Default (" + globalLabel + ")",
-                "After 1 day",
-                "After 2 days",
-                "After 3 days",
-                "After 7 days",
-                "After 14 days",
-                "After 30 days",
-                "Never Auto-Delete",
-                "Custom days..."
+                getString(R.string.retention_use_global_default, globalLabel),
+                getString(R.string.retention_after_1_day),
+                getString(R.string.retention_after_x_days, 2),
+                getString(R.string.retention_after_x_days, 3),
+                getString(R.string.retention_after_x_days, 7),
+                getString(R.string.retention_after_x_days, 14),
+                getString(R.string.retention_after_x_days, 30),
+                getString(R.string.retention_never_delete),
+                getString(R.string.retention_custom_days)
         };
 
         Integer currentRule = PreferenceUtil.getAppAutoDeleteRule(requireContext(), summary.packageName);
@@ -249,48 +249,52 @@ public class AppsFragment extends Fragment {
         else selectedIdx = 8;
 
         BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Retention: " + (summary.appName != null ? summary.appName : summary.packageName))
+                .setTitle(getString(R.string.retention_dialog_title_format, (summary.appName != null ? summary.appName : summary.packageName)))
                 .setSingleChoiceItems(options, selectedIdx, (d, which) -> {
                     d.dismiss();
                     switch (which) {
                         case 0:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, null);
-                            Toast.makeText(requireContext(), "Using global default", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.toast_using_global_default, Toast.LENGTH_SHORT).show();
                             break;
                         case 1:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 1);
-                            Toast.makeText(requireContext(), "Auto-delete set to 1 day", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.toast_auto_delete_set_1_day, Toast.LENGTH_SHORT).show();
                             break;
                         case 2:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 2);
-                            Toast.makeText(requireContext(), "Auto-delete set to 2 days", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, 2), Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 3);
-                            Toast.makeText(requireContext(), "Auto-delete set to 3 days", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, 3), Toast.LENGTH_SHORT).show();
                             break;
                         case 4:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 7);
-                            Toast.makeText(requireContext(), "Auto-delete set to 7 days", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, 7), Toast.LENGTH_SHORT).show();
                             break;
                         case 5:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 14);
-                            Toast.makeText(requireContext(), "Auto-delete set to 14 days", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, 14), Toast.LENGTH_SHORT).show();
                             break;
                         case 6:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, 30);
-                            Toast.makeText(requireContext(), "Auto-delete set to 30 days", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, 30), Toast.LENGTH_SHORT).show();
                             break;
                         case 7:
                             PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, -1);
-                            Toast.makeText(requireContext(), "Never auto-delete", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.toast_never_auto_delete, Toast.LENGTH_SHORT).show();
                             break;
                         case 8:
                             int currentCustom = (currentRule != null && currentRule > 0) ? currentRule : 7;
                             AutoDeleteDialogHelper.showCustomDaysDialog(requireContext(), currentCustom, days -> {
                                 int saveVal = days <= 0 ? -1 : days;
                                 PreferenceUtil.setAppAutoDeleteRule(requireContext(), summary.packageName, saveVal);
-                                Toast.makeText(requireContext(), "Auto-delete set to " + days + " days", Toast.LENGTH_SHORT).show();
+                                if (saveVal == -1) {
+                                    Toast.makeText(requireContext(), R.string.toast_never_auto_delete, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(requireContext(), getString(R.string.toast_auto_delete_set_x_days, days), Toast.LENGTH_SHORT).show();
+                                }
                             });
                             break;
                     }
@@ -302,11 +306,11 @@ public class AppsFragment extends Fragment {
         String appName = summary.appName != null ? summary.appName : summary.packageName;
         Runnable proceed = () -> {
             BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Delete Logs")
-                    .setMessage("Are you sure you want to delete all " + summary.count + " notifications recorded for " + appName + "?")
+                    .setTitle(R.string.delete_app_logs_title)
+                    .setMessage(getString(R.string.confirm_delete_app_logs_message, summary.count, appName))
                     .setPositiveButton(R.string.delete, (dialog, which) -> {
                         viewModel.deleteByPackages(Collections.singletonList(summary.packageName));
-                        Toast.makeText(requireContext(), "Cleared logs for " + appName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.toast_cleared_logs_for_app, appName), Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(R.string.cancel, null));
         };
@@ -314,7 +318,7 @@ public class AppsFragment extends Fragment {
         boolean isBiometricEnabled = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("biometric_lock", false);
         if (isBiometricEnabled) {
-            verifyBiometricsToProceed(proceed, "Authenticate to clear logs");
+            verifyBiometricsToProceed(proceed, getString(R.string.auth_delete_app_logs));
         } else {
             proceed.run();
         }

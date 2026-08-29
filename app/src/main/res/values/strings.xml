@@ -9,7 +9,7 @@
     <string name="nav_stats">Stats</string>
     <string name="nav_settings">Settings</string>
 
-    <!-- Common Actions & Buttons -->
+    <!-- Common Actions &amp; Buttons -->
     <string name="cancel">Cancel</string>
     <string name="clear">Clear</string>
     <string name="clear_all">Clear All</string>
@@ -67,7 +67,7 @@
     <string name="app_filter_format">App: %s</string>
     <string name="app_and_date_filter_format">App: %1$s  |  Date: %2$s</string>
 
-    <!-- Permissions & Security Prompts -->
+    <!-- Permissions &amp; Security Prompts -->
     <string name="permission_required_title">Notification Access Required</string>
     <string name="permission_required_message">Notification Vault needs Notification Listener access to capture and store your notification history. No data leaves your device.</string>
     <string name="grant_access">Grant Access</string>
@@ -167,7 +167,7 @@
     <string name="sort_name_az">Name (A–Z)</string>
     <string name="sort_least_alerts">Least Alerts</string>
 
-    <!-- App Rules & Management -->
+    <!-- App Rules &amp; Management -->
     <string name="app_rules">App Rules</string>
     <string name="app_rules_title">App Capture Rules</string>
     <string name="filter_user_apps">User Apps</string>
@@ -245,13 +245,13 @@
     <string name="widget_apps_title">Apps</string>
     <string name="widget_empty_notifications">No notifications yet</string>
 
-    <!-- Backup & Restore -->
+    <!-- Backup &amp; Restore -->
     <string name="backup_export_success">Backup exported successfully</string>
     <string name="backup_export_failed">Backup export failed: %s</string>
     <string name="backup_import_success">Backup imported successfully</string>
     <string name="backup_import_failed">Backup import failed: %s</string>
     <string name="no_title">(No Title)</string>
-    <!-- Media & Cloud Backup Dialogs/Toasts -->
+    <!-- Media &amp; Cloud Backup Dialogs/Toasts -->
     <string name="cloud_backup_dialog_title">Cloud / Drive Backup</string>
     <string name="save_backup_now">Save &amp; Backup Now</string>
     <string name="change_folder">Change Folder</string>
@@ -285,7 +285,7 @@
     <string name="stats_evening">Evening</string>
     <string name="stats_night">Night</string>
 
-    <!-- Apps Fragment & Selection -->
+    <!-- Apps Fragment &amp; Selection -->
     <string name="select_all">Select All</string>
     <string name="selected_count_format">%d selected</string>
     <string name="search_tracked_apps_hint">Search tracked apps…</string>
@@ -298,7 +298,7 @@
     <string name="auth_delete_app_logs">Confirm authentication to delete app logs</string>
     <string name="verify_identity">Verify Identity</string>
 
-    <!-- UI Labels & Actions -->
+    <!-- UI Labels &amp; Actions -->
     <string name="export_button">Export</string>
     <string name="decrypt_and_import">Decrypt &amp; Import</string>
     <string name="importing_backup_title">Importing Backup</string>
@@ -367,7 +367,7 @@
     <string name="permission_instruction_step6">6. Return to settings, turn on the \'Allow notification access\' switch again, and tap \'Allow\' on the confirmation popup.</string>
     <string name="permission_instruction_step7">7. Finally, ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent).</string>
 
-    <!-- Content Descriptions & Accessibility -->
+    <!-- Content Descriptions &amp; Accessibility -->
     <string name="desc_delete_app_logs">Delete App Logs</string>
     <string name="desc_selected">Selected</string>
     <string name="desc_configure_keywords">Configure Keywords</string>
@@ -399,4 +399,37 @@
     <string name="widget_capture_desc">One-tap switch to pause or resume vault capture</string>
     <string name="widget_add_action">Add</string>
     <string name="got_it">Got it</string>
+    <string name="apps_header_summary_format">%1$d Tracked Apps</string>
+    <string name="total_notifications_badge_format">%1$d total alerts</string>
+    <string name="zero_tracked_apps">0 Tracked Apps</string>
+    <string name="zero_alerts">0 alerts</string>
+    <string name="action_view_all_notifications">View All Notifications</string>
+    <string name="action_configure_rules">Configure Capture Rules &amp; Filters</string>
+    <string name="action_set_auto_delete">Set Auto-Delete Retention</string>
+    <string name="action_clear_app_logs">Clear All Logs for this App</string>
+    <string name="retention_dialog_title_format">Retention: %1$s</string>
+    <string name="retention_use_global_default">Use Global Default (%1$s)</string>
+    <string name="retention_after_1_day">After 1 day</string>
+    <string name="retention_after_1_day_otp">After 1 day (e.g. OTP / Banking)</string>
+    <string name="retention_after_x_days">After %1$d days</string>
+    <string name="retention_never_delete">Never Auto-Delete (Keep forever)</string>
+    <string name="retention_custom_days">Custom days...</string>
+    <string name="toast_using_global_default">Using global default</string>
+    <string name="toast_auto_delete_set_1_day">Auto-delete set to 1 day</string>
+    <string name="toast_auto_delete_set_x_days">Auto-delete set to %1$d days</string>
+    <string name="toast_never_auto_delete">Never auto-delete</string>
+    <string name="toast_cleared_logs_for_app">Cleared logs for %1$s</string>
+    <string name="confirm_delete_app_logs_message">Are you sure you want to delete all %1$d notifications recorded for %2$s?</string>
+    <string name="auto_delete_global_disabled">Global auto-delete is disabled (Never delete)</string>
+    <string name="auto_delete_default_1_day">Default: Delete notifications older than 1 day</string>
+    <string name="auto_delete_default_x_days">Default: Delete notifications older than %1$d days</string>
+    <string name="chip_rule_never_delete">Never Delete</string>
+    <string name="chip_rule_1_day">1 day</string>
+    <string name="chip_rule_x_days">%1$d days</string>
+    <string name="chip_rule_global_format">Global (%1$s)</string>
+    <string name="stats_captured_last_7_days">Captured in Last 7 Days</string>
+    <string name="stats_captured_last_30_days">Captured in Last 30 Days</string>
+    <string name="stats_captured_all_time">All-Time Captured</string>
+    <string name="stats_tap_bar_to_inspect">Tap bar to inspect</string>
+    <string name="time_yesterday_format">Yesterday, %1$s</string>
 </resources>

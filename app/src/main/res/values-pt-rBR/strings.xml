@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d notificação hoje</string>
     <string name="widget_notif_today_plural">%d notificações hoje</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Regras de exclusão automática</string>
     <string name="global_auto_delete_section">Período de retenção padrão</string>
     <string name="global_auto_delete_section_desc">Aplicado a todos os apps, exceto se configurada uma regra personalizada abaixo</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Filtro de aplicativo limpo</string>
     <string name="app_filter_format">App: %s</string>
     <string name="app_and_date_filter_format">App: %1$s  |  Data: %2$s</string>
+    <string name="apps_header_summary_format">%1$d aplicativos rastreados</string>
+    <string name="total_notifications_badge_format">%1$d alertas no total</string>
+    <string name="zero_tracked_apps">0 aplicativos rastreados</string>
+    <string name="zero_alerts">0 alertas</string>
+    <string name="action_view_all_notifications">Ver todas as notificações</string>
+    <string name="action_configure_rules">Configurar regras e filtros de captura</string>
+    <string name="action_set_auto_delete">Definir retenção de exclusão automática</string>
+    <string name="action_clear_app_logs">Limpar todos os registros deste aplicativo</string>
+    <string name="retention_dialog_title_format">Retenção: %1$s</string>
+    <string name="retention_use_global_default">Usar padrão global (%1$s)</string>
+    <string name="retention_after_1_day">Após 1 dia</string>
+    <string name="retention_after_1_day_otp">Após 1 dia (ex.: OTP / Bancos)</string>
+    <string name="retention_after_x_days">Após %1$d dias</string>
+    <string name="retention_never_delete">Nunca excluir automaticamente (Manter para sempre)</string>
+    <string name="retention_custom_days">Dias personalizados...</string>
+    <string name="toast_using_global_default">Usando padrão global</string>
+    <string name="toast_auto_delete_set_1_day">Exclusão automática definida para 1 dia</string>
+    <string name="toast_auto_delete_set_x_days">Exclusão automática definida para %1$d dias</string>
+    <string name="toast_never_auto_delete">Nunca excluir automaticamente</string>
+    <string name="toast_cleared_logs_for_app">Registros limpos para %1$s</string>
+    <string name="confirm_delete_app_logs_message">Tem certeza de que deseja excluir todas as %1$d notificações gravadas para %2$s?</string>
+    <string name="auto_delete_global_disabled">A exclusão automática global está desativada (Nunca excluir)</string>
+    <string name="auto_delete_default_1_day">Padrão: Excluir notificações com mais de 1 dia</string>
+    <string name="auto_delete_default_x_days">Padrão: Excluir notificações com mais de %1$d dias</string>
+    <string name="chip_rule_never_delete">Nunca excluir</string>
+    <string name="chip_rule_1_day">1 dia</string>
+    <string name="chip_rule_x_days">%1$d dias</string>
+    <string name="chip_rule_global_format">Global (%1$s)</string>
+    <string name="stats_captured_last_7_days">Capturadas nos últimos 7 dias</string>
+    <string name="stats_captured_last_30_days">Capturadas nos últimos 30 dias</string>
+    <string name="stats_captured_all_time">Capturadas em todo o período</string>
+    <string name="stats_tap_bar_to_inspect">Toque na barra para inspecionar</string>
+    <string name="time_yesterday_format">Ontem, %1$s</string>
 </resources>

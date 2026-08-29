@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">%d powiadomienie dzisiaj</string>
     <string name="widget_notif_today_plural">%d powiadomień dzisiaj</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Reguły automatycznego usuwania</string>
     <string name="global_auto_delete_section">Domyślny okres przechowywania</string>
     <string name="global_auto_delete_section_desc">Stosowane do wszystkich aplikacji, chyba że poniżej ustawiono wyjątek</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Filtr aplikacji wyczyszczony</string>
     <string name="app_filter_format">Aplikacja: %s</string>
     <string name="app_and_date_filter_format">Aplikacja: %1$s  |  Data: %2$s</string>
+    <string name="apps_header_summary_format">%1$d śledzonych aplikacji</string>
+    <string name="total_notifications_badge_format">%1$d wszystkich powiadomień</string>
+    <string name="zero_tracked_apps">0 śledzonych aplikacji</string>
+    <string name="zero_alerts">0 powiadomień</string>
+    <string name="action_view_all_notifications">Pokaż wszystkie powiadomienia</string>
+    <string name="action_configure_rules">Skonfiguruj reguły przechwytywania i filtry</string>
+    <string name="action_set_auto_delete">Ustaw czas automatycznego usuwania</string>
+    <string name="action_clear_app_logs">Wyczyść wszystkie dzienniki tej aplikacji</string>
+    <string name="retention_dialog_title_format">Przechowywanie: %1$s</string>
+    <string name="retention_use_global_default">Użyj ustawienia domyślnego (%1$s)</string>
+    <string name="retention_after_1_day">Po 1 dniu</string>
+    <string name="retention_after_1_day_otp">Po 1 dniu (np. OTP / Bankowość)</string>
+    <string name="retention_after_x_days">Po %1$d dniach</string>
+    <string name="retention_never_delete">Nigdy nie usuwaj automatycznie (Zachowaj)</string>
+    <string name="retention_custom_days">Własna liczba dni...</string>
+    <string name="toast_using_global_default">Użycie wartości domyślnej</string>
+    <string name="toast_auto_delete_set_1_day">Automatyczne usuwanie ustawione na 1 dzień</string>
+    <string name="toast_auto_delete_set_x_days">Automatyczne usuwanie ustawione na %1$d dni</string>
+    <string name="toast_never_auto_delete">Nigdy nie usuwaj automatycznie</string>
+    <string name="toast_cleared_logs_for_app">Wyczyszczono dzienniki dla %1$s</string>
+    <string name="confirm_delete_app_logs_message">Czy na pewno chcesz usunąć wszystkie %1$d powiadomienia zarejestrowane dla %2$s?</string>
+    <string name="auto_delete_global_disabled">Automatyczne usuwanie jest wyłączone (Nigdy nie usuwaj)</string>
+    <string name="auto_delete_default_1_day">Domyślnie: Usuwaj powiadomienia starsze niż 1 dzień</string>
+    <string name="auto_delete_default_x_days">Domyślnie: Usuwaj powiadomienia starsze niż %1$d dni</string>
+    <string name="chip_rule_never_delete">Nigdy nie usuwaj</string>
+    <string name="chip_rule_1_day">1 dzień</string>
+    <string name="chip_rule_x_days">%1$d dni</string>
+    <string name="chip_rule_global_format">Globalne (%1$s)</string>
+    <string name="stats_captured_last_7_days">Przechwycone w ciągu ostatnich 7 dni</string>
+    <string name="stats_captured_last_30_days">Przechwycone w ciągu ostatnich 30 dni</string>
+    <string name="stats_captured_all_time">Przechwycone w całym okresie</string>
+    <string name="stats_tap_bar_to_inspect">Dotknij paska, aby sprawdzić</string>
+    <string name="time_yesterday_format">Wczoraj, %1$s</string>
 </resources>

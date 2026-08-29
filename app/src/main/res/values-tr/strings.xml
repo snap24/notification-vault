@@ -315,7 +315,7 @@
     <string name="widget_notif_today_singular">Bugün %d bildirim</string>
     <string name="widget_notif_today_plural">Bugün %d bildirim</string>
 
-    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <!-- Unified Auto-Delete &amp; Widget Filter Translations -->
     <string name="dialog_unified_auto_delete_title">Otomatik Silme Kuralları</string>
     <string name="global_auto_delete_section">Varsayılan Saklama Süresi</string>
     <string name="global_auto_delete_section_desc">Aşağıda özel bir kural belirlenmediği sürece tüm uygulamalara uygulanır</string>
@@ -356,4 +356,37 @@
     <string name="app_filter_cleared">Uygulama filtresi temizlendi</string>
     <string name="app_filter_format">Uygulama: %s</string>
     <string name="app_and_date_filter_format">Uygulama: %1$s  |  Tarih: %2$s</string>
+    <string name="apps_header_summary_format">%1$d Takip Edilen Uygulama</string>
+    <string name="total_notifications_badge_format">%1$d toplam bildirim</string>
+    <string name="zero_tracked_apps">0 Takip Edilen Uygulama</string>
+    <string name="zero_alerts">0 bildirim</string>
+    <string name="action_view_all_notifications">Tüm Bildirimleri Görüntüle</string>
+    <string name="action_configure_rules">Yakalama Kurallarını ve Filtrelerini Yapılandır</string>
+    <string name="action_set_auto_delete">Otomatik Silme Saklama Süresini Ayarla</string>
+    <string name="action_clear_app_logs">Bu Uygulamanın Tüm Günlüklerini Temizle</string>
+    <string name="retention_dialog_title_format">Saklama: %1$s</string>
+    <string name="retention_use_global_default">Genel Varsayılanı Kullan (%1$s)</string>
+    <string name="retention_after_1_day">1 gün sonra</string>
+    <string name="retention_after_1_day_otp">1 gün sonra (örn. OTP / Bankacılık)</string>
+    <string name="retention_after_x_days">%1$d gün sonra</string>
+    <string name="retention_never_delete">Asla Otomatik Silme (Her zaman sakla)</string>
+    <string name="retention_custom_days">Özel gün sayısı...</string>
+    <string name="toast_using_global_default">Genel varsayılan kullanılıyor</string>
+    <string name="toast_auto_delete_set_1_day">Otomatik silme 1 güne ayarlandı</string>
+    <string name="toast_auto_delete_set_x_days">Otomatik silme %1$d güne ayarlandı</string>
+    <string name="toast_never_auto_delete">Asla otomatik silme</string>
+    <string name="toast_cleared_logs_for_app">%1$s için günlükler temizlendi</string>
+    <string name="confirm_delete_app_logs_message">%2$s için kaydedilen tüm %1$d bildirimi silmek istediğinizden emin misiniz?</string>
+    <string name="auto_delete_global_disabled">Genel otomatik silme devre dışı (Asla silme)</string>
+    <string name="auto_delete_default_1_day">Varsayılan: 1 günden eski bildirimleri sil</string>
+    <string name="auto_delete_default_x_days">Varsayılan: %1$d günden eski bildirimleri sil</string>
+    <string name="chip_rule_never_delete">Asla Silme</string>
+    <string name="chip_rule_1_day">1 gün</string>
+    <string name="chip_rule_x_days">%1$d gün</string>
+    <string name="chip_rule_global_format">Genel (%1$s)</string>
+    <string name="stats_captured_last_7_days">Son 7 Günde Yakalandı</string>
+    <string name="stats_captured_last_30_days">Son 30 Günde Yakalandı</string>
+    <string name="stats_captured_all_time">Tüm Zamanlarda Yakalandı</string>
+    <string name="stats_tap_bar_to_inspect">İncelemek için çubuğa dokunun</string>
+    <string name="time_yesterday_format">Dün, %1$s</string>
 </resources>

@@ -180,13 +180,13 @@ public class AutoDeleteDialogHelper {
     }
 
     private static void updateGlobalDesc(Context context, int days, TextView tvDesc) {
-        if (tvDesc == null) return;
+        if (tvDesc == null || context == null) return;
         if (days == 0) {
-            tvDesc.setText("Global auto-delete is disabled (Never delete)");
+            tvDesc.setText(R.string.auto_delete_global_disabled);
         } else if (days == 1) {
-            tvDesc.setText("Default: Delete notifications older than 1 day");
+            tvDesc.setText(R.string.auto_delete_default_1_day);
         } else {
-            tvDesc.setText("Default: Delete notifications older than " + days + " days");
+            tvDesc.setText(context.getString(R.string.auto_delete_default_x_days, days));
         }
     }
 
@@ -422,18 +422,18 @@ public class AutoDeleteDialogHelper {
 
             Integer rule = appRules.get(item.packageName);
             int globalDays = globalDaysProvider.getGlobalDays();
-            String globalLabel = globalDays == 0 ? "Never" : globalDays + "d";
+            String globalLabel = globalDays == 0 ? context.getString(R.string.chip_rule_never_delete) : globalDays + "d";
 
             if (rule == null) {
-                holder.chipRule.setText("Global (" + globalLabel + ")");
+                holder.chipRule.setText(context.getString(R.string.chip_rule_global_format, globalLabel));
                 holder.chipRule.setChipIconResource(R.drawable.ic_clock);
                 holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
             } else if (rule == -1) {
-                holder.chipRule.setText("Never Delete");
+                holder.chipRule.setText(R.string.chip_rule_never_delete);
                 holder.chipRule.setChipIconResource(R.drawable.ic_lock);
                 holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
             } else {
-                holder.chipRule.setText(rule == 1 ? "After 1 day" : "After " + rule + " days");
+                holder.chipRule.setText(rule == 1 ? context.getString(R.string.retention_after_1_day) : context.getString(R.string.retention_after_x_days, rule));
                 holder.chipRule.setChipIconResource(R.drawable.ic_delete_sweep);
                 holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
             }
@@ -446,18 +446,18 @@ public class AutoDeleteDialogHelper {
 
         private void showRuleSelectorDialog(AppItem item) {
             int globalDays = globalDaysProvider.getGlobalDays();
-            String globalLabel = globalDays == 0 ? "Never" : globalDays + " days";
+            String globalLabel = globalDays == 0 ? context.getString(R.string.chip_rule_never_delete) : context.getString(R.string.chip_rule_x_days, globalDays);
 
             String[] options = new String[]{
-                    "Use Global Default (" + globalLabel + ")",
-                    "After 1 day (e.g. OTP / Banking)",
-                    "After 2 days",
-                    "After 3 days",
-                    "After 7 days",
-                    "After 14 days",
-                    "After 30 days",
-                    "Never Auto-Delete (Keep forever)",
-                    "Custom days..."
+                    context.getString(R.string.retention_use_global_default, globalLabel),
+                    context.getString(R.string.retention_after_1_day_otp),
+                    context.getString(R.string.retention_after_x_days, 2),
+                    context.getString(R.string.retention_after_x_days, 3),
+                    context.getString(R.string.retention_after_x_days, 7),
+                    context.getString(R.string.retention_after_x_days, 14),
+                    context.getString(R.string.retention_after_x_days, 30),
+                    context.getString(R.string.retention_never_delete),
+                    context.getString(R.string.retention_custom_days)
             };
 
             Integer currentRule = appRules.get(item.packageName);
