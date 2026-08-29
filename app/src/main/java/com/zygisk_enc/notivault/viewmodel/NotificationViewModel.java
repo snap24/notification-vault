@@ -183,6 +183,7 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
                     final java.util.concurrent.atomic.AtomicLong lastPublishTime = new java.util.concurrent.atomic.AtomicLong(System.currentTimeMillis());
+                    final boolean allowProgressiveListStreaming = searchingMode || (limit <= 500);
 
                     for (int c = 0; c < numChunks; c++) {
                         final int chunkIndex = c;
@@ -243,16 +244,12 @@ public class NotificationViewModel extends AndroidViewModel {
                                     // 1) Search mode (entire search dataset)
                                     // 2) Initial feed batch (0 - 500 items)
                                     // For subsequent scroll batches (501+), toolbar pill shows progress while list appends once at 100%
-                                    final boolean allowProgressiveListStreaming = searchingMode || (limit <= 500);
-
                                     if (allowProgressiveListStreaming) {
-                                        int milestone = progress / 10;
-                                        long now = System.currentTimeMillis();
+                                        int step = searchingMode ? 25 : 10;
+                                        int milestone = progress / step;
                                         boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
-                                        boolean timeTrigger = (now - lastPublishTime.get() >= 80);
 
-                                        if ((milestoneTrigger || timeTrigger) && runToken == currentRunToken) {
-                                            lastPublishTime.set(now);
+                                        if (milestoneTrigger && runToken == currentRunToken) {
                                             java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
                                             for (int k = 0; k < numChunks; k++) {
                                                 synchronized (chunkResults[k]) {
