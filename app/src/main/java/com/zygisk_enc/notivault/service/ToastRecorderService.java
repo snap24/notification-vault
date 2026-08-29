@@ -45,14 +45,11 @@ public class ToastRecorderService extends AccessibilityService {
 
                 boolean isDuplicate = false;
                 if (lastToast != null) {
-                    boolean timeMatches = Math.abs(now - lastToast.timestamp) <= 30 * 1000L;
-                    if (timeMatches) {
-                        String lastDecrypted = EncryptionHelper.decrypt(lastToast.text);
-                        if (text.equals(lastDecrypted)) {
-                            isDuplicate = true;
-                            int newCount = Math.max(1, lastToast.duplicateCount) + 1;
-                            db.toastDao().updateDuplicate(lastToast.id, newCount, now);
-                        }
+                    String lastDecrypted = EncryptionHelper.decrypt(lastToast.text);
+                    if (text.equals(lastDecrypted)) {
+                        isDuplicate = true;
+                        int newCount = Math.max(1, lastToast.duplicateCount) + 1;
+                        db.toastDao().updateDuplicate(lastToast.id, newCount, now);
                     }
                 }
 
