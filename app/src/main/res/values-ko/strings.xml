@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">클라우드 백업 완료</string>
     <string name="notification_cloud_backup_success_desc">암호화된 백업이 클라우드 폴더에 저장되었습니다.</string>
     <string name="notification_cloud_backup_failed">클라우드 백업 실패</string>
+    <string name="deleting_progress">삭제 중… %d%%</string>
 </resources>

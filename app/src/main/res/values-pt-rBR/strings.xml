@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Backup na nuvem realizado com sucesso</string>
     <string name="notification_cloud_backup_success_desc">Seu backup criptografado foi salvo na pasta da nuvem.</string>
     <string name="notification_cloud_backup_failed">Falha no backup na nuvem</string>
+    <string name="deleting_progress">Excluindo… %d%%</string>
 </resources>

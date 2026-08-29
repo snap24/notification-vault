@@ -438,4 +438,5 @@
     <string name="notification_cloud_backup_success">Cloud Backup Successful</string>
     <string name="notification_cloud_backup_success_desc">Your encrypted backup was saved to the cloud folder.</string>
     <string name="notification_cloud_backup_failed">Cloud Backup Failed</string>
+    <string name="deleting_progress">Deleting… %d%%</string>
 </resources>

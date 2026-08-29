@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Cadangan Cloud Berhasil</string>
     <string name="notification_cloud_backup_success_desc">Cadangan terenkripsi Anda telah disimpan ke folder cloud.</string>
     <string name="notification_cloud_backup_failed">Cadangan Cloud Gagal</string>
+    <string name="deleting_progress">Menghapus… %d%%</string>
 </resources>

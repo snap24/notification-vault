@@ -53,16 +53,35 @@ public class NotificationRepository {
         });
     }
 
+    public interface ProgressCallback {
+        void onProgress(int progress);
+        void onComplete();
+    }
+
     public void deleteAll() {
+        deleteAll(null);
+    }
+
+    public void deleteAll(ProgressCallback callback) {
         executor.execute(() -> {
-            List<NotificationEntity> list = dao.getAllNotificationsSync();
-            if (list != null) {
-                for (NotificationEntity entity : list) {
-                    deleteNotificationImage(entity.imagePath);
+            try {
+                if (callback != null) callback.onProgress(0);
+                List<NotificationEntity> list = dao.getAllNotificationsSync();
+                if (list != null && !list.isEmpty()) {
+                    int total = list.size();
+                    for (int i = 0; i < total; i++) {
+                        deleteNotificationImage(list.get(i).imagePath);
+                        if (callback != null && (i % 25 == 0 || i == total - 1)) {
+                            callback.onProgress((i * 100) / total);
+                        }
+                    }
                 }
+                dao.deleteAll();
+                if (callback != null) callback.onProgress(100);
+                com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+            } finally {
+                if (callback != null) callback.onComplete();
             }
-            dao.deleteAll();
-            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
 
@@ -94,9 +113,29 @@ public class NotificationRepository {
     }
 
     public void deleteByDateRange(long startTime, long endTime) {
+        deleteByDateRange(startTime, endTime, null);
+    }
+
+    public void deleteByDateRange(long startTime, long endTime, ProgressCallback callback) {
         executor.execute(() -> {
-            dao.deleteByDateRange(startTime, endTime);
-            com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+            try {
+                if (callback != null) callback.onProgress(0);
+                List<String> imagePaths = dao.getOldImagePaths(endTime);
+                if (imagePaths != null && !imagePaths.isEmpty()) {
+                    int total = imagePaths.size();
+                    for (int i = 0; i < total; i++) {
+                        deleteNotificationImage(imagePaths.get(i));
+                        if (callback != null && (i % 20 == 0 || i == total - 1)) {
+                            callback.onProgress((i * 100) / total);
+                        }
+                    }
+                }
+                dao.deleteByDateRange(startTime, endTime);
+                if (callback != null) callback.onProgress(100);
+                com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+            } finally {
+                if (callback != null) callback.onComplete();
+            }
         });
     }
 
@@ -136,18 +175,30 @@ public class NotificationRepository {
     }
 
     public void deleteByPackages(java.util.List<String> packages) {
+        deleteByPackages(packages, null);
+    }
+
+    public void deleteByPackages(java.util.List<String> packages, ProgressCallback callback) {
         executor.execute(() -> {
             try {
+                if (callback != null) callback.onProgress(0);
                 java.util.List<String> imagePaths = dao.getImagePathsForPackages(packages);
-                if (imagePaths != null) {
-                    for (String path : imagePaths) {
-                        deleteNotificationImage(path);
+                if (imagePaths != null && !imagePaths.isEmpty()) {
+                    int total = imagePaths.size();
+                    for (int i = 0; i < total; i++) {
+                        deleteNotificationImage(imagePaths.get(i));
+                        if (callback != null && (i % 20 == 0 || i == total - 1)) {
+                            callback.onProgress((i * 100) / total);
+                        }
                     }
                 }
                 dao.deleteByPackages(packages);
+                if (callback != null) callback.onProgress(100);
                 com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                if (callback != null) callback.onComplete();
             }
         });
     }

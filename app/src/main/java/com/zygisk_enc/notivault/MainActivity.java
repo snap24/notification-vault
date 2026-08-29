@@ -104,12 +104,16 @@ public class MainActivity extends BaseActivity {
                 new androidx.lifecycle.ViewModelProvider(this)
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
 
-        notifViewModel.getLoadProgress().observe(this, progress -> {
-            if (progress == null || progress < 0 || progress >= 100) {
+        notifViewModel.getOperationProgress().observe(this, op -> {
+            if (op == null || op.progress < 0 || (op.progress >= 100 && op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE)) {
                 binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
-            } else {
+            } else if (op.progress >= 0 && op.progress <= 100) {
                 binding.cardToolbarDecryption.setVisibility(android.view.View.VISIBLE);
-                binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, progress));
+                if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_DELETING) {
+                    binding.tvToolbarDecryption.setText(getString(R.string.deleting_progress, op.progress));
+                } else {
+                    binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, op.progress));
+                }
             }
         });
 

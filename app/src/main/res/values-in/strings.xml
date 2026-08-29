@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">क्लाउड बैकअप सफल</string>
     <string name="notification_cloud_backup_success_desc">आपका एन्क्रिप्टेड बैकअप क्लाउड फ़ोल्डर में सहेज दिया गया है।</string>
     <string name="notification_cloud_backup_failed">क्लाउड बैकअप विफल</string>
+    <string name="deleting_progress">हटाया जा रहा है… %d%%</string>
 </resources>

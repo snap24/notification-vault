@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">クラウドバックアップが完了しました</string>
     <string name="notification_cloud_backup_success_desc">暗号化されたバックアップがクラウドフォルダに保存されました。</string>
     <string name="notification_cloud_backup_failed">クラウドバックアップに失敗しました</string>
+    <string name="deleting_progress">削除中… %d%%</string>
 </resources>

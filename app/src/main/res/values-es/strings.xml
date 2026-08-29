@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Copia de seguridad en la nube exitosa</string>
     <string name="notification_cloud_backup_success_desc">Su copia de seguridad cifrada se guardó en la carpeta de la nube.</string>
     <string name="notification_cloud_backup_failed">Error en la copia de seguridad en la nube</string>
+    <string name="deleting_progress">Eliminando… %d%%</string>
 </resources>

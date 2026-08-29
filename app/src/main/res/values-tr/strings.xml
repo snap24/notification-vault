@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Bulut Yedekleme Başarılı</string>
     <string name="notification_cloud_backup_success_desc">Şifrelenmiş yedeğiniz bulut klasörüne kaydedildi.</string>
     <string name="notification_cloud_backup_failed">Bulut Yedekleme Başarısız</string>
+    <string name="deleting_progress">Siliniyor… %d%%</string>
 </resources>

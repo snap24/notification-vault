@@ -43,7 +43,23 @@ public class NotificationViewModel extends AndroidViewModel {
         decryptedCache.evictAll();
     }
 
+    public static class OperationProgress {
+        public static final int TYPE_NONE = 0;
+        public static final int TYPE_DECRYPTING = 1;
+        public static final int TYPE_DELETING = 2;
+
+        public final int type;
+        public final int progress;
+
+        public OperationProgress(int type, int progress) {
+            this.type = type;
+            this.progress = progress;
+        }
+    }
+
     private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
+    private final MutableLiveData<OperationProgress> operationProgress =
+            new MutableLiveData<>(new OperationProgress(OperationProgress.TYPE_NONE, -1));
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int PARALLEL_THREADS = Math.max(2, Math.min(8, CPU_COUNT));
     private final java.util.concurrent.ExecutorService coordinatorExecutor =
@@ -64,6 +80,10 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getLoadProgress() {
         return loadProgress;
+    }
+
+    public LiveData<OperationProgress> getOperationProgress() {
+        return operationProgress;
     }
 
     private boolean isBatchingUpdates = false;
@@ -150,6 +170,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     if (total == 0) {
                         if (runToken == currentRunToken) {
                             loadProgress.postValue(-1);
+                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                             notifications.postValue(new java.util.ArrayList<>());
                         }
                         return;
@@ -171,6 +192,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     final boolean showProgress = itemsToDecrypt > 0;
                     if (showProgress && runToken == currentRunToken) {
                         loadProgress.postValue(0);
+                        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, 0));
                     }
 
                     // Slicing across parallel threads
@@ -225,6 +247,7 @@ public class NotificationViewModel extends AndroidViewModel {
                                     if (showProgress && (processed % 15 == 0 || processed == total)) {
                                         if (runToken == currentRunToken) {
                                             loadProgress.postValue(progress);
+                                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, progress));
                                         }
                                     }
 
@@ -303,20 +326,24 @@ public class NotificationViewModel extends AndroidViewModel {
                     if (showProgress) {
                         if (runToken == currentRunToken) {
                             loadProgress.postValue(100);
+                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, 100));
                         }
                         try { Thread.sleep(300); } catch (InterruptedException ignored) {}
                         if (runToken == currentRunToken) {
                             loadProgress.postValue(-1);
+                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                         }
                     } else {
                         if (runToken == currentRunToken) {
                             loadProgress.postValue(-1);
+                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     if (runToken == currentRunToken) {
                         loadProgress.postValue(-1);
+                        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                     }
                 }
             });
@@ -465,11 +492,56 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void deleteAll() {
-        repository.deleteAll();
+        final long runToken = ++currentRunToken;
+        decryptedCache.evictAll();
+        lastRawList = null;
+        notifications.postValue(new java.util.ArrayList<>());
+        loadProgress.postValue(-1);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 0));
+
+        repository.deleteAll(new NotificationRepository.ProgressCallback() {
+            @Override
+            public void onProgress(int progress) {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
+                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                }
+            }
+        });
     }
 
     public void deleteByDateRange(long startTime, long endTime) {
-        repository.deleteByDateRange(startTime, endTime);
+        final long runToken = ++currentRunToken;
+        decryptedCache.evictAll();
+        lastRawList = null;
+        loadProgress.postValue(-1);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 0));
+
+        repository.deleteByDateRange(startTime, endTime, new NotificationRepository.ProgressCallback() {
+            @Override
+            public void onProgress(int progress) {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
+                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                }
+            }
+        });
     }
 
     public void deleteByDays(java.util.Collection<Long> daysUtc) {
@@ -512,7 +584,29 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void deleteByPackages(List<String> packages) {
-        repository.deleteByPackages(packages);
+        final long runToken = ++currentRunToken;
+        decryptedCache.evictAll();
+        lastRawList = null;
+        loadProgress.postValue(-1);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 0));
+
+        repository.deleteByPackages(packages, new NotificationRepository.ProgressCallback() {
+            @Override
+            public void onProgress(int progress) {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (runToken == currentRunToken) {
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
+                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
+                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                }
+            }
+        });
     }
 
     public void deleteOlderThanForPackages(long timestamp, List<String> packages) {

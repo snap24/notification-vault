@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Cloud-Backup erfolgreich</string>
     <string name="notification_cloud_backup_success_desc">Ihr verschlüsseltes Backup wurde im Cloud-Ordner gespeichert.</string>
     <string name="notification_cloud_backup_failed">Cloud-Backup fehlgeschlagen</string>
+    <string name="deleting_progress">Wird gelöscht… %d%%</string>
 </resources>

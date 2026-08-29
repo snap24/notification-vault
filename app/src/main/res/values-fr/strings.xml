@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Sauvegarde cloud réussie</string>
     <string name="notification_cloud_backup_success_desc">Votre sauvegarde chiffrée a été enregistrée dans le dossier cloud.</string>
     <string name="notification_cloud_backup_failed">Échec de la sauvegarde cloud</string>
+    <string name="deleting_progress">Suppression… %d%%</string>
 </resources>

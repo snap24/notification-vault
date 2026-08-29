@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Backup cloud riuscito</string>
     <string name="notification_cloud_backup_success_desc">Il backup crittografato è stato salvato nella cartella cloud.</string>
     <string name="notification_cloud_backup_failed">Backup cloud non riuscito</string>
+    <string name="deleting_progress">Eliminazione… %d%%</string>
 </resources>

@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">نجح النسخ الاحتياطي السحابي</string>
     <string name="notification_cloud_backup_success_desc">تم حفظ نسختك الاحتياطية المشفرة في المجلد السحابي.</string>
     <string name="notification_cloud_backup_failed">فشل النسخ الاحتياطي السحابي</string>
+    <string name="deleting_progress">جارٍ الحذف… %d%%</string>
 </resources>

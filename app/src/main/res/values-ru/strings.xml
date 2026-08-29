@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Облачное резервное копирование успешно</string>
     <string name="notification_cloud_backup_success_desc">Ваша зашифрованная резервная копия сохранена в облачной папке.</string>
     <string name="notification_cloud_backup_failed">Сбой облачного резервного копирования</string>
+    <string name="deleting_progress">Удаление… %d%%</string>
 </resources>

@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">Kopia zapasowa w chmurze powiodła się</string>
     <string name="notification_cloud_backup_success_desc">Zaszyfrowana kopia zapasowa została zapisana w folderze w chmurze.</string>
     <string name="notification_cloud_backup_failed">Niepowodzenie kopii zapasowej w chmurze</string>
+    <string name="deleting_progress">Usuwanie… %d%%</string>
 </resources>

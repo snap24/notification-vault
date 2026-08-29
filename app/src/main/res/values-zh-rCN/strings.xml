@@ -395,4 +395,5 @@
     <string name="notification_cloud_backup_success">云端备份成功</string>
     <string name="notification_cloud_backup_success_desc">您的加密备份已成功保存到云端文件夹。</string>
     <string name="notification_cloud_backup_failed">云端备份失败</string>
+    <string name="deleting_progress">正在删除… %d%%</string>
 </resources>
