@@ -158,53 +158,78 @@
     <color name="orange_dark_outlineVariant">#53433F</color>
     <color name="orange_dark_surfaceContainerHigh">#2D2422</color>
 
-    <!-- Grey Theme Colors -->
-    <color name="grey_light_primary">#5A626A</color>
+    <!-- Grey Theme Colors (Pure Slate & Neutral Dark Charcoal, Zero Brown Tint) -->
+    <color name="grey_light_primary">#535A62</color>
     <color name="grey_light_onPrimary">#FFFFFF</color>
-    <color name="grey_light_primaryContainer">#E2E6EB</color>
-    <color name="grey_light_onPrimaryContainer">#171C22</color>
-    <color name="grey_light_secondary">#5D6065</color>
+    <color name="grey_light_primaryContainer">#DCE1E7</color>
+    <color name="grey_light_onPrimaryContainer">#11161B</color>
+    <color name="grey_light_secondary">#595F66</color>
     <color name="grey_light_onSecondary">#FFFFFF</color>
-    <color name="grey_light_secondaryContainer">#E2E2E7</color>
-    <color name="grey_light_onSecondaryContainer">#1A1C1E</color>
-    <color name="grey_light_background">#F8F9FA</color>
-    <color name="grey_light_onBackground">#1A1C1E</color>
-    <color name="grey_light_surface">#F8F9FA</color>
-    <color name="grey_light_onSurface">#1A1C1E</color>
-    <color name="grey_light_surfaceVariant">#E0E2E5</color>
-    <color name="grey_light_onSurfaceVariant">#43474B</color>
-    <color name="grey_light_outline">#74777F</color>
-    <color name="grey_light_outlineVariant">#C3C7CB</color>
-    <color name="grey_light_surfaceContainerHigh">#EBECEE</color>
+    <color name="grey_light_secondaryContainer">#DEE3EA</color>
+    <color name="grey_light_onSecondaryContainer">#14191E</color>
+    <color name="grey_light_tertiary">#626870</color>
+    <color name="grey_light_tertiaryContainer">#E4E8EE</color>
+    <color name="grey_light_onTertiaryContainer">#181D22</color>
+    <color name="grey_light_background">#F7F9FA</color>
+    <color name="grey_light_onBackground">#191C1E</color>
+    <color name="grey_light_surface">#F7F9FA</color>
+    <color name="grey_light_onSurface">#191C1E</color>
+    <color name="grey_light_surfaceVariant">#DEE2E6</color>
+    <color name="grey_light_onSurfaceVariant">#41464C</color>
+    <color name="grey_light_outline">#72777E</color>
+    <color name="grey_light_outlineVariant">#C2C7CD</color>
+    <color name="grey_light_surfaceContainerLow">#F2F4F6</color>
+    <color name="grey_light_surfaceContainer">#ECEEF1</color>
+    <color name="grey_light_surfaceContainerHigh">#E6E8EB</color>
+    <color name="grey_light_surfaceContainerHighest">#E0E2E5</color>
 
-    <color name="grey_dark_primary">#C1C7CE</color>
-    <color name="grey_dark_onPrimary">#2C3136</color>
-    <color name="grey_dark_primaryContainer">#42494E</color>
-    <color name="grey_dark_onPrimaryContainer">#DCE2E9</color>
-    <color name="grey_dark_secondary">#C5C6CB</color>
-    <color name="grey_dark_onSecondary">#2E3035</color>
-    <color name="grey_dark_secondaryContainer">#45474B</color>
-    <color name="grey_dark_onSecondaryContainer">#E2E2E7</color>
-    <color name="grey_dark_background">#1A1C1E</color>
-    <color name="grey_dark_onBackground">#E2E2E6</color>
-    <color name="grey_dark_surface">#1A1C1E</color>
-    <color name="grey_dark_onSurface">#E2E2E6</color>
-    <color name="grey_dark_surfaceVariant">#43474B</color>
-    <color name="grey_dark_onSurfaceVariant">#C3C7CB</color>
-    <color name="grey_dark_outline">#8D9196</color>
-    <color name="grey_dark_outlineVariant">#43474B</color>
-    <color name="grey_dark_surfaceContainerHigh">#25272A</color>
+    <color name="grey_dark_primary">#D0D6DC</color>
+    <color name="grey_dark_onPrimary">#202428</color>
+    <color name="grey_dark_primaryContainer">#353A41</color>
+    <color name="grey_dark_onPrimaryContainer">#E6EBF0</color>
+    <color name="grey_dark_secondary">#BFC5CC</color>
+    <color name="grey_dark_onSecondary">#25292E</color>
+    <color name="grey_dark_secondaryContainer">#3B4047</color>
+    <color name="grey_dark_onSecondaryContainer">#E2E7ED</color>
+    <color name="grey_dark_tertiary">#ADB4BC</color>
+    <color name="grey_dark_tertiaryContainer">#30353B</color>
+    <color name="grey_dark_onTertiaryContainer">#DDE3EA</color>
+    <color name="grey_dark_background">#121417</color>
+    <color name="grey_dark_onBackground">#E2E5E9</color>
+    <color name="grey_dark_surface">#121417</color>
+    <color name="grey_dark_onSurface">#E2E5E9</color>
+    <color name="grey_dark_surfaceVariant">#2E3339</color>
+    <color name="grey_dark_onSurfaceVariant">#C2C7CE</color>
+    <color name="grey_dark_outline">#8B9199</color>
+    <color name="grey_dark_outlineVariant">#3D434A</color>
+    <color name="grey_dark_surfaceContainerLow">#181B1F</color>
+    <color name="grey_dark_surfaceContainer">#1E2126</color>
+    <color name="grey_dark_surfaceContainerHigh">#25292F</color>
+    <color name="grey_dark_surfaceContainerHighest">#2D3239</color>
 
     <!-- Pink Logo Color -->
     <color name="pink_logo">#FF00D6</color>
 
-    <!-- Pitch Black Colors -->
+    <!-- Pitch Black AMOLED Colors (100% Pure Black #000000, Zero Tint) -->
     <color name="black_dark_background">#000000</color>
     <color name="black_dark_surface">#000000</color>
-    <color name="black_dark_surfaceContainerHigh">#101010</color>
-    <color name="black_dark_surfaceVariant">#1A1A1A</color>
-    <color name="black_dark_outline">#333333</color>
-    <color name="black_dark_outlineVariant">#222222</color>
+    <color name="black_dark_surfaceContainerLow">#000000</color>
+    <color name="black_dark_surfaceContainer">#000000</color>
+    <color name="black_dark_surfaceContainerHigh">#0D0D0D</color>
+    <color name="black_dark_surfaceContainerHighest">#151515</color>
+    <color name="black_dark_surfaceVariant">#141414</color>
+    <color name="black_dark_outline">#363636</color>
+    <color name="black_dark_outlineVariant">#202020</color>
+    <color name="black_dark_primary">#F0F0F0</color>
+    <color name="black_dark_onPrimary">#000000</color>
+    <color name="black_dark_primaryContainer">#1E1E1E</color>
+    <color name="black_dark_onPrimaryContainer">#F5F5F5</color>
+    <color name="black_dark_secondary">#D0D0D0</color>
+    <color name="black_dark_secondaryContainer">#1A1A1A</color>
+    <color name="black_dark_onSecondaryContainer">#E5E5E5</color>
+    <color name="black_dark_tertiary">#AAAAAA</color>
+    <color name="black_dark_tertiaryContainer">#1A1A1A</color>
+    <color name="black_dark_onTertiaryContainer">#E0E0E0</color>
 
     <!-- Widget Modern Glass Colors -->
     <color name="widget_card_bg">#E61E1F22</color>

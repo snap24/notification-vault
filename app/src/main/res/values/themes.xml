@@ -106,16 +106,19 @@
         <item name="colorSurfaceContainerHigh">@color/orange_light_surfaceContainerHigh</item>
     </style>
 
-    <!-- Black Theme (Fallback light settings, will act dark anyway if triggered) -->
+    <!-- Pitch Black AMOLED Theme (Fallback light settings, will act dark anyway if triggered) -->
     <style name="Theme.NotiVault.Black" parent="Theme.NotiVault">
-        <item name="colorPrimary">@color/purple_dark_primary</item>
-        <item name="colorOnPrimary">@color/purple_dark_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/purple_dark_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/purple_dark_onPrimaryContainer</item>
-        <item name="colorSecondary">@color/purple_dark_secondary</item>
-        <item name="colorOnSecondary">@color/purple_dark_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/purple_dark_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/purple_dark_onSecondaryContainer</item>
+        <item name="colorPrimary">@color/black_dark_primary</item>
+        <item name="colorOnPrimary">@color/black_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/black_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/black_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/black_dark_secondary</item>
+        <item name="colorOnSecondary">@color/black_dark_onPrimary</item>
+        <item name="colorSecondaryContainer">@color/black_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/black_dark_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/black_dark_tertiary</item>
+        <item name="colorTertiaryContainer">@color/black_dark_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/black_dark_onTertiaryContainer</item>
         <item name="android:colorBackground">@color/black_dark_background</item>
         <item name="colorOnBackground">#FFFFFF</item>
         <item name="colorSurface">@color/black_dark_surface</item>
@@ -124,10 +127,15 @@
         <item name="colorOnSurfaceVariant">#CCCCCC</item>
         <item name="colorOutline">@color/black_dark_outline</item>
         <item name="colorOutlineVariant">@color/black_dark_outlineVariant</item>
+        <item name="colorSurfaceContainerLow">@color/black_dark_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/black_dark_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/black_dark_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/black_dark_surfaceContainerHighest</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="elevationOverlayEnabled">false</item>
     </style>
-    <!-- Grey Theme -->
+
+    <!-- Grey Theme (Pure Slate & Neutral Dark Charcoal, Zero Brown Tint) -->
     <style name="Theme.NotiVault.Grey" parent="Theme.NotiVault">
         <item name="colorPrimary">@color/grey_light_primary</item>
         <item name="colorOnPrimary">@color/grey_light_onPrimary</item>
@@ -137,6 +145,9 @@
         <item name="colorOnSecondary">@color/grey_light_onSecondary</item>
         <item name="colorSecondaryContainer">@color/grey_light_secondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/grey_light_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/grey_light_tertiary</item>
+        <item name="colorTertiaryContainer">@color/grey_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/grey_light_onTertiaryContainer</item>
         <item name="android:colorBackground">@color/grey_light_background</item>
         <item name="colorOnBackground">@color/grey_light_onBackground</item>
         <item name="colorSurface">@color/grey_light_surface</item>
@@ -145,6 +156,9 @@
         <item name="colorOnSurfaceVariant">@color/grey_light_onSurfaceVariant</item>
         <item name="colorOutline">@color/grey_light_outline</item>
         <item name="colorOutlineVariant">@color/grey_light_outlineVariant</item>
+        <item name="colorSurfaceContainerLow">@color/grey_light_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/grey_light_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/grey_light_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/grey_light_surfaceContainerHighest</item>
     </style>
 </resources>
