@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">어제, %1$s</string>
     <string name="auth_import_backup">백업을 가져오려면 인증을 확인하세요</string>
     <string name="toast_import_started">백그라운드에서 가져오기가 시작되었습니다. 진행 상황은 상태 표시줄을 확인하세요. 최근 앱 목록에서 앱을 닫지 마세요.</string>
+    <string name="notification_cloud_backup_running">클라우드 백업 저장 중</string>
+    <string name="notification_cloud_backup_success">클라우드 백업 완료</string>
+    <string name="notification_cloud_backup_success_desc">암호화된 백업이 클라우드 폴더에 저장되었습니다.</string>
+    <string name="notification_cloud_backup_failed">클라우드 백업 실패</string>
 </resources>

@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Ieri, %1$s</string>
     <string name="auth_import_backup">Conferma l\'autenticazione per importare il backup</string>
     <string name="toast_import_started">Importazione avviata in background. Controlla la barra di stato per l\'avanzamento. Non chiudere l\'app dall\'elenco delle app recenti.</string>
+    <string name="notification_cloud_backup_running">Salvataggio backup cloud in corso</string>
+    <string name="notification_cloud_backup_success">Backup cloud riuscito</string>
+    <string name="notification_cloud_backup_success_desc">Il backup crittografato è stato salvato nella cartella cloud.</string>
+    <string name="notification_cloud_backup_failed">Backup cloud non riuscito</string>
 </resources>

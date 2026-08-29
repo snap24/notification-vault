@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Вчера, %1$s</string>
     <string name="auth_import_backup">Подтвердите аутентификацию для импорта резервной копии</string>
     <string name="toast_import_started">Импорт запущен в фоновом режиме. Проверьте строку состояния для отслеживания прогресса. Пожалуйста, не закрывайте приложение из списка недавних приложений.</string>
+    <string name="notification_cloud_backup_running">Сохранение резервной копии в облаке</string>
+    <string name="notification_cloud_backup_success">Облачное резервное копирование успешно</string>
+    <string name="notification_cloud_backup_success_desc">Ваша зашифрованная резервная копия сохранена в облачной папке.</string>
+    <string name="notification_cloud_backup_failed">Сбой облачного резервного копирования</string>
 </resources>

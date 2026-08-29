@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Ontem, %1$s</string>
     <string name="auth_import_backup">Confirme a autenticação para importar o backup</string>
     <string name="toast_import_started">Importação iniciada em segundo plano. Verifique a barra de status para ver o progresso. Não feche o aplicativo da lista de aplicativos recentes.</string>
+    <string name="notification_cloud_backup_running">Salvando backup na nuvem</string>
+    <string name="notification_cloud_backup_success">Backup na nuvem realizado com sucesso</string>
+    <string name="notification_cloud_backup_success_desc">Seu backup criptografado foi salvo na pasta da nuvem.</string>
+    <string name="notification_cloud_backup_failed">Falha no backup na nuvem</string>
 </resources>

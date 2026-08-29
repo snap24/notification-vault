@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Gestern, %1$s</string>
     <string name="auth_import_backup">Authentifizierung bestätigen, um Backup zu importieren</string>
     <string name="toast_import_started">Import im Hintergrund gestartet. Überprüfen Sie die Statusleiste auf den Fortschritt. Bitte schließen Sie die App nicht aus der Liste der letzten Apps.</string>
+    <string name="notification_cloud_backup_running">Cloud-Backup wird gespeichert</string>
+    <string name="notification_cloud_backup_success">Cloud-Backup erfolgreich</string>
+    <string name="notification_cloud_backup_success_desc">Ihr verschlüsseltes Backup wurde im Cloud-Ordner gespeichert.</string>
+    <string name="notification_cloud_backup_failed">Cloud-Backup fehlgeschlagen</string>
 </resources>

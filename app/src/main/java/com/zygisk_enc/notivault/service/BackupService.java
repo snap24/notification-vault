@@ -53,16 +53,20 @@ public class BackupService extends Service {
             handleImport(uri, password);
         } else {
             boolean includeMedia = intent.getBooleanExtra("includeMedia", false);
-            handleExport(uri, password, includeMedia);
+            boolean isCloudBackup = intent.getBooleanExtra("isCloudBackup", false);
+            handleExport(uri, password, includeMedia, isCloudBackup);
         }
 
         return START_NOT_STICKY;
     }
 
-    private void handleExport(Uri uri, String password, boolean includeMedia) {
+    private void handleExport(Uri uri, String password, boolean includeMedia, boolean isCloudBackup) {
+        String title = isCloudBackup ? getString(R.string.notification_cloud_backup_running) : "Exporting Backup";
+        String initialText = "Preparing data...";
+
         notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Exporting Backup")
-                .setContentText("Preparing data...")
+                .setContentTitle(title)
+                .setContentText(initialText)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setProgress(100, 0, false)
                 .setOngoing(true);
@@ -76,16 +80,24 @@ public class BackupService extends Service {
         BackupUtil.exportBackup(this, uri, password, includeMedia, new BackupUtil.BackupProgressListener() {
             @Override
             public void onProgress(int progress) {
-                notificationBuilder.setContentText("Exporting... " + progress + "%")
+                notificationBuilder.setContentText((isCloudBackup ? getString(R.string.notification_cloud_backup_running) : "Exporting") + "... " + progress + "%")
                         .setProgress(100, progress, false);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
             }
 
             @Override
             public void onSuccess() {
+                if (isCloudBackup) {
+                    androidx.preference.PreferenceManager.getDefaultSharedPreferences(BackupService.this)
+                            .edit().putLong("cloud_backup_last_run", System.currentTimeMillis()).apply();
+                }
+
+                String successTitle = isCloudBackup ? getString(R.string.notification_cloud_backup_success) : "Backup Export Successful";
+                String successText = isCloudBackup ? getString(R.string.notification_cloud_backup_success_desc) : "Your encrypted backup was saved successfully.";
+
                 Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
-                        .setContentTitle("Backup Export Successful")
-                        .setContentText("Your encrypted backup was saved successfully.")
+                        .setContentTitle(successTitle)
+                        .setContentText(successText)
                         .setSmallIcon(R.drawable.ic_notification)
                         .setProgress(0, 0, false)
                         .setOngoing(false)
@@ -104,8 +116,10 @@ public class BackupService extends Service {
                     ex.printStackTrace();
                 }
 
+                String failureTitle = isCloudBackup ? getString(R.string.notification_cloud_backup_failed) : "Backup Export Failed";
+
                 Notification failureNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
-                        .setContentTitle("Backup Export Failed")
+                        .setContentTitle(failureTitle)
                         .setContentText("Error: " + e.getMessage())
                         .setSmallIcon(R.drawable.ic_notification)
                         .setProgress(0, 0, false)

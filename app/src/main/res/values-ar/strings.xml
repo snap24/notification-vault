@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">أمس، %1$s</string>
     <string name="auth_import_backup">تأكيد المصادقة لاستيراد النسخة الاحتياطية</string>
     <string name="toast_import_started">بدأ الاستيراد في الخلفية. تحقق من شريط الحالة لمعرفة التقدم. يرجى عدم إغلاق التطبيق من قائمة التطبيقات الحديثة.</string>
+    <string name="notification_cloud_backup_running">حفظ النسخة الاحتياطية السحابية</string>
+    <string name="notification_cloud_backup_success">نجح النسخ الاحتياطي السحابي</string>
+    <string name="notification_cloud_backup_success_desc">تم حفظ نسختك الاحتياطية المشفرة في المجلد السحابي.</string>
+    <string name="notification_cloud_backup_failed">فشل النسخ الاحتياطي السحابي</string>
 </resources>

@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Dün, %1$s</string>
     <string name="auth_import_backup">Yedeği içe aktarmak için kimlik doğrulamasını onaylayın</string>
     <string name="toast_import_started">İçe aktarma arka planda başlatıldı. İlerlemeyi görmek için durum çubuğunu kontrol edin. Lütfen uygulamayı son uygulamalar listesinden kapatmayın.</string>
+    <string name="notification_cloud_backup_running">Bulut Yedeği Kaydediliyor</string>
+    <string name="notification_cloud_backup_success">Bulut Yedekleme Başarılı</string>
+    <string name="notification_cloud_backup_success_desc">Şifrelenmiş yedeğiniz bulut klasörüne kaydedildi.</string>
+    <string name="notification_cloud_backup_failed">Bulut Yedekleme Başarısız</string>
 </resources>

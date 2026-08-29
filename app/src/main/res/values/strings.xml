@@ -434,4 +434,8 @@
     <string name="time_yesterday_format">Yesterday, %1$s</string>
     <string name="auth_import_backup">Confirm authentication to import backup</string>
     <string name="toast_import_started">Import started in background. Check the status bar for progress. Please do not close the app from your recent apps list, as this will cause the import to fail.</string>
+    <string name="notification_cloud_backup_running">Saving Cloud Backup</string>
+    <string name="notification_cloud_backup_success">Cloud Backup Successful</string>
+    <string name="notification_cloud_backup_success_desc">Your encrypted backup was saved to the cloud folder.</string>
+    <string name="notification_cloud_backup_failed">Cloud Backup Failed</string>
 </resources>

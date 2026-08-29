@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Wczoraj, %1$s</string>
     <string name="auth_import_backup">Potwierdź uwierzytelnienie, aby zaimportować kopię zapasową</string>
     <string name="toast_import_started">Importowanie rozpoczęte w tle. Sprawdź pasek stanu, aby zobaczyć postęp. Nie zamykaj aplikacji z listy ostatnich aplikacji.</string>
+    <string name="notification_cloud_backup_running">Zapisywanie kopii zapasowej w chmurze</string>
+    <string name="notification_cloud_backup_success">Kopia zapasowa w chmurze powiodła się</string>
+    <string name="notification_cloud_backup_success_desc">Zaszyfrowana kopia zapasowa została zapisana w folderze w chmurze.</string>
+    <string name="notification_cloud_backup_failed">Niepowodzenie kopii zapasowej w chmurze</string>
 </resources>

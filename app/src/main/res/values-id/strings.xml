@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">Kemarin, %1$s</string>
     <string name="auth_import_backup">Konfirmasi autentikasi untuk mengimpor cadangan</string>
     <string name="toast_import_started">Impor dimulai di latar belakang. Periksa bilah status untuk melihat progres. Harap jangan menutup aplikasi dari daftar aplikasi terbaru.</string>
+    <string name="notification_cloud_backup_running">Menyimpan Cadangan Cloud</string>
+    <string name="notification_cloud_backup_success">Cadangan Cloud Berhasil</string>
+    <string name="notification_cloud_backup_success_desc">Cadangan terenkripsi Anda telah disimpan ke folder cloud.</string>
+    <string name="notification_cloud_backup_failed">Cadangan Cloud Gagal</string>
 </resources>

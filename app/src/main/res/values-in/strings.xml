@@ -391,4 +391,8 @@
     <string name="time_yesterday_format">कल, %1$s</string>
     <string name="auth_import_backup">बैकअप आयात करने के लिए प्रमाणीकरण की पुष्टि करें</string>
     <string name="toast_import_started">आयात पृष्ठभूमि में शुरू हुआ। प्रगति के लिए स्थिति पट्टी देखें। कृपया हाल के ऐप्स की सूची से ऐप को बंद न करें।</string>
+    <string name="notification_cloud_backup_running">क्लाउड बैकअप सहेजा जा रहा है</string>
+    <string name="notification_cloud_backup_success">क्लाउड बैकअप सफल</string>
+    <string name="notification_cloud_backup_success_desc">आपका एन्क्रिप्टेड बैकअप क्लाउड फ़ोल्डर में सहेज दिया गया है।</string>
+    <string name="notification_cloud_backup_failed">क्लाउड बैकअप विफल</string>
 </resources>

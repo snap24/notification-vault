@@ -1147,30 +1147,15 @@ public class HistoryFragment extends Fragment {
             return;
         }
 
-        Toast.makeText(ctx, R.string.toast_backup_started, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ctx, com.zygisk_enc.notivault.service.BackupService.class);
+        intent.setAction(com.zygisk_enc.notivault.service.BackupService.ACTION_EXPORT);
+        intent.putExtra("uri", newFile.getUri().toString());
+        intent.putExtra("password", password);
+        intent.putExtra("includeMedia", includeMedia);
+        intent.putExtra("isCloudBackup", true);
+        androidx.core.content.ContextCompat.startForegroundService(ctx, intent);
 
-        BackupUtil.exportBackup(ctx, newFile.getUri(), password, includeMedia, new BackupUtil.BackupProgressListener() {
-            @Override public void onProgress(int progress) {}
-
-            @Override
-            public void onSuccess() {
-                PreferenceManager.getDefaultSharedPreferences(ctx)
-                        .edit().putLong("cloud_backup_last_run", System.currentTimeMillis()).apply();
-                if (isAdded() && getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                            Toast.makeText(ctx, getString(R.string.toast_backup_saved, filename), Toast.LENGTH_LONG).show());
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                try { newFile.delete(); } catch (Exception ignored) {}
-                if (isAdded() && getActivity() != null) {
-                    getActivity().runOnUiThread(() ->
-                            Toast.makeText(ctx, getString(R.string.toast_backup_failed, e.getMessage()), Toast.LENGTH_LONG).show());
-                }
-            }
-        });
+        Toast.makeText(ctx, R.string.toast_export_started, Toast.LENGTH_LONG).show();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
