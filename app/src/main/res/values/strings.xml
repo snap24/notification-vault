@@ -74,7 +74,16 @@
     <string name="auth_disable_lock">Confirm authentication to disable App Lock</string>
     <string name="auth_export_backup">Confirm authentication to export backup</string>
     <string name="auth_access_toast_logs">Authenticate to access your toast logs</string>
+    <string name="auth_delete_notifications">Confirm authentication to delete notifications</string>
+    <string name="auth_clear_all_notifications">Confirm authentication to clear all notifications</string>
+    <string name="biometric_identity_verification">Notification Vault Identity Verification</string>
+    <string name="select_date_to_delete_logs">Select Date to Delete Logs</string>
+    <string name="delete_logs_for_date_title">Delete Logs for %s</string>
+    <string name="delete_logs_for_date_message">Are you sure you want to delete all notifications recorded on %s? Favorites will be preserved.</string>
     <string name="lock_overlay_title">NotiVault is Locked</string>
+    <string name="app_lock_prompt_title">Notification Vault Lock</string>
+    <string name="auth_confirm_unlock">Confirm biometric authentication to unlock</string>
+    <string name="grant_access_countdown">Grant Access (%ds)</string>
     <string name="toast_widget_setup_cancelled">Widget setup cancelled</string>
 
     <!-- Toast Logs Screen -->
@@ -146,6 +155,9 @@
     <string name="capture_all_system_desc">Enable or disable notification recording for all system apps.</string>
     <string name="status_recording_active">Recording Active</string>
     <string name="status_recording_disabled">Recording Disabled</string>
+    <string name="status_recording_paused">Recording Paused</string>
+    <string name="widget_status_active">Active</string>
+    <string name="widget_status_paused">Paused</string>
     <string name="status_filters_active">Custom Filters Active</string>
 
     <string name="edit_rule_title">Edit Capture Rule</string>
@@ -157,6 +169,7 @@
     <string name="dialog_app_action_rules">Configure Logging Rules</string>
     <string name="dialog_rule_title">Rules: %s</string>
     <string name="dialog_rule_block_all">Enable Keyword Filtering</string>
+    <string name="dialog_rule_block_all_desc">Apply custom keywords ignore or allow list filter rules.</string>
     <string name="dialog_rule_block_keywords">Ignore notifications containing (comma-separated):</string>
     <string name="dialog_rule_block_keywords_hint">e.g. OTP, verification, code</string>
     <string name="dialog_rule_allow_keywords">Only record notifications containing (comma-separated):</string>
@@ -231,4 +244,116 @@
     <string name="toast_backup_saved">✓ Backup saved to %s</string>
     <string name="toast_backup_failed">Backup failed: %s</string>
     <string name="toast_accessibility_description">Allows NotiVault to record Toast notifications displayed on the screen.</string>
+
+    <!-- Stats Fragment -->
+    <string name="stats_distraction_analytics">Distraction Analytics</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="stats_captured_today">captured today</string>
+    <string name="stats_logged_yesterday">logged yesterday</string>
+    <string name="stats_top_loudest_apps">Top Loudest Apps</string>
+    <string name="stats_top_apps_desc">Apps responsible for most notification alerts</string>
+    <string name="stats_empty_top_apps">No notifications logged to generate top apps report.</string>
+    <string name="stats_time_distribution">Time of Day Distribution</string>
+    <string name="stats_time_distribution_desc">Notification frequency over the last 7 days</string>
+    <string name="stats_morning">Morning</string>
+    <string name="stats_afternoon">Afternoon</string>
+    <string name="stats_evening">Evening</string>
+    <string name="stats_night">Night</string>
+
+    <!-- Apps Fragment & Selection -->
+    <string name="select_all">Select All</string>
+    <string name="selected_count_format">%d selected</string>
+    <string name="search_tracked_apps_hint">Search tracked apps…</string>
+    <string name="desc_cancel_selection">Cancel Selection</string>
+    <string name="delete_app_logs_title">Delete App Logs</string>
+    <string name="delete_app_logs_message_singular">Are you sure you want to permanently delete all notification logs and saved media for %d selected app?</string>
+    <string name="delete_app_logs_message_plural">Are you sure you want to permanently delete all notification logs and saved media for %d selected apps?</string>
+    <string name="toast_deleted_apps_logs_singular">Deleted logs for %d app</string>
+    <string name="toast_deleted_apps_logs_plural">Deleted logs for %d apps</string>
+    <string name="auth_delete_app_logs">Confirm authentication to delete app logs</string>
+    <string name="verify_identity">Verify Identity</string>
+
+    <!-- UI Labels & Actions -->
+    <string name="export_button">Export</string>
+    <string name="decrypt_and_import">Decrypt &amp; Import</string>
+    <string name="importing_backup_title">Importing Backup</string>
+    <string name="importing_backup_message">Starting import... This may take a moment to initialize and might appear stuck at 0%. Please wait. Your phone is deriving secure keys by stretching your password thousands of times and encrypting entries using hardware security.</string>
+    <string name="toast_export_started">Export started in background. Check the status bar for progress. Please do not close the app from your recent apps list, as this will cause the export to fail.</string>
+    <string name="toast_failed_to_open_link">Failed to open link</string>
+    <string name="auth_manage_auto_delete">Confirm authentication to manage Auto Delete</string>
+    <string name="auth_change_auto_delete">Confirm authentication to change Auto Delete settings</string>
+    <string name="hint_long_press_clear_date">Long press to clear date filter</string>
+    <string name="snackbar_logs_deleted_date">Logs deleted for %s</string>
+    <string name="snackbar_all_notifications_cleared">All notifications cleared</string>
+    <string name="dialog_system_rules_title">System App Capture Rules</string>
+    <string name="accessibility_permission_required_title">Accessibility Access Required</string>
+    <string name="toast_open_accessibility_failed">Could not open Accessibility Settings</string>
+    <string name="toast_widget_showing_all">Widget showing all notifications</string>
+    <string name="toast_widget_filtered_to">Widget filtered to %s</string>
+    <string name="app_notification_count_singular">%d notification</string>
+    <string name="app_notification_count_plural">%d notifications</string>
+    <string name="toast_saved_auto_delete_singular">Saved auto-delete settings (%d app enabled)</string>
+    <string name="toast_saved_auto_delete_plural">Saved auto-delete settings (%d apps enabled)</string>
+    <string name="auto_delete_all_category">Auto-delete all %s</string>
+    <string name="auto_delete_enabled_count">%1$d of %2$d enabled for auto-deletion</string>
+    <string name="category_user_apps">user apps</string>
+    <string name="category_system_apps">system apps</string>
+    <string name="category_apps">apps</string>
+    <string name="auto_delete_all_listed_apps">Auto-delete all listed apps</string>
+    <string name="auto_delete_toggle_all_desc">Toggle auto-delete for all currently shown apps.</string>
+
+    <!-- Dialog Presets -->
+    <string name="dialog_quick_presets">Quick Presets</string>
+    <string name="preset_7_days">7 Days</string>
+    <string name="preset_15_days">15 Days</string>
+    <string name="preset_30_days">30 Days</string>
+    <string name="preset_60_days">60 Days</string>
+    <string name="preset_90_days">90 Days</string>
+    <string name="preset_180_days">180 Days</string>
+    <string name="dialog_export_options_title">Secure Export Options</string>
+    <string name="dialog_export_include_media">Include Media Attachments</string>
+    <string name="dialog_export_include_media_desc">Export photos alongside notification history</string>
+    <string name="dialog_import_password_title">Enter Backup Password</string>
+    <string name="dialog_import_password_desc">This backup is encrypted. Please enter the password you set during export to decrypt and restore your data.</string>
+    <string name="hint_set_backup_password">Set Backup Password</string>
+    <string name="hint_enter_password">Enter Password</string>
+    <string name="lock_overlay_subtitle">Authenticate to access your notifications</string>
+    <string name="cloud_backup_instruction">Choose a folder where encrypted backups will be saved.\n\nIf you pick a folder inside Google Drive, Nextcloud, or any cloud app on your phone, the file will be synced automatically — no account login required.\n\nTap the top-left hamburger menu (☰) in the picker and select Google Drive, then choose or create your backup folder:</string>
+    <string name="cloud_backup_setup_title">Cloud / Drive Backup Setup</string>
+    <string name="pick_folder">Pick Folder</string>
+    <string name="pick_folder_countdown">Pick Folder (%ds)</string>
+    <string name="label_none">(none)</string>
+    <string name="label_folder_format">📁 Folder: %s</string>
+    <string name="label_last_backup_format">🕐 Last backup: %s</string>
+    <string name="hint_backup_password">Backup password</string>
+    <string name="label_auto_backup_schedule">Auto-backup schedule</string>
+    <string name="label_include_media_attachments">Include media attachments</string>
+
+    <!-- Accessibility Instructions -->
+    <string name="accessibility_instruction_step1">To record background toasts, please follow these steps:\n\n1. Find \'NotiVault Toast Recorder\' in the accessibility service list and turn it on.</string>
+    <string name="accessibility_instruction_step2">Note: If the setting is greyed out with a \'Restricted setting\' warning:\n\n• Go to your phone\'s Home screen, long-press the \'Notification Vault\' app icon, and tap \'App info\'.\n• Tap the three-dots menu in the top-right and select \'Allow restricted settings\'.\n• Return here or go to accessibility settings and enable \'NotiVault Toast Recorder\'.</string>
+
+    <!-- Permission Instructions -->
+    <string name="permission_instruction_step1">To record notifications, please follow these steps:\n\n1. Find \'Notification Vault\' in the list and tap the switch next to \'Allow notification access\'.</string>
+    <string name="permission_instruction_step2">2. If you see the \'App was denied access\' or \'Restricted setting\' warning, tap \'OK\'.</string>
+    <string name="permission_instruction_step3">3. Go to your home screen or app drawer, long-press the \'Notification Vault\' app icon, and tap \'App info\'.</string>
+    <string name="permission_instruction_step4">4. On the App info screen, tap the three-dots menu in the top-right corner and select \'Allow restricted settings\'.</string>
+    <string name="permission_instruction_step5">5. Authenticate using your fingerprint, face, or PIN to confirm.</string>
+    <string name="permission_instruction_step6">6. Return to settings, turn on the \'Allow notification access\' switch again, and tap \'Allow\' on the confirmation popup.</string>
+    <string name="permission_instruction_step7">7. Finally, ensure all the checkboxes are ticked (Real-time, Conversations, Notifications, Silent).</string>
+
+    <!-- Content Descriptions & Accessibility -->
+    <string name="desc_delete_app_logs">Delete App Logs</string>
+    <string name="desc_selected">Selected</string>
+    <string name="desc_configure_keywords">Configure Keywords</string>
+    <string name="desc_refresh">Refresh</string>
+    <string name="desc_open_vault">Open Vault</string>
+    <string name="desc_status">Status</string>
+    <string name="desc_decrease_days">Decrease days</string>
+    <string name="desc_increase_days">Increase days</string>
+    <string name="active">Active</string>
+    <string name="widget_empty_count">0 notifications today</string>
+    <string name="widget_notif_today_singular">%d notification today</string>
+    <string name="widget_notif_today_plural">%d notifications today</string>
 </resources>

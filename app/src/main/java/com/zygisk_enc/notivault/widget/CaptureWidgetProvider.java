@@ -93,7 +93,7 @@ public class CaptureWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_quick_capture_1x1);
 
         // Update Status text and dot
-        views.setTextViewText(R.id.tv_widget_status, captureEnabled ? "Active" : "Paused");
+        views.setTextViewText(R.id.tv_widget_status, context.getString(captureEnabled ? R.string.widget_status_active : R.string.widget_status_paused));
         views.setImageViewResource(R.id.iv_status_dot, R.drawable.ic_circle_status);
         views.setInt(R.id.iv_status_dot, "setColorFilter", captureEnabled ? 0xFF4CAF50 : 0xFFFF9800);
 
@@ -126,12 +126,15 @@ public class CaptureWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_quick_capture);
 
         // Update Status text and dot
-        views.setTextViewText(R.id.tv_widget_status, captureEnabled ? "Recording Active" : "Recording Paused");
+        views.setTextViewText(R.id.tv_widget_status, context.getString(captureEnabled ? R.string.status_recording_active : R.string.status_recording_paused));
         views.setImageViewResource(R.id.iv_status_dot, R.drawable.ic_circle_status);
         views.setInt(R.id.iv_status_dot, "setColorFilter", captureEnabled ? 0xFF4CAF50 : 0xFFFF9800);
 
         // Update Count
-        views.setTextViewText(R.id.tv_widget_count, countToday + (countToday == 1 ? " notification today" : " notifications today"));
+        String countStr = countToday == 1
+                ? context.getString(R.string.widget_notif_today_singular, countToday)
+                : context.getString(R.string.widget_notif_today_plural, countToday);
+        views.setTextViewText(R.id.tv_widget_count, countStr);
 
         // Update Toggle Button Icon
         views.setImageViewResource(R.id.btn_widget_toggle_capture, captureEnabled ? R.drawable.ic_pause : R.drawable.ic_play_arrow);

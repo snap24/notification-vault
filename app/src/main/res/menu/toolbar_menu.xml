@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_view_source"
-        android:title="Source"
+        android:title="@string/source"
         android:icon="@drawable/ic_code"
         app:showAsAction="always|withText" />
 </menu>

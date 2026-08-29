@@ -60,14 +60,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
                 .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton("Export", null)
+                .setPositiveButton(R.string.export_button, null)
                 .create();
 
         dialog.setOnShowListener(d -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
                 if (password.isEmpty()) {
-                    Toast.makeText(requireContext(), "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -81,7 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
                 exportCompleted[0] = true;
                 Toast.makeText(requireContext(), 
-                        "Export started in background. Check the status bar for progress. Please do not close the app from your recent apps list, as this will cause the export to fail.", 
+                        R.string.toast_export_started, 
                         Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             });
@@ -107,10 +107,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
                 .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton("Decrypt & Import", (dialog, which) -> {
+                .setPositiveButton(R.string.decrypt_and_import, (dialog, which) -> {
                     String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
                     if (password.isEmpty()) {
-                        Toast.makeText(requireContext(), "Password cannot be empty", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -139,8 +139,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     progressLayout.addView(tvProgress);
 
                     androidx.appcompat.app.AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Importing Backup")
-                            .setMessage("Starting import... This may take a moment to initialize and might appear stuck at 0%. Please wait. Your phone is deriving secure keys by stretching your password thousands of times and encrypting entries using hardware security.")
+                            .setTitle(R.string.importing_backup_title)
+                            .setMessage(R.string.importing_backup_message)
                             .setView(progressLayout)
                             .setCancelable(false)
                             .show();
@@ -249,7 +249,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 if (isBiometricEnabled) {
                     verifyBiometricsToProceed(() -> {
                         com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
-                    }, "Confirm authentication to manage Auto Delete");
+                    }, getString(R.string.auth_manage_auto_delete));
                 } else {
                     com.zygisk_enc.notivault.util.AutoDeleteDialogHelper.showPerAppAutoDeleteDialog(requireContext());
                 }
@@ -274,7 +274,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         if (preference instanceof SwitchPreferenceCompat) {
                             ((SwitchPreferenceCompat) preference).setChecked(false);
                         }
-                    }, "Confirm authentication to disable App Lock");
+                    }, getString(R.string.auth_disable_lock));
                     return false; // Intercept: don't toggle yet
                 }
                 return true; // Let enabling proceed directly
@@ -311,7 +311,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 if (isBiometricEnabled) {
                     verifyBiometricsToProceed(() -> {
                         exportBackupLauncher.launch("notivault_backup_" + System.currentTimeMillis() + ".vault");
-                    }, "Confirm authentication to export backup");
+                    }, getString(R.string.auth_export_backup));
                 } else {
                     exportBackupLauncher.launch("notivault_backup_" + System.currentTimeMillis() + ".vault");
                 }
@@ -367,7 +367,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
                     startActivity(intent);
                 } catch (Exception e) {
-                    Toast.makeText(requireContext(), "Failed to open link", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.toast_failed_to_open_link, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             });
@@ -398,7 +398,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Verify Identity")
+                .setTitle(getString(R.string.verify_identity))
                 .setSubtitle(subtitle)
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           BiometricManager.Authenticators.DEVICE_CREDENTIAL)
@@ -413,7 +413,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(() -> showAutoDeleteDaysDialog(preference), "Confirm authentication to change Auto Delete settings");
+                verifyBiometricsToProceed(() -> showAutoDeleteDaysDialog(preference), getString(R.string.auth_change_auto_delete));
                 return;
             }
             showAutoDeleteDaysDialog(preference);
@@ -423,7 +423,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(() -> super.onDisplayPreferenceDialog(preference), "Confirm authentication to change Auto Delete settings");
+                verifyBiometricsToProceed(() -> super.onDisplayPreferenceDialog(preference), getString(R.string.auth_change_auto_delete));
                 return;
             }
         }

@@ -114,7 +114,7 @@
             android:layout_marginStart="8dp"
             android:background="@drawable/bg_button_square_ripple"
             android:src="@drawable/ic_star_border"
-            android:contentDescription="Favorite Toggle"
+            android:contentDescription="@string/desc_star"
             app:tint="?attr/colorPrimary" />
 
     </LinearLayout>

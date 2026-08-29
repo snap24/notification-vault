@@ -144,7 +144,7 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_vault_dashboard);
 
         // Status Pill
-        views.setTextViewText(R.id.tv_dashboard_status_text, captureEnabled ? "Active" : "Paused");
+        views.setTextViewText(R.id.tv_dashboard_status_text, context.getString(captureEnabled ? R.string.widget_status_active : R.string.widget_status_paused));
         views.setInt(R.id.iv_dashboard_status_dot, "setColorFilter", captureEnabled ? 0xFF4CAF50 : 0xFFFF9800);
 
         // Stats

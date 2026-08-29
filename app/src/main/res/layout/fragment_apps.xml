@@ -22,7 +22,7 @@
             android:id="@+id/cb_select_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select All"
+            android:text="@string/select_all"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="0 selected"
+            android:text="@string/selected_count_format"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/btn_delete_selected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delete"
+            android:text="@string/delete"
             style="@style/Widget.Material3.Button.TonalButton"
             app:icon="@drawable/ic_delete_sweep"
             app:iconTint="?attr/colorError"
@@ -52,7 +52,7 @@
             android:layout_height="36dp"
             android:background="@drawable/bg_button_square_ripple"
             android:src="@drawable/ic_close"
-            android:contentDescription="Cancel Selection"
+            android:contentDescription="@string/desc_cancel_selection"
             app:tint="?attr/colorPrimary" />
 
     </LinearLayout>
@@ -62,7 +62,7 @@
         android:id="@+id/til_search_apps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search tracked apps..."
+        android:hint="@string/search_tracked_apps_hint"
         android:layout_marginBottom="12dp"
         app:startIconDrawable="@drawable/ic_search"
         app:endIconMode="clear_text"

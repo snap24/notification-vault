@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distraction Analytics"
+            android:text="@string/stats_distraction_analytics"
             android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
@@ -57,7 +57,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Today"
+                        android:text="@string/today"
                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textStyle="bold" />
@@ -75,7 +75,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="captured today"
+                        android:text="@string/stats_captured_today"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginTop="4dp" />
@@ -105,7 +105,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Yesterday"
+                        android:text="@string/yesterday"
                         android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textStyle="bold" />
@@ -123,7 +123,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="logged yesterday"
+                        android:text="@string/stats_logged_yesterday"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginTop="4dp" />
@@ -154,7 +154,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Top Loudest Apps"
+                    android:text="@string/stats_top_loudest_apps"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
@@ -162,7 +162,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Apps responsible for most notification alerts"
+                    android:text="@string/stats_top_apps_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="16dp" />
@@ -177,7 +177,7 @@
                     android:id="@+id/tv_no_apps_stats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No notifications logged to generate top apps report."
+                    android:text="@string/stats_empty_top_apps"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center"
@@ -208,7 +208,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Time of Day Distribution"
+                    android:text="@string/stats_time_distribution"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
@@ -216,7 +216,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Notification frequency over the last 7 days"
+                    android:text="@string/stats_time_distribution_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="20dp" />
@@ -231,7 +231,7 @@
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Morning"
+                        android:text="@string/stats_morning"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -265,7 +265,7 @@
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Afternoon"
+                        android:text="@string/stats_afternoon"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -299,7 +299,7 @@
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Evening"
+                        android:text="@string/stats_evening"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -332,7 +332,7 @@
                     <TextView
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Night"
+                        android:text="@string/stats_night"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />

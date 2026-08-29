@@ -249,7 +249,7 @@ public class HistoryFragment extends Fragment {
         binding.btnOpenCalendar.setOnClickListener(v -> {
             Long currentStart = viewModel.getFilterDateStart().getValue();
             MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-            builder.setTitleText("Select Date");
+            builder.setTitleText(getString(R.string.desc_select_date));
             if (currentStart != null) builder.setSelection(currentStart);
 
             CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
@@ -299,9 +299,9 @@ public class HistoryFragment extends Fragment {
         binding.btnOpenCalendar.setOnLongClickListener(v -> {
             if (viewModel.getFilterDateStart().getValue() != null) {
                 viewModel.setDateFilter(null, null);
-                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Date filter cleared", Snackbar.LENGTH_SHORT));
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT));
             } else {
-                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Long press to clear date filter", Snackbar.LENGTH_SHORT));
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.hint_long_press_clear_date, Snackbar.LENGTH_SHORT));
             }
             return true;
         });
@@ -369,7 +369,7 @@ public class HistoryFragment extends Fragment {
 
     private void showDeleteCalendar() {
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-        builder.setTitleText("Select Date to Delete Logs");
+        builder.setTitleText(getString(R.string.select_date_to_delete_logs));
         builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
 
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
@@ -409,7 +409,7 @@ public class HistoryFragment extends Fragment {
                         
                         com.google.android.material.button.MaterialButton btnDeleteAll = 
                                 new com.google.android.material.button.MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle);
-                        btnDeleteAll.setText("Delete All");
+                        btnDeleteAll.setText(R.string.clear_all);
                         int errorColor = com.google.android.material.color.MaterialColors.getColor(
                                 requireContext(), com.google.android.material.R.attr.colorError, android.graphics.Color.RED);
                         btnDeleteAll.setTextColor(errorColor);
@@ -448,12 +448,12 @@ public class HistoryFragment extends Fragment {
 
             Runnable proceedToDeleteDate = () -> {
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Delete Logs for " + formattedDate)
-                        .setMessage("Are you sure you want to delete all notifications recorded on " + formattedDate + "? Favorites will be preserved.")
+                        .setTitle(getString(R.string.delete_logs_for_date_title, formattedDate))
+                        .setMessage(getString(R.string.delete_logs_for_date_message, formattedDate))
                         .setNegativeButton(R.string.cancel, null)
                         .setPositiveButton(R.string.clear, (d, w) -> {
                             viewModel.deleteByDateRange(start, end);
-                            showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "Logs deleted for " + formattedDate, Snackbar.LENGTH_SHORT));
+                            showAnchoredSnackbar(Snackbar.make(binding.getRoot(), getString(R.string.snackbar_logs_deleted_date, formattedDate), Snackbar.LENGTH_SHORT));
                         })
                         .show();
             };
@@ -461,7 +461,7 @@ public class HistoryFragment extends Fragment {
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedToDeleteDate, "Confirm authentication to delete notifications");
+                verifyBiometricsToProceed(proceedToDeleteDate, getString(R.string.auth_delete_notifications));
             } else {
                 proceedToDeleteDate.run();
             }
@@ -478,7 +478,7 @@ public class HistoryFragment extends Fragment {
                     .setNegativeButton(R.string.cancel, null)
                     .setPositiveButton(R.string.clear, (dialog, which) -> {
                         viewModel.deleteAll();
-                        showAnchoredSnackbar(Snackbar.make(binding.getRoot(), "All notifications cleared", Snackbar.LENGTH_SHORT));
+                        showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.snackbar_all_notifications_cleared, Snackbar.LENGTH_SHORT));
                     })
                     .show();
         };
@@ -486,7 +486,7 @@ public class HistoryFragment extends Fragment {
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("biometric_lock", false);
         if (isBiometricEnabled) {
-            verifyBiometricsToProceed(proceedToClear, "Confirm authentication to clear all notifications");
+            verifyBiometricsToProceed(proceedToClear, getString(R.string.auth_clear_all_notifications));
         } else {
             proceedToClear.run();
         }
@@ -587,7 +587,7 @@ public class HistoryFragment extends Fragment {
                 binding.tvLoadProgress.setVisibility(View.GONE);
             } else {
                 binding.tvLoadProgress.setVisibility(View.VISIBLE);
-                binding.tvLoadProgress.setText("Decrypting... " + progress + "%");
+                binding.tvLoadProgress.setText(getString(R.string.decrypting_progress, progress));
             }
         });
         
@@ -629,7 +629,7 @@ public class HistoryFragment extends Fragment {
         for (NotificationEntity entity : notifications) {
             String group = DateUtils.getDateGroupKey(entity.timestamp);
             if (!group.equals(lastGroup)) {
-                result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(entity.timestamp)));
+                result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(getContext(), entity.timestamp)));
                 lastGroup = group;
             }
             result.add(new NotificationAdapter.ListItem(entity));
@@ -670,7 +670,7 @@ public class HistoryFragment extends Fragment {
                         if (bitmap != null) {
                             android.widget.ImageView imageView = new android.widget.ImageView(requireContext());
                             android.widget.LinearLayout.LayoutParams imgLp = new android.widget.LinearLayout.LayoutParams(
-                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                     android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                                     (int) (240 * requireContext().getResources().getDisplayMetrics().density)
                             );
                             imgLp.topMargin = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
@@ -688,7 +688,7 @@ public class HistoryFragment extends Fragment {
                             btnLp.bottomMargin = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
                             btnLp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
                             btnSave.setLayoutParams(btnLp);
-                            btnSave.setText("Save");
+                            btnSave.setText(R.string.save);
                             btnSave.setOnClickListener(v -> saveImageToPublicDirectory(currentPath, entity.appName));
                             layout.addView(btnSave);
                             imgIndex++;
@@ -794,7 +794,7 @@ public class HistoryFragment extends Fragment {
         });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Notification Vault Identity Verification")
+                .setTitle(getString(R.string.biometric_identity_verification))
                 .setSubtitle(subtitle)
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           BiometricManager.Authenticators.DEVICE_CREDENTIAL)
@@ -825,11 +825,7 @@ public class HistoryFragment extends Fragment {
 
             // Instructions text
             TextView tvInstruction = new TextView(ctx);
-            tvInstruction.setText("Choose a folder where encrypted backups will be saved.\n\n" +
-                    "If you pick a folder inside Google Drive, Nextcloud, or any " +
-                    "cloud app on your phone, the file will be synced automatically — " +
-                    "no account login required.\n\n" +
-                    "Tap the top-left hamburger menu (☰) in the picker and select Google Drive, then choose or create your backup folder:");
+            tvInstruction.setText(R.string.cloud_backup_instruction);
             tvInstruction.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
             tvInstruction.setPadding(0, 0, 0, (int) (12 * ctx.getResources().getDisplayMetrics().density));
             container.addView(tvInstruction);
@@ -847,10 +843,10 @@ public class HistoryFragment extends Fragment {
             scrollView.addView(container);
 
             androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
-                    .setTitle("Cloud / Drive Backup Setup")
+                    .setTitle(R.string.cloud_backup_setup_title)
                     .setView(scrollView)
-                    .setPositiveButton("Pick Folder (2s)", null)
-                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton(getString(R.string.pick_folder_countdown, 2), null)
+                    .setNegativeButton(R.string.cancel, null)
                     .setCancelable(true)
                     .create();
 
@@ -872,11 +868,11 @@ public class HistoryFragment extends Fragment {
                             return;
                         }
                         if (count[0] > 0) {
-                            btnPositive.setText("Pick Folder (" + count[0] + "s)");
+                            btnPositive.setText(getString(R.string.pick_folder_countdown, count[0]));
                             count[0]--;
                             handler.postDelayed(this, 1000);
                         } else {
-                            btnPositive.setText("Pick Folder");
+                            btnPositive.setText(R.string.pick_folder);
                             btnPositive.setEnabled(true);
                         }
                     }
@@ -905,11 +901,11 @@ public class HistoryFragment extends Fragment {
                     ? "..." + folderUri.substring(Math.max(0, folderUri.lastIndexOf('%') - 0))
                           .replace("%2F", "/").replace("%3A", ":")
                     : folderUri
-                : "(none)";
+                : getString(R.string.label_none);
         // Trim for display
         if (folderLabel.length() > 45) folderLabel = "..." + folderLabel.substring(folderLabel.length() - 42);
 
-        String lastRunLabel = lastRun == 0 ? "Never" :
+        String lastRunLabel = lastRun == 0 ? getString(R.string.never) :
                 new java.text.SimpleDateFormat("dd MMM yyyy HH:mm", java.util.Locale.getDefault())
                         .format(new java.util.Date(lastRun));
 
@@ -924,13 +920,13 @@ public class HistoryFragment extends Fragment {
 
         // Folder info row
         TextView tvFolder = new TextView(ctx);
-        tvFolder.setText("📁 Folder: " + folderLabel);
+        tvFolder.setText(getString(R.string.label_folder_format, folderLabel));
         tvFolder.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
         layout.addView(tvFolder);
 
         // Last run row
         TextView tvLast = new TextView(ctx);
-        tvLast.setText("🕐 Last backup: " + lastRunLabel);
+        tvLast.setText(getString(R.string.label_last_backup_format, lastRunLabel));
         tvLast.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
         android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -952,7 +948,7 @@ public class HistoryFragment extends Fragment {
         // Password field
         com.google.android.material.textfield.TextInputLayout tilPass =
                 new com.google.android.material.textfield.TextInputLayout(ctx);
-        tilPass.setHint("Backup password");
+        tilPass.setHint(getString(R.string.hint_backup_password));
         tilPass.setEndIconMode(com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         TextInputEditText etPass = new TextInputEditText(ctx);
         etPass.setInputType(android.text.InputType.TYPE_CLASS_TEXT |
@@ -967,7 +963,7 @@ public class HistoryFragment extends Fragment {
 
         // Schedule spinner
         TextView tvScheduleLabel = new TextView(ctx);
-        tvScheduleLabel.setText("Auto-backup schedule");
+        tvScheduleLabel.setText(R.string.label_auto_backup_schedule);
         tvScheduleLabel.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium);
         android.widget.LinearLayout.LayoutParams sLp = new android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
@@ -976,7 +972,7 @@ public class HistoryFragment extends Fragment {
         tvScheduleLabel.setLayoutParams(sLp);
         layout.addView(tvScheduleLabel);
 
-        String[] scheduleLabels = {"Off (manual only)", "Daily", "Weekly", "Monthly (30 days)"};
+        String[] scheduleLabels = getResources().getStringArray(R.array.cloud_backup_schedule_entries);
         int[]    scheduleHours  = {0, 24, 168, 720};
         Spinner spinner = new Spinner(ctx);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx,
@@ -993,7 +989,7 @@ public class HistoryFragment extends Fragment {
         boolean savedIncludeMedia = PreferenceUtil.getCloudBackupIncludeMedia(ctx);
         com.google.android.material.materialswitch.MaterialSwitch switchMedia =
                 new com.google.android.material.materialswitch.MaterialSwitch(ctx);
-        switchMedia.setText("Include media attachments");
+        switchMedia.setText(R.string.label_include_media_attachments);
         switchMedia.setChecked(savedIncludeMedia);
         android.widget.LinearLayout.LayoutParams mediaLp = new android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,

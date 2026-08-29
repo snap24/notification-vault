@@ -16,7 +16,7 @@
         android:layout_height="38dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_notification"
-        android:contentDescription="App Icon" />
+        android:contentDescription="@string/desc_app_icon" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -29,7 +29,7 @@
             android:id="@+id/tv_app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All Notifications"
+            android:text="@string/widget_all_notifications"
             android:textColor="?attr/colorOnSurface"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -38,7 +38,7 @@
             android:id="@+id/tv_app_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Show all logged notifications"
+            android:text="@string/widget_all_notifications_desc"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="12sp" />
 
@@ -51,6 +51,6 @@
         android:src="@drawable/ic_check"
         android:visibility="gone"
         app:tint="?attr/colorPrimary"
-        android:contentDescription="Selected" />
+        android:contentDescription="@string/desc_selected" />
 
 </LinearLayout>

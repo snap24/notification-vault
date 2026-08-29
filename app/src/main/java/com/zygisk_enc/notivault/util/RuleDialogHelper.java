@@ -249,7 +249,7 @@ public class RuleDialogHelper {
                 .setTitle(R.string.dialog_rules_list_title)
                 .setView(view)
                 .setNegativeButton(R.string.close, null)
-                .setNeutralButton("System Apps", null)
+                .setNeutralButton(R.string.filter_system_apps, null)
                 .create();
 
         dialog.setOnShowListener(d -> {
@@ -259,16 +259,16 @@ public class RuleDialogHelper {
                     isShowingSystem[0] = !isShowingSystem[0];
                     if (isShowingSystem[0]) {
                         currentListHolder[0] = systemAppItems;
-                        neutralBtn.setText("User Apps");
-                        dialog.setTitle("System App Capture Rules");
-                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText("Capture all system apps");
-                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText("Enable or disable recording for all system apps.");
+                        neutralBtn.setText(R.string.filter_user_apps);
+                        dialog.setTitle(R.string.dialog_system_rules_title);
+                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText(R.string.capture_all_system_apps);
+                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText(R.string.capture_all_system_desc);
                     } else {
                         currentListHolder[0] = userAppItems;
-                        neutralBtn.setText("System Apps");
+                        neutralBtn.setText(R.string.filter_system_apps);
                         dialog.setTitle(R.string.dialog_rules_list_title);
-                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText("Capture all user apps");
-                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText("Enable or disable notification recording globally.");
+                        if (tvToggleAllTitle != null) tvToggleAllTitle.setText(R.string.capture_all_user_apps);
+                        if (tvToggleAllDesc != null) tvToggleAllDesc.setText(R.string.capture_all_user_desc);
                     }
                     etSearch.setText("");
                     adapter.setList(currentListHolder[0]);
@@ -380,17 +380,17 @@ public class RuleDialogHelper {
             String statusText;
 
             if (!item.isCaptureEnabled) {
-                statusText = "Recording Disabled";
+                statusText = context.getString(R.string.status_recording_disabled);
                 statusColorAttr = com.google.android.material.R.attr.colorError;
                 cardColorAttr = com.google.android.material.R.attr.colorErrorContainer;
             } else if (item.rule != null && item.rule.isRuleEnabled && 
                        ((item.rule.blockKeywords != null && !item.rule.blockKeywords.isEmpty()) || 
                         (item.rule.allowKeywords != null && !item.rule.allowKeywords.isEmpty()))) {
-                statusText = "Custom Filters Active";
+                statusText = context.getString(R.string.status_filters_active);
                 statusColorAttr = com.google.android.material.R.attr.colorPrimary;
                 cardColorAttr = com.google.android.material.R.attr.colorSecondaryContainer;
             } else {
-                statusText = "Recording Active";
+                statusText = context.getString(R.string.status_recording_active);
                 statusColorAttr = com.google.android.material.R.attr.colorOnSurfaceVariant;
                 cardColorAttr = com.google.android.material.R.attr.colorSurfaceContainerLow;
             }

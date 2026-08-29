@@ -78,7 +78,7 @@ public class AppsFragment extends Fragment {
 
         // Selection changed listener
         adapter.setOnSelectionChangedListener((selectedCount, totalCount) -> {
-            binding.tvSelectedCount.setText(selectedCount + " selected");
+            binding.tvSelectedCount.setText(getString(R.string.selected_count_format, selectedCount));
             binding.btnDeleteSelected.setEnabled(selectedCount > 0);
 
             binding.cbSelectAll.setOnCheckedChangeListener(null);
@@ -97,24 +97,30 @@ public class AppsFragment extends Fragment {
             if (selected.isEmpty()) return;
 
             Runnable proceedWithDeletion = () -> {
+                int count = selected.size();
+                String message = count == 1
+                        ? getString(R.string.delete_app_logs_message_singular, count)
+                        : getString(R.string.delete_app_logs_message_plural, count);
+
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Delete App Logs")
-                        .setMessage("Are you sure you want to permanently delete all notification logs and saved media for " 
-                                + selected.size() + " selected app" + (selected.size() > 1 ? "s" : "") + "?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
+                        .setTitle(R.string.delete_app_logs_title)
+                        .setMessage(message)
+                        .setPositiveButton(R.string.delete, (dialog, which) -> {
                             viewModel.deleteByPackages(new ArrayList<>(selected));
-                            int count = selected.size();
                             exitSelectionMode();
-                            Toast.makeText(requireContext(), "Deleted logs for " + count + " app" + (count > 1 ? "s" : ""), Toast.LENGTH_SHORT).show();
+                            String toastMsg = count == 1
+                                    ? getString(R.string.toast_deleted_apps_logs_singular, count)
+                                    : getString(R.string.toast_deleted_apps_logs_plural, count);
+                            Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
             };
 
             boolean isBiometricEnabled = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
             if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedWithDeletion, "Confirm authentication to delete app logs");
+                verifyBiometricsToProceed(proceedWithDeletion, getString(R.string.auth_delete_app_logs));
             } else {
                 proceedWithDeletion.run();
             }
@@ -161,7 +167,7 @@ public class AppsFragment extends Fragment {
         backPressedCallback.setEnabled(next);
         if (next) {
             binding.cbSelectAll.setChecked(false);
-            binding.tvSelectedCount.setText("0 selected");
+            binding.tvSelectedCount.setText(getString(R.string.selected_count_format, 0));
             binding.btnDeleteSelected.setEnabled(false);
         }
     }
@@ -196,7 +202,7 @@ public class AppsFragment extends Fragment {
         });
 
         androidx.biometric.BiometricPrompt.PromptInfo promptInfo = new androidx.biometric.BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Verify Identity")
+                .setTitle(getString(R.string.verify_identity))
                 .setSubtitle(subtitle)
                 .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL)

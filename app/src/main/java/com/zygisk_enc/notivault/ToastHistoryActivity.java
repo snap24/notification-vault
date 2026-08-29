@@ -89,7 +89,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
                 Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 startActivity(intent);
             } catch (Exception e) {
-                Toast.makeText(this, "Could not open Accessibility Settings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_open_accessibility_failed, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -101,7 +101,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
                 binding.tvLoadProgress.setVisibility(View.GONE);
             } else {
                 binding.tvLoadProgress.setVisibility(View.VISIBLE);
-                binding.tvLoadProgress.setText("Decrypting... " + progress + "%");
+                binding.tvLoadProgress.setText(getString(R.string.decrypting_progress, progress));
             }
         });
 
@@ -285,7 +285,7 @@ public class ToastHistoryActivity extends AppCompatActivity {
         });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Notification Vault Identity Verification")
+                .setTitle(getString(R.string.biometric_identity_verification))
                 .setSubtitle(subtitle)
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           BiometricManager.Authenticators.DEVICE_CREDENTIAL)
@@ -351,8 +351,8 @@ public class ToastHistoryActivity extends AppCompatActivity {
         });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Notification Vault Lock")
-                .setSubtitle("Confirm biometric authentication to unlock")
+                .setTitle(getString(R.string.app_lock_prompt_title))
+                .setSubtitle(getString(R.string.auth_confirm_unlock))
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build();
@@ -366,10 +366,10 @@ public class ToastHistoryActivity extends AppCompatActivity {
         checkBiometricLock();
         if (adapter != null && adapter.getItemCount() == 0) {
             if (isAccessibilityServiceEnabled()) {
-                binding.tvAccessibilityHint.setText("Toasts will appear here as they are shown on screen.");
+                binding.tvAccessibilityHint.setText(R.string.toasts_active_desc);
                 binding.btnGrantAccessibility.setVisibility(View.GONE);
             } else {
-                binding.tvAccessibilityHint.setText("Turn on Accessibility access to log background toasts.");
+                binding.tvAccessibilityHint.setText(R.string.empty_toasts_desc);
                 binding.btnGrantAccessibility.setVisibility(View.VISIBLE);
             }
         }

@@ -66,8 +66,8 @@ public class WidgetFilterActivity extends AppCompatActivity {
             // 1. Global "All Notifications" option
             items.add(new FilterItem(
                     "ALL",
-                    "All Notifications",
-                    "Show notifications from all apps",
+                    getString(R.string.widget_all_notifications),
+                    getString(R.string.widget_all_notifications_desc),
                     getDrawable(R.drawable.ic_notification),
                     currentPkg == null || "ALL".equals(currentPkg)
             ));
@@ -90,7 +90,9 @@ public class WidgetFilterActivity extends AppCompatActivity {
                     icon = getDrawable(R.mipmap.ic_launcher);
                 }
 
-                String countStr = summary.count + (summary.count == 1 ? " notification" : " notifications");
+                String countStr = summary.count == 1
+                        ? getString(R.string.app_notification_count_singular, summary.count)
+                        : getString(R.string.app_notification_count_plural, summary.count);
                 boolean isSelected = summary.packageName.equals(currentPkg);
 
                 items.add(new FilterItem(
@@ -113,9 +115,9 @@ public class WidgetFilterActivity extends AppCompatActivity {
                     WidgetHelper.updateAllWidgets(this);
 
                     if ("ALL".equals(item.packageName)) {
-                        Toast.makeText(this, "Widget showing all notifications", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.toast_widget_showing_all, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Widget filtered to " + item.appName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_widget_filtered_to, item.appName), Toast.LENGTH_SHORT).show();
                     }
                     finish();
                 });

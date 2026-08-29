@@ -20,7 +20,7 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@mipmap/ic_launcher"
-            android:contentDescription="NotiVault" />
+            android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/tv_feed_title"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Recent Notifications"
+            android:text="@string/widget_recent_notifications_title"
             android:textColor="@color/widget_text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -40,7 +40,7 @@
             android:layout_height="32dp"
             android:background="@drawable/bg_widget_action"
             android:src="@drawable/ic_refresh"
-            android:contentDescription="Refresh"
+            android:contentDescription="@string/desc_refresh"
             android:padding="6dp"
             android:scaleType="fitCenter" />
 
@@ -52,7 +52,7 @@
             android:layout_marginStart="6dp"
             android:background="@drawable/bg_widget_action"
             android:src="@drawable/ic_notification"
-            android:contentDescription="Open Vault"
+            android:contentDescription="@string/desc_open_vault"
             android:padding="6dp"
             android:scaleType="fitCenter" />
 
@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="No notifications logged"
+            android:text="@string/widget_empty_notifications"
             android:textColor="@color/widget_text_tertiary"
             android:textSize="13sp"
             android:visibility="gone" />

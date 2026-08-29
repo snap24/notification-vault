@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Secure Export Options"
+        android:text="@string/dialog_export_options_title"
         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:layout_marginBottom="16dp" />
 
@@ -25,7 +25,7 @@
             android:id="@+id/tiet_export_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Set Backup Password"
+            android:hint="@string/hint_set_backup_password"
             android:inputType="textPassword"
             android:maxLines="1" />
 
@@ -47,7 +47,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Include Media Attachments"
+                android:text="@string/dialog_export_include_media"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface" />
@@ -55,7 +55,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Export photos alongside notification history"
+                android:text="@string/dialog_export_include_media_desc"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 

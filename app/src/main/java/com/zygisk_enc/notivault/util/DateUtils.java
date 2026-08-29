@@ -7,9 +7,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.zygisk_enc.notivault.R;
+
 public class DateUtils {
 
-    public static String getRelativeTimeLabel(long timestamp) {
+    public static String getRelativeTimeLabel(Context context, long timestamp) {
         Calendar notifCal = Calendar.getInstance();
         notifCal.setTimeInMillis(timestamp);
 
@@ -18,13 +20,17 @@ public class DateUtils {
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
 
         if (isSameDay(notifCal, today)) {
-            return "Today";
+            return context != null ? context.getString(R.string.today) : "Today";
         } else if (isSameDay(notifCal, yesterday)) {
-            return "Yesterday";
+            return context != null ? context.getString(R.string.yesterday) : "Yesterday";
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
             return sdf.format(new Date(timestamp));
         }
+    }
+
+    public static String getRelativeTimeLabel(long timestamp) {
+        return getRelativeTimeLabel(null, timestamp);
     }
 
     public static String getTimeString(Context context, long timestamp) {

@@ -291,8 +291,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Notification Vault Lock")
-                .setSubtitle("Confirm biometric authentication to unlock")
+                .setTitle(getString(R.string.app_lock_prompt_title))
+                .setSubtitle(getString(R.string.auth_confirm_unlock))
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
                                           BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build();
@@ -315,7 +315,11 @@ public class MainActivity extends AppCompatActivity {
             final String[] names = flat.split(":");
             for (String name : names) {
                 final ComponentName cn = ComponentName.unflattenFromString(name);
-                if (cn != null && pkgName.equals(cn.getPackageName())) return true;
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -326,17 +330,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isAccessibilityServiceEnabled() {
         String expectedPackage = getPackageName();
         String expectedClass = com.zygisk_enc.notivault.service.ToastRecorderService.class.getName();
-        
-        String enabledServicesSetting = Settings.Secure.getString(
+        String enabledServices = Settings.Secure.getString(
                 getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        if (enabledServicesSetting == null) return false;
-        
+        if (enabledServices == null) return false;
+
         TextUtils.SimpleStringSplitter colonSplitter = new TextUtils.SimpleStringSplitter(':');
-        colonSplitter.setString(enabledServicesSetting);
+        colonSplitter.setString(enabledServices);
         while (colonSplitter.hasNext()) {
-            String componentNameString = colonSplitter.next();
-            ComponentName cn = ComponentName.unflattenFromString(componentNameString);
-            if (cn != null && cn.getPackageName().equals(expectedPackage) 
+            String componentName = colonSplitter.next();
+            ComponentName cn = ComponentName.unflattenFromString(componentName);
+            if (cn != null && cn.getPackageName().equals(expectedPackage)
                     && cn.getClassName().equals(expectedClass)) {
                 return true;
             }
@@ -345,21 +348,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPermissionsSequence() {
+        if (!isNotificationServiceEnabled()) {
+            showNotificationPermissionDialog();
+        } else if (!isAccessibilityServiceEnabled()) {
+            boolean prompted = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean("accessibility_prompted", false);
+            if (!prompted) {
+                showAccessibilityPermissionDialog();
+            }
+        }
+    }
+
+    private void showNotificationPermissionDialog() {
         if (activePermissionDialog != null && activePermissionDialog.isShowing()) {
             return;
         }
 
-        boolean prompted = PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean("accessibility_prompted", false);
-
-        if (!isNotificationServiceEnabled()) {
-            showPermissionDialog();
-        } else if (!isAccessibilityServiceEnabled() && !prompted) {
-            showAccessibilityPermissionDialog();
-        }
-    }
-
-    private void showPermissionDialog() {
         android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_permission_instruction, null);
         activePermissionDialog = new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.permission_required_title)
@@ -371,7 +375,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.not_now, (d, which) -> {
                     activePermissionDialog = null;
-                    // Proceed to check next permission in sequence
                     checkPermissionsSequence();
                 })
                 .create();
@@ -382,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
             new android.os.CountDownTimer(3000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    positiveButton.setText(getString(R.string.grant_access) + " (" + ((millisUntilFinished / 1000) + 1) + "s)");
+                    positiveButton.setText(getString(R.string.grant_access_countdown, ((millisUntilFinished / 1000) + 1)));
                 }
 
                 @Override
@@ -402,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
 
         android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_accessibility_permission_instruction, null);
         activePermissionDialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Accessibility Access Required")
+                .setTitle(R.string.accessibility_permission_required_title)
                 .setView(dialogView)
                 .setCancelable(false)
                 .setPositiveButton(R.string.grant_access, (d, which) -> {

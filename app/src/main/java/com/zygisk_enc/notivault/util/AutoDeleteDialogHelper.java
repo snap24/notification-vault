@@ -129,7 +129,10 @@ public class AutoDeleteDialogHelper {
                         .setPositiveButton(R.string.save, (d, which) -> {
                             PreferenceUtil.setAutoDeletePackages(context, workingSelection);
                             int count = workingSelection.size();
-                            Toast.makeText(context, "Saved auto-delete settings (" + count + " app" + (count == 1 ? "" : "s") + " enabled)", Toast.LENGTH_SHORT).show();
+                            String toastMsg = count == 1
+                                    ? context.getString(R.string.toast_saved_auto_delete_singular, count)
+                                    : context.getString(R.string.toast_saved_auto_delete_plural, count);
+                            Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT).show();
                         })
                         .create();
 
@@ -245,11 +248,15 @@ public class AutoDeleteDialogHelper {
         switchView.setOnCheckedChangeListener(null);
         switchView.setChecked(visibleCount > 0 && selectedVisibleCount == visibleCount);
 
-        String category = adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_SYSTEM ? "system apps"
-                : adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_ALL ? "apps" : "user apps";
+        Context context = title.getContext();
+        String category = adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_SYSTEM
+                ? context.getString(R.string.category_system_apps)
+                : adapter.getFilterMode() == AutoDeleteAppAdapter.MODE_ALL
+                ? context.getString(R.string.category_apps)
+                : context.getString(R.string.category_user_apps);
 
-        title.setText("Auto-delete all " + category);
-        desc.setText(selectedVisibleCount + " of " + visibleCount + " enabled for auto-deletion");
+        title.setText(context.getString(R.string.auto_delete_all_category, category));
+        desc.setText(context.getString(R.string.auto_delete_enabled_count, selectedVisibleCount, visibleCount));
     }
 
     static class AutoDeleteAppAdapter extends RecyclerView.Adapter<AutoDeleteAppAdapter.ViewHolder> {

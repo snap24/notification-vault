@@ -9,14 +9,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter Backup Password"
+        android:text="@string/dialog_import_password_title"
         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:layout_marginBottom="8dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="This backup is encrypted. Please enter the password you set during export to decrypt and restore your data."
+        android:text="@string/dialog_import_password_desc"
         android:textAppearance="@style/TextAppearance.Material3.BodySmall"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="16dp" />
@@ -32,7 +32,7 @@
             android:id="@+id/tiet_import_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Password"
+            android:hint="@string/hint_enter_password"
             android:inputType="textPassword"
             android:maxLines="1" />
 

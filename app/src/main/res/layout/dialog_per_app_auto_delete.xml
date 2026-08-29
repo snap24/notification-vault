@@ -11,7 +11,7 @@
         android:id="@+id/til_search_apps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search apps..."
+        android:hint="@string/search_apps_hint"
         android:layout_marginBottom="8dp"
         app:startIconDrawable="@drawable/ic_search"
         app:endIconMode="clear_text"
@@ -45,7 +45,7 @@
             android:id="@+id/chip_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Apps"
+            android:text="@string/filter_user_apps"
             android:checked="true"
             style="@style/Widget.Material3.Chip.Filter" />
 
@@ -53,14 +53,14 @@
             android:id="@+id/chip_system"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="System Apps"
+            android:text="@string/filter_system_apps"
             style="@style/Widget.Material3.Chip.Filter" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All"
+            android:text="@string/show_all"
             style="@style/Widget.Material3.Chip.Filter" />
 
     </com.google.android.material.chip.ChipGroup>
@@ -95,7 +95,7 @@
                     android:id="@+id/tv_toggle_all_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Auto-delete all listed apps"
+                    android:text="@string/auto_delete_all_listed_apps"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
@@ -104,7 +104,7 @@
                     android:id="@+id/tv_toggle_all_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Toggle auto-delete for all currently shown apps."
+                    android:text="@string/auto_delete_toggle_all_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginTop="2dp" />

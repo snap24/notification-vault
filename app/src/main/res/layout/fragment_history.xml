@@ -62,7 +62,7 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_button_square_ripple"
                     android:src="@drawable/ic_close"
-                    android:contentDescription="Close Search"
+                    android:contentDescription="@string/desc_close_search"
                     app:tint="?attr/colorPrimary" />
 
             </LinearLayout>
@@ -89,7 +89,7 @@
                         android:layout_height="36dp"
                         android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_search"
-                        android:contentDescription="Search"
+                        android:contentDescription="@string/desc_search"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
@@ -99,7 +99,7 @@
                         android:layout_marginStart="2dp"
                         android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_calendar"
-                        android:contentDescription="Select Date"
+                        android:contentDescription="@string/desc_select_date"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
@@ -109,7 +109,7 @@
                         android:layout_marginStart="2dp"
                         android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_rules"
-                        android:contentDescription="App Rules"
+                        android:contentDescription="@string/desc_app_rules"
                         app:tint="?attr/colorPrimary" />
 
                     <ImageButton
@@ -119,7 +119,7 @@
                         android:layout_marginStart="2dp"
                         android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_delete_sweep"
-                        android:contentDescription="Clear All"
+                        android:contentDescription="@string/desc_clear_all"
                         app:tint="?attr/colorPrimary" />
 
                     <com.google.android.material.button.MaterialButton
@@ -129,7 +129,7 @@
                         android:layout_marginStart="2dp"
                         android:paddingHorizontal="4dp"
                         android:minWidth="0dp"
-                        android:text="Toasts"
+                        android:text="@string/toasts"
                         style="@style/Widget.Material3.Button.TextButton"
                         app:icon="@drawable/ic_toast_bread"
                         app:iconGravity="textEnd" />
@@ -142,7 +142,7 @@
                         android:layout_marginStart="2dp"
                         android:background="@drawable/bg_button_square_ripple"
                         android:src="@drawable/ic_cloud_upload"
-                        android:contentDescription="Cloud Backup"
+                        android:contentDescription="@string/desc_cloud_backup"
                         app:tint="?attr/colorPrimary" />
 
                     <!-- Decryption progress indicator (shown to the right of cloud button) -->

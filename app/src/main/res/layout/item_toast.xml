@@ -29,7 +29,7 @@
                 android:id="@+id/iv_app_icon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:contentDescription="App Icon"
+                android:contentDescription="@string/desc_app_icon"
                 tools:src="@drawable/ic_code" />
 
             <LinearLayout

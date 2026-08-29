@@ -56,7 +56,7 @@
                 android:layout_marginTop="1dp"
                 android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                 android:textStyle="bold"
-                android:text="Recording Active" />
+                android:text="@string/status_recording_active" />
 
         </LinearLayout>
 
@@ -67,7 +67,7 @@
             android:layout_marginEnd="4dp"
             android:background="@drawable/bg_button_square_ripple"
             android:src="@drawable/ic_settings"
-            android:contentDescription="Configure Keywords"
+            android:contentDescription="@string/desc_configure_keywords"
             app:tint="?attr/colorPrimary" />
 
         <com.google.android.material.materialswitch.MaterialSwitch

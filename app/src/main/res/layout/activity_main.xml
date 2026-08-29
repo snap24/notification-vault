@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
-                android:text="Source"
+                android:text="@string/source"
                 style="@style/Widget.Material3.Button.TextButton"
                 app:icon="@drawable/ic_code"
                 app:iconPadding="4dp"
@@ -45,7 +45,7 @@
                 android:layout_marginEnd="4dp"
                 android:background="@drawable/bg_button_square_ripple"
                 android:src="@drawable/ic_delete_sweep"
-                android:contentDescription="Delete App Logs"
+                android:contentDescription="@string/desc_delete_app_logs"
                 app:tint="?attr/colorPrimary"
                 android:visibility="gone" />
 
@@ -119,14 +119,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NotiVault is Locked"
+            android:text="@string/lock_overlay_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:layout_marginTop="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Authenticate to access your notifications"
+            android:text="@string/lock_overlay_subtitle"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginTop="8dp" />
@@ -135,7 +135,7 @@
             android:id="@+id/btn_unlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Unlock"
+            android:text="@string/unlock"
             android:layout_marginTop="24dp"
             app:icon="@drawable/ic_lock" />
 

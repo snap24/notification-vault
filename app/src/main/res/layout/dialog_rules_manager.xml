@@ -11,7 +11,7 @@
         android:id="@+id/til_search_apps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search apps..."
+        android:hint="@string/search_apps_hint"
         android:layout_marginBottom="10dp"
         app:startIconDrawable="@drawable/ic_search"
         app:endIconMode="clear_text"
@@ -62,7 +62,7 @@
                     android:id="@+id/tv_toggle_all_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Capture all user apps"
+                    android:text="@string/capture_all_user_apps"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
@@ -71,7 +71,7 @@
                     android:id="@+id/tv_toggle_all_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enable or disable notification recording globally."
+                    android:text="@string/capture_all_user_desc"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginTop="2dp" />

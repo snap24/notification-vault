@@ -14,7 +14,7 @@
         android:layout_height="32dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/ic_launcher"
-        android:contentDescription="App Icon" />
+        android:contentDescription="@string/desc_app_icon" />
 
     <LinearLayout
         android:layout_width="0dp"
