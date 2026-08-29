@@ -47,36 +47,70 @@ public class NotiVaultService extends NotificationListenerService {
         String packageName = sbn.getPackageName();
         if (isExcluded(packageName)) return;
 
-        // Skip ongoing / foreground service notifications
         Notification notification = sbn.getNotification();
         if (notification == null) return;
-        if ((notification.flags & Notification.FLAG_FOREGROUND_SERVICE) != 0) return;
-        if ((notification.flags & Notification.FLAG_ONGOING_EVENT) != 0) return;
-        
-        // Skip group summaries (e.g. "X new messages") to prevent duplicate aggregate logs
-        if ((notification.flags & Notification.FLAG_GROUP_SUMMARY) != 0) return;
 
         Bundle extras = notification.extras;
         if (extras == null) return;
 
         CharSequence titleCS = extras.getCharSequence(Notification.EXTRA_TITLE);
+        if (titleCS == null) {
+            titleCS = extras.getCharSequence(Notification.EXTRA_TITLE_BIG);
+        }
         CharSequence textCS = extras.getCharSequence(Notification.EXTRA_TEXT);
         CharSequence bigTextCS = extras.getCharSequence(Notification.EXTRA_BIG_TEXT);
+        CharSequence subTextCS = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
+        CharSequence infoTextCS = extras.getCharSequence(Notification.EXTRA_INFO_TEXT);
+        CharSequence summaryTextCS = extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT);
 
         String title = titleCS != null ? titleCS.toString().trim() : "";
         String text = textCS != null ? textCS.toString().trim() : "";
         String bigText = bigTextCS != null ? bigTextCS.toString().trim() : null;
 
+        // Fallback for primary text from secondary text fields if text is empty
+        if (text.isEmpty()) {
+            if (subTextCS != null && !subTextCS.toString().trim().isEmpty()) {
+                text = subTextCS.toString().trim();
+            } else if (infoTextCS != null && !infoTextCS.toString().trim().isEmpty()) {
+                text = infoTextCS.toString().trim();
+            } else if (summaryTextCS != null && !summaryTextCS.toString().trim().isEmpty()) {
+                text = summaryTextCS.toString().trim();
+            }
+        }
+
         long messageTime = sbn.getPostTime();
 
-        // Extract only the newest message and its unique timestamp if available
+        // Extract full messages array for messaging apps (Discord, Telegram, WhatsApp, Messenger, etc.)
         Parcelable[] messages = (Parcelable[]) extras.get("android.messages");
         if (messages != null && messages.length > 0) {
+            StringBuilder conversationBuilder = new StringBuilder();
+            for (Parcelable p : messages) {
+                if (p instanceof Bundle) {
+                    Bundle msgBundle = (Bundle) p;
+                    CharSequence sender = msgBundle.getCharSequence("sender");
+                    CharSequence msgText = msgBundle.getCharSequence("text");
+                    if (msgText == null || msgText.toString().trim().isEmpty()) {
+                        String mimeType = msgBundle.getString("type");
+                        if (mimeType != null && mimeType.startsWith("image/")) {
+                            msgText = "📷 Photo";
+                        }
+                    }
+                    if (msgText != null && !msgText.toString().trim().isEmpty()) {
+                        if (conversationBuilder.length() > 0) {
+                            conversationBuilder.append("\n");
+                        }
+                        if (sender != null && !sender.toString().trim().isEmpty()) {
+                            conversationBuilder.append(sender).append(": ");
+                        }
+                        conversationBuilder.append(msgText.toString().trim());
+                    }
+                }
+            }
+
             Parcelable lastMsgParcel = messages[messages.length - 1];
             if (lastMsgParcel instanceof Bundle) {
                 Bundle msgBundle = (Bundle) lastMsgParcel;
                 CharSequence textVal = msgBundle.getCharSequence("text");
-                // Fallback representation for empty text (e.g. image/sticker)
                 if (textVal == null || textVal.toString().trim().isEmpty()) {
                     String mimeType = msgBundle.getString("type");
                     if (mimeType != null && mimeType.startsWith("image/")) {
@@ -84,8 +118,10 @@ public class NotiVaultService extends NotificationListenerService {
                     }
                 }
                 
-                if (textVal != null) {
-                    bigText = textVal.toString().trim();
+                if (textVal != null && !textVal.toString().trim().isEmpty()) {
+                    if (text.isEmpty()) {
+                        text = textVal.toString().trim();
+                    }
                 }
 
                 long msgTime = msgBundle.getLong("time");
@@ -93,34 +129,39 @@ public class NotiVaultService extends NotificationListenerService {
                     messageTime = msgTime;
                 }
             }
+
+            if (conversationBuilder.length() > 0) {
+                bigText = conversationBuilder.toString();
+            }
         }
 
-        // Fallback to text lines (e.g. Gmail)
+        // Fallback to text lines (e.g. Gmail, group summaries, batched Discord/Facebook alerts)
         CharSequence[] lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES);
         if (lines != null && lines.length > 0) {
             StringBuilder linesBuilder = new StringBuilder();
             for (CharSequence line : lines) {
-                if (line != null) {
+                if (line != null && !line.toString().trim().isEmpty()) {
                     if (linesBuilder.length() > 0) {
                         linesBuilder.append("\n");
                     }
-                    linesBuilder.append(line);
+                    linesBuilder.append(line.toString().trim());
                 }
             }
-            if (linesBuilder.length() > 0 && (bigText == null || bigText.isEmpty())) {
-                bigText = linesBuilder.toString();
+            if (linesBuilder.length() > 0) {
+                if (bigText == null || bigText.isEmpty()) {
+                    bigText = linesBuilder.toString();
+                }
+                if (text.isEmpty()) {
+                    text = lines[lines.length - 1].toString().trim();
+                }
             }
         }
-
-        // Skip entirely empty notifications
-        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) return;
 
         // Extract picture attachments (if any)
         Uri imageUri = null;
         Bitmap mainPicture = null;
 
-        // For MessagingStyle (e.g. WhatsApp, Telegram, Signal):
-        // Only extract image if the CURRENT newest message is actually an image or sticker!
+        // For MessagingStyle (e.g. WhatsApp, Telegram, Signal, Discord):
         if (messages != null && messages.length > 0) {
             Parcelable lastMsgParcel = messages[messages.length - 1];
             if (lastMsgParcel instanceof Bundle) {
@@ -146,6 +187,11 @@ public class NotiVaultService extends NotificationListenerService {
                     mainPicture = getBitmapFromIcon((Icon) pictureIconObj);
                 }
             }
+        }
+
+        // Skip truly empty notifications (no text, no bigText, no subText, and no image)
+        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text) && TextUtils.isEmpty(bigText) && mainPicture == null && imageUri == null) {
+            return;
         }
 
         String appName = getAppName(packageName);
