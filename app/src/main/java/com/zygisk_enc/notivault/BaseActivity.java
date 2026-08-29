@@ -131,7 +131,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void registerActiveDialog(Dialog dialog) {
         if (dialog != null) {
             activeDialogs.add(dialog);
-            dialog.setOnDismissListener(d -> activeDialogs.remove(dialog));
         }
     }
 
@@ -251,6 +250,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("biometric_lock", false);
+        if (isBiometricEnabled) {
+            dismissAllOpenDialogs();
+        }
+
         boolean isFlagSecure = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("flag_secure", true);
 
@@ -321,7 +326,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!AppLockManager.isUnlocked()) {
+        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("biometric_lock", false);
+        if (isBiometricEnabled || !AppLockManager.isUnlocked()) {
             dismissAllOpenDialogs();
         }
     }

@@ -430,7 +430,7 @@ public class MainActivity extends BaseActivity {
             dialog.getBehavior().setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
         });
 
-        dialog.show();
+        showDialog(this, dialog);
     }
 
     @Override
