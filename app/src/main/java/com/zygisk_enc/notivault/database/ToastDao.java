@@ -31,4 +31,10 @@ public interface ToastDao {
 
     @Query("SELECT MIN(timestamp) FROM toasts")
     androidx.lifecycle.LiveData<Long> getOldestTimestamp();
+
+    @Query("SELECT packageName, appName, COUNT(*) as count FROM toasts GROUP BY packageName ORDER BY count DESC")
+    LiveData<List<AppSummary>> getToastAppSummaries();
+
+    @Query("SELECT packageName, appName, COUNT(*) as count FROM toasts GROUP BY packageName ORDER BY count DESC")
+    List<AppSummary> getToastAppSummariesSync();
 }

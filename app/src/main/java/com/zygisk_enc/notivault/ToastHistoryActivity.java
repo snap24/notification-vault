@@ -32,6 +32,7 @@ public class ToastHistoryActivity extends BaseActivity {
     private ToastViewModel viewModel;
     private ToastAdapter adapter;
     private Long oldestToastTimestamp = null;
+    private String formattedDateFilter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class ToastHistoryActivity extends BaseActivity {
         });
 
         setupRecyclerView();
+        setupAppPicker();
         setupDatePicker();
         setupClearAll();
 
@@ -143,6 +145,129 @@ public class ToastHistoryActivity extends BaseActivity {
         binding.recyclerView.setAdapter(adapter);
     }
 
+    private void setupAppPicker() {
+        binding.btnFilterApp.setOnClickListener(v -> showAppFilterBottomSheet());
+        binding.btnFilterApp.setOnLongClickListener(v -> {
+            viewModel.setFilterPackage(null);
+            updateFilterDisplay();
+            Snackbar.make(binding.getRoot(), R.string.app_filter_cleared, Snackbar.LENGTH_SHORT).show();
+            return true;
+        });
+
+        binding.chipActiveAppFilter.setOnCloseIconClickListener(v -> {
+            viewModel.setFilterPackage(null);
+            updateFilterDisplay();
+            Snackbar.make(binding.getRoot(), R.string.app_filter_cleared, Snackbar.LENGTH_SHORT).show();
+        });
+
+        binding.chipActiveDateFilter.setOnCloseIconClickListener(v -> {
+            viewModel.setDateFilter(null, null);
+            formattedDateFilter = null;
+            updateFilterDisplay();
+            Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT).show();
+        });
+    }
+
+    private void showAppFilterBottomSheet() {
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_toast_app_filter, null);
+        dialog.setContentView(sheetView);
+
+        androidx.recyclerview.widget.RecyclerView rvApps = sheetView.findViewById(R.id.rv_apps);
+        android.widget.TextView tvNoApps = sheetView.findViewById(R.id.tv_no_apps);
+        android.widget.EditText etSearch = sheetView.findViewById(R.id.et_search_apps);
+        View btnShowAll = sheetView.findViewById(R.id.btn_show_all_apps);
+
+        com.zygisk_enc.notivault.adapter.AppFilterAdapter appAdapter =
+                new com.zygisk_enc.notivault.adapter.AppFilterAdapter();
+        rvApps.setLayoutManager(new LinearLayoutManager(this));
+        rvApps.setAdapter(appAdapter);
+
+        appAdapter.setOnAppClickListener(summary -> {
+            viewModel.setFilterPackage(summary.packageName);
+            updateFilterDisplay();
+            dialog.dismiss();
+        });
+
+        btnShowAll.setOnClickListener(v -> {
+            viewModel.setFilterPackage(null);
+            updateFilterDisplay();
+            dialog.dismiss();
+        });
+
+        viewModel.getAppSummaries().observe(this, summaries -> {
+            if (summaries == null || summaries.isEmpty()) {
+                rvApps.setVisibility(View.GONE);
+                tvNoApps.setVisibility(View.VISIBLE);
+            } else {
+                rvApps.setVisibility(View.VISIBLE);
+                tvNoApps.setVisibility(View.GONE);
+                appAdapter.submitList(summaries);
+            }
+        });
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    appAdapter.filter(s != null ? s.toString() : "");
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+        }
+
+        dialog.show();
+    }
+
+    private void updateFilterDisplay() {
+        String pkg = viewModel.getFilterPackage().getValue();
+        boolean hasAppFilter = (pkg != null && !pkg.isEmpty());
+        boolean hasDateFilter = (formattedDateFilter != null && !formattedDateFilter.isEmpty());
+
+        boolean hasAnyFilter = hasAppFilter || hasDateFilter;
+
+        if (!hasAnyFilter) {
+            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
+            binding.scrollActiveFilters.setVisibility(View.GONE);
+            binding.btnReloadAll.setVisibility(View.GONE);
+        } else {
+            binding.scrollActiveFilters.setVisibility(View.VISIBLE);
+            binding.btnReloadAll.setVisibility(View.VISIBLE);
+
+            String appLabel = pkg;
+            if (hasAppFilter) {
+                try {
+                    android.content.pm.ApplicationInfo ai = getPackageManager().getApplicationInfo(pkg, 0);
+                    CharSequence name = getPackageManager().getApplicationLabel(ai);
+                    if (name != null && name.length() > 0) {
+                        appLabel = name.toString();
+                    }
+                } catch (Exception ignored) {}
+
+                binding.chipActiveAppFilter.setVisibility(View.VISIBLE);
+                binding.chipActiveAppFilter.setText(getString(R.string.app_filter_format, appLabel));
+            } else {
+                binding.chipActiveAppFilter.setVisibility(View.GONE);
+            }
+
+            if (hasDateFilter) {
+                binding.chipActiveDateFilter.setVisibility(View.VISIBLE);
+                binding.chipActiveDateFilter.setText(getString(R.string.date_filter_format, formattedDateFilter));
+            } else {
+                binding.chipActiveDateFilter.setVisibility(View.GONE);
+            }
+
+            if (hasAppFilter && hasDateFilter) {
+                binding.tvActiveFilters.setText(getString(R.string.app_and_date_filter_format, appLabel, formattedDateFilter));
+            } else if (hasAppFilter) {
+                binding.tvActiveFilters.setText(getString(R.string.app_filter_format, appLabel));
+            } else {
+                binding.tvActiveFilters.setText(getString(R.string.date_filter_format, formattedDateFilter));
+            }
+        }
+    }
+
     private void setupDatePicker() {
         binding.btnOpenCalendar.setOnClickListener(v -> {
             MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
@@ -188,25 +313,24 @@ public class ToastHistoryActivity extends BaseActivity {
                 endCal.set(Calendar.MILLISECOND, 999);
 
                 viewModel.setDateFilter(startCal.getTimeInMillis(), endCal.getTimeInMillis());
-                String dateStr = (utc.get(Calendar.MONTH) + 1) + "/" + utc.get(Calendar.DAY_OF_MONTH) + "/" + utc.get(Calendar.YEAR);
-                binding.tvActiveFilters.setText(getString(R.string.date_filter_format, dateStr));
-                binding.btnReloadAll.setVisibility(View.VISIBLE);
+                formattedDateFilter = (utc.get(Calendar.MONTH) + 1) + "/" + utc.get(Calendar.DAY_OF_MONTH) + "/" + utc.get(Calendar.YEAR);
+                updateFilterDisplay();
             });
             picker.show(getSupportFragmentManager(), "DATE_PICKER");
         });
 
-        // Setup reload button click to clear filter
+        // Setup reload button click to clear all filters
         binding.btnReloadAll.setOnClickListener(v -> {
-            viewModel.setDateFilter(null, null);
-            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
-            binding.btnReloadAll.setVisibility(View.GONE);
+            viewModel.resetAllFilters();
+            formattedDateFilter = null;
+            updateFilterDisplay();
             Snackbar.make(binding.getRoot(), R.string.filters_reset, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnOpenCalendar.setOnLongClickListener(v -> {
             viewModel.setDateFilter(null, null);
-            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
-            binding.btnReloadAll.setVisibility(View.GONE);
+            formattedDateFilter = null;
+            updateFilterDisplay();
             Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT).show();
             return true;
         });

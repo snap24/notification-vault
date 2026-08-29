@@ -62,6 +62,10 @@
     <string name="filters_reset">Filters reset</string>
     <string name="date_filter_cleared">Date filter cleared</string>
     <string name="date_filter_format">Date: %s</string>
+    <string name="filter_by_app">Filter by App</string>
+    <string name="app_filter_cleared">App filter cleared</string>
+    <string name="app_filter_format">App: %s</string>
+    <string name="app_and_date_filter_format">App: %1$s  |  Date: %2$s</string>
 
     <!-- Permissions & Security Prompts -->
     <string name="permission_required_title">Notification Access Required</string>

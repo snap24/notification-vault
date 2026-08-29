@@ -18,8 +18,10 @@ public class ToastViewModel extends AndroidViewModel {
     private final AppDatabase database;
     private final MutableLiveData<Long> filterDateStart = new MutableLiveData<>(null);
     private final MutableLiveData<Long> filterDateEnd = new MutableLiveData<>(null);
+    private final MutableLiveData<String> filterPackage = new MutableLiveData<>(null);
     private final MediatorLiveData<List<ToastEntity>> toasts = new MediatorLiveData<>();
     private final LiveData<List<ToastEntity>> rawToastsSource;
+    private final LiveData<List<com.zygisk_enc.notivault.database.AppSummary>> appSummaries;
     private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
     private final MutableLiveData<Boolean> scrollToTopEvent = new MutableLiveData<>(false);
@@ -32,10 +34,12 @@ public class ToastViewModel extends AndroidViewModel {
         super(application);
         database = AppDatabase.getInstance(application);
         rawToastsSource = database.toastDao().getAllToasts();
+        appSummaries = database.toastDao().getToastAppSummaries();
 
         toasts.addSource(rawToastsSource, list -> filterAndDecrypt(list));
         toasts.addSource(filterDateStart, date -> filterAndDecrypt(rawToastsSource.getValue()));
         toasts.addSource(filterDateEnd, date -> filterAndDecrypt(rawToastsSource.getValue()));
+        toasts.addSource(filterPackage, pkg -> filterAndDecrypt(rawToastsSource.getValue()));
     }
 
     public LiveData<List<ToastEntity>> getToasts() {
@@ -65,6 +69,26 @@ public class ToastViewModel extends AndroidViewModel {
     public void setDateFilter(Long start, Long end) {
         filterDateStart.setValue(start);
         filterDateEnd.setValue(end);
+        requestScrollToTop();
+    }
+
+    public void setFilterPackage(String packageName) {
+        filterPackage.setValue(packageName);
+        requestScrollToTop();
+    }
+
+    public LiveData<String> getFilterPackage() {
+        return filterPackage;
+    }
+
+    public LiveData<List<com.zygisk_enc.notivault.database.AppSummary>> getAppSummaries() {
+        return appSummaries;
+    }
+
+    public void resetAllFilters() {
+        filterDateStart.setValue(null);
+        filterDateEnd.setValue(null);
+        filterPackage.setValue(null);
         requestScrollToTop();
     }
 
@@ -110,6 +134,7 @@ public class ToastViewModel extends AndroidViewModel {
 
                 Long dateStart = filterDateStart.getValue();
                 Long dateEnd = filterDateEnd.getValue();
+                String filterPkg = filterPackage.getValue();
                 List<ToastEntity> filtered = new ArrayList<>();
 
                 boolean posted5 = false;
@@ -125,6 +150,13 @@ public class ToastViewModel extends AndroidViewModel {
                     // 1. Filter by date FIRST
                     if (dateStart != null && dateEnd != null) {
                         if (entity.timestamp < dateStart || entity.timestamp > dateEnd) {
+                            continue;
+                        }
+                    }
+
+                    // 2. Filter by app package
+                    if (filterPkg != null && !filterPkg.isEmpty()) {
+                        if (!filterPkg.equalsIgnoreCase(entity.packageName)) {
                             continue;
                         }
                     }
