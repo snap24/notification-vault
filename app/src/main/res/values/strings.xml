@@ -433,4 +433,5 @@
     <string name="stats_tap_bar_to_inspect">Tap bar to inspect</string>
     <string name="time_yesterday_format">Yesterday, %1$s</string>
     <string name="auth_import_backup">Confirm authentication to import backup</string>
+    <string name="toast_import_started">Import started in background. Check the status bar for progress. Please do not close the app from your recent apps list, as this will cause the import to fail.</string>
 </resources>

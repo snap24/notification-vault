@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">İncelemek için çubuğa dokunun</string>
     <string name="time_yesterday_format">Dün, %1$s</string>
     <string name="auth_import_backup">Yedeği içe aktarmak için kimlik doğrulamasını onaylayın</string>
+    <string name="toast_import_started">İçe aktarma arka planda başlatıldı. İlerlemeyi görmek için durum çubuğunu kontrol edin. Lütfen uygulamayı son uygulamalar listesinden kapatmayın.</string>
 </resources>

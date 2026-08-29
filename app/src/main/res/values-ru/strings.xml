@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">Нажмите на столбец для просмотра</string>
     <string name="time_yesterday_format">Вчера, %1$s</string>
     <string name="auth_import_backup">Подтвердите аутентификацию для импорта резервной копии</string>
+    <string name="toast_import_started">Импорт запущен в фоновом режиме. Проверьте строку состояния для отслеживания прогресса. Пожалуйста, не закрывайте приложение из списка недавних приложений.</string>
 </resources>

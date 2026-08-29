@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">Dotknij paska, aby sprawdzić</string>
     <string name="time_yesterday_format">Wczoraj, %1$s</string>
     <string name="auth_import_backup">Potwierdź uwierzytelnienie, aby zaimportować kopię zapasową</string>
+    <string name="toast_import_started">Importowanie rozpoczęte w tle. Sprawdź pasek stanu, aby zobaczyć postęp. Nie zamykaj aplikacji z listy ostatnich aplikacji.</string>
 </resources>

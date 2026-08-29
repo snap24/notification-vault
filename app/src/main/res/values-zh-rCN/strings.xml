@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">点击柱状图进行查看</string>
     <string name="time_yesterday_format">昨天，%1$s</string>
     <string name="auth_import_backup">确认身份验证以导入备份</string>
+    <string name="toast_import_started">已在后台开始导入。请在状态栏查看进度。请勿从最近的应用列表中关闭应用。</string>
 </resources>

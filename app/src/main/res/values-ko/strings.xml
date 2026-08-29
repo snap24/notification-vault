@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">막대를 탭하여 세부 정보 확인</string>
     <string name="time_yesterday_format">어제, %1$s</string>
     <string name="auth_import_backup">백업을 가져오려면 인증을 확인하세요</string>
+    <string name="toast_import_started">백그라운드에서 가져오기가 시작되었습니다. 진행 상황은 상태 표시줄을 확인하세요. 최근 앱 목록에서 앱을 닫지 마세요.</string>
 </resources>

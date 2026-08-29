@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">اضغط على الشريط للفحص</string>
     <string name="time_yesterday_format">أمس، %1$s</string>
     <string name="auth_import_backup">تأكيد المصادقة لاستيراد النسخة الاحتياطية</string>
+    <string name="toast_import_started">بدأ الاستيراد في الخلفية. تحقق من شريط الحالة لمعرفة التقدم. يرجى عدم إغلاق التطبيق من قائمة التطبيقات الحديثة.</string>
 </resources>

@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">バーをタップして詳細を確認</string>
     <string name="time_yesterday_format">昨日、%1$s</string>
     <string name="auth_import_backup">バックアップをインポートするための認証を確認</string>
+    <string name="toast_import_started">バックグラウンドでインポートが開始されました。進行状況はステータスバーを確認してください。最近使用したアプリ一覧から閉じないでください。</string>
 </resources>

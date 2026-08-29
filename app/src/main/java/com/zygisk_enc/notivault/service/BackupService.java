@@ -16,6 +16,9 @@ import com.zygisk_enc.notivault.util.BackupUtil;
 
 public class BackupService extends Service {
 
+    public static final String ACTION_EXPORT = "com.zygisk_enc.notivault.action.EXPORT_BACKUP";
+    public static final String ACTION_IMPORT = "com.zygisk_enc.notivault.action.IMPORT_BACKUP";
+
     private static final String CHANNEL_ID = "backup_channel";
     private static final int NOTIFICATION_ID = 2002;
     private NotificationManager notificationManager;
@@ -35,9 +38,9 @@ public class BackupService extends Service {
             return START_NOT_STICKY;
         }
 
+        String action = intent.getAction();
         String uriStr = intent.getStringExtra("uri");
         String password = intent.getStringExtra("password");
-        boolean includeMedia = intent.getBooleanExtra("includeMedia", false);
 
         if (uriStr == null || password == null) {
             stopSelf();
@@ -46,7 +49,17 @@ public class BackupService extends Service {
 
         Uri uri = Uri.parse(uriStr);
 
-        // Start Foreground Service immediately to satisfy Android 8.0+ requirements
+        if (ACTION_IMPORT.equals(action)) {
+            handleImport(uri, password);
+        } else {
+            boolean includeMedia = intent.getBooleanExtra("includeMedia", false);
+            handleExport(uri, password, includeMedia);
+        }
+
+        return START_NOT_STICKY;
+    }
+
+    private void handleExport(Uri uri, String password, boolean includeMedia) {
         notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Exporting Backup")
                 .setContentText("Preparing data...")
@@ -54,14 +67,12 @@ public class BackupService extends Service {
                 .setProgress(100, 0, false)
                 .setOngoing(true);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(NOTIFICATION_ID, notificationBuilder.build(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
         } else {
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
         }
 
-        // Run the export on a background thread (BackupUtil handles it in a thread already,
-        // but we orchestrate service stopping here)
         BackupUtil.exportBackup(this, uri, password, includeMedia, new BackupUtil.BackupProgressListener() {
             @Override
             public void onProgress(int progress) {
@@ -106,8 +117,60 @@ public class BackupService extends Service {
                 stopSelf();
             }
         });
+    }
 
-        return START_NOT_STICKY;
+    private void handleImport(Uri uri, String password) {
+        notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(R.string.importing_backup_title))
+                .setContentText(getString(R.string.importing_backup_message))
+                .setSmallIcon(R.drawable.ic_notification)
+                .setProgress(100, 0, false)
+                .setOngoing(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, notificationBuilder.build(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
+        }
+
+        BackupUtil.importBackup(this, uri, password, new BackupUtil.BackupProgressListener() {
+            @Override
+            public void onProgress(int progress) {
+                notificationBuilder.setContentText(getString(R.string.importing_backup_title) + "... " + progress + "%")
+                        .setProgress(100, progress, false);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+
+            @Override
+            public void onSuccess() {
+                Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
+                        .setContentTitle(getString(R.string.importing_backup_title))
+                        .setContentText(getString(R.string.backup_import_success))
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setProgress(0, 0, false)
+                        .setOngoing(false)
+                        .build();
+
+                notificationManager.notify(NOTIFICATION_ID, successNotification);
+                stopForeground(STOP_FOREGROUND_DETACH);
+                stopSelf();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Notification failureNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
+                        .setContentTitle(getString(R.string.importing_backup_title))
+                        .setContentText(getString(R.string.backup_import_failed, e.getMessage()))
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setProgress(0, 0, false)
+                        .setOngoing(false)
+                        .build();
+
+                notificationManager.notify(NOTIFICATION_ID, failureNotification);
+                stopForeground(STOP_FOREGROUND_DETACH);
+                stopSelf();
+            }
+        });
     }
 
     private void createNotificationChannel() {

@@ -109,100 +109,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_import_backup, null);
         TextInputEditText tietPassword = view.findViewById(R.id.tiet_import_password);
 
-        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
                 .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.decrypt_and_import, (dialog, which) -> {
-                    String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
-                    if (password.isEmpty()) {
-                        Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                .setPositiveButton(R.string.decrypt_and_import, null)
+                .create();
 
-                    // Create programmatic layout for progress
-                    android.widget.LinearLayout progressLayout = new android.widget.LinearLayout(requireContext());
-                    progressLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
-                    progressLayout.setPadding(60, 40, 60, 40);
-                    progressLayout.setGravity(android.view.Gravity.CENTER);
+        dialog.setOnShowListener(d -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
+                if (password.isEmpty()) {
+                    Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                    com.google.android.material.progressindicator.LinearProgressIndicator progressIndicator = 
-                            new com.google.android.material.progressindicator.LinearProgressIndicator(requireContext());
-                    progressIndicator.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
-                    progressIndicator.setMax(100);
-                    progressIndicator.setProgress(0);
-                    progressLayout.addView(progressIndicator);
+                Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.service.BackupService.class);
+                intent.setAction(com.zygisk_enc.notivault.service.BackupService.ACTION_IMPORT);
+                intent.putExtra("uri", uri.toString());
+                intent.putExtra("password", password);
+                androidx.core.content.ContextCompat.startForegroundService(requireContext(), intent);
 
-                    android.widget.TextView tvProgress = new android.widget.TextView(requireContext());
-                    tvProgress.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
-                    tvProgress.setText("0%");
-                    tvProgress.setPadding(0, 16, 0, 0);
-                    tvProgress.setTypeface(null, android.graphics.Typeface.BOLD);
-                    tvProgress.setTextColor(com.google.android.material.color.MaterialColors.getColor(
-                            requireContext(), com.google.android.material.R.attr.colorPrimary, android.graphics.Color.BLUE));
-                    progressLayout.addView(tvProgress);
+                Toast.makeText(requireContext(), 
+                        R.string.toast_import_started, 
+                        Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            });
+        });
 
-                    androidx.appcompat.app.AlertDialog progressDialog = com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), 
-                            new MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle(R.string.importing_backup_title)
-                                    .setMessage(R.string.importing_backup_message)
-                                    .setView(progressLayout)
-                                    .setCancelable(false));
-
-                    // Keep screen awake while importing so display timeout does not turn off screen mid-import
-                    if (getActivity() != null) {
-                        getActivity().getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    }
-                    if (progressDialog.getWindow() != null) {
-                        progressDialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    }
-                    progressDialog.setOnDismissListener(d -> {
-                        if (getActivity() != null) {
-                            getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                        }
-                    });
-
-                    BackupUtil.importBackup(requireContext(), uri, password, new BackupUtil.BackupProgressListener() {
-                        @Override
-                        public void onProgress(int progress) {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    progressIndicator.setProgress(progress);
-                                    tvProgress.setText(progress + "%");
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onSuccess() {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    if (getActivity() != null) {
-                                        getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                    }
-                                    progressDialog.dismiss();
-                                    Toast.makeText(requireContext(), 
-                                            R.string.backup_import_success, Toast.LENGTH_SHORT).show();
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    if (getActivity() != null) {
-                                        getActivity().getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                    }
-                                    progressDialog.dismiss();
-                                    Toast.makeText(requireContext(), 
-                                            getString(R.string.backup_import_failed, e.getMessage()), Toast.LENGTH_LONG).show();
-                                });
-                            }
-                        }
-                    });
-                }));
+        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), dialog);
     }
 
     @Override

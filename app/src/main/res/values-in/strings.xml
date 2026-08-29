@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">निरीक्षण करने के लिए बार पर टैप करें</string>
     <string name="time_yesterday_format">कल, %1$s</string>
     <string name="auth_import_backup">बैकअप आयात करने के लिए प्रमाणीकरण की पुष्टि करें</string>
+    <string name="toast_import_started">आयात पृष्ठभूमि में शुरू हुआ। प्रगति के लिए स्थिति पट्टी देखें। कृपया हाल के ऐप्स की सूची से ऐप को बंद न करें।</string>
 </resources>

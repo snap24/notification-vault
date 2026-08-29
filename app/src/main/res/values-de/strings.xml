@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">Balken zum Untersuchen antippen</string>
     <string name="time_yesterday_format">Gestern, %1$s</string>
     <string name="auth_import_backup">Authentifizierung bestätigen, um Backup zu importieren</string>
+    <string name="toast_import_started">Import im Hintergrund gestartet. Überprüfen Sie die Statusleiste auf den Fortschritt. Bitte schließen Sie die App nicht aus der Liste der letzten Apps.</string>
 </resources>

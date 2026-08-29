@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">Toque na barra para inspecionar</string>
     <string name="time_yesterday_format">Ontem, %1$s</string>
     <string name="auth_import_backup">Confirme a autenticação para importar o backup</string>
+    <string name="toast_import_started">Importação iniciada em segundo plano. Verifique a barra de status para ver o progresso. Não feche o aplicativo da lista de aplicativos recentes.</string>
 </resources>

@@ -390,4 +390,5 @@
     <string name="stats_tap_bar_to_inspect">Ketuk bilah untuk memeriksa</string>
     <string name="time_yesterday_format">Kemarin, %1$s</string>
     <string name="auth_import_backup">Konfirmasi autentikasi untuk mengimpor cadangan</string>
+    <string name="toast_import_started">Impor dimulai di latar belakang. Periksa bilah status untuk melihat progres. Harap jangan menutup aplikasi dari daftar aplikasi terbaru.</string>
 </resources>
