@@ -70,6 +70,36 @@ public class ShortcutHelper {
         }
     }
 
+    private static IconCompat createStyledShortcutIcon(Context context, int iconRes, int glyphColor, int bgColor) {
+        try {
+            float density = context.getResources().getDisplayMetrics().density;
+            int size = (int) (48 * density);
+            android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+
+            // Draw circular badge background
+            android.graphics.Paint bgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            bgPaint.setColor(bgColor);
+            float radius = size / 2f;
+            canvas.drawCircle(radius, radius, radius, bgPaint);
+
+            // Draw centered vector icon with tint
+            android.graphics.drawable.Drawable drawable = androidx.core.content.ContextCompat.getDrawable(context, iconRes);
+            if (drawable != null) {
+                android.graphics.drawable.Drawable wrapped = androidx.core.graphics.drawable.DrawableCompat.wrap(drawable.mutate());
+                androidx.core.graphics.drawable.DrawableCompat.setTint(wrapped, glyphColor);
+
+                int padding = (int) (10 * density);
+                wrapped.setBounds(padding, padding, size - padding, size - padding);
+                wrapped.draw(canvas);
+            }
+            return IconCompat.createWithBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return IconCompat.createWithResource(context, iconRes);
+        }
+    }
+
     public static ShortcutInfoCompat createShortcutInfo(Context context, String shortcutId) {
         switch (shortcutId) {
             case ID_TOAST_LOGS: {
@@ -78,7 +108,7 @@ public class ShortcutHelper {
                 return new ShortcutInfoCompat.Builder(context, ID_TOAST_LOGS)
                         .setShortLabel(context.getString(R.string.shortcut_toast_logs_short))
                         .setLongLabel(context.getString(R.string.shortcut_toast_logs_long))
-                        .setIcon(IconCompat.createWithResource(context, R.drawable.ic_toast_bread))
+                        .setIcon(createStyledShortcutIcon(context, R.drawable.ic_toast_bread, 0xFFE65100, 0xFFFFE0B2))
                         .setIntent(intent)
                         .setRank(1)
                         .build();
@@ -90,7 +120,7 @@ public class ShortcutHelper {
                 return new ShortcutInfoCompat.Builder(context, ID_FAVORITES)
                         .setShortLabel(context.getString(R.string.shortcut_favorites_short))
                         .setLongLabel(context.getString(R.string.shortcut_favorites_long))
-                        .setIcon(IconCompat.createWithResource(context, R.drawable.ic_star))
+                        .setIcon(createStyledShortcutIcon(context, R.drawable.ic_star, 0xFFF57F17, 0xFFFFF9C4))
                         .setIntent(intent)
                         .setRank(2)
                         .build();
@@ -102,7 +132,7 @@ public class ShortcutHelper {
                 return new ShortcutInfoCompat.Builder(context, ID_SEARCH)
                         .setShortLabel(context.getString(R.string.shortcut_search_short))
                         .setLongLabel(context.getString(R.string.shortcut_search_long))
-                        .setIcon(IconCompat.createWithResource(context, R.drawable.ic_search))
+                        .setIcon(createStyledShortcutIcon(context, R.drawable.ic_search, 0xFF1565C0, 0xFFBBDEFB))
                         .setIntent(intent)
                         .setRank(3)
                         .build();
@@ -114,6 +144,9 @@ public class ShortcutHelper {
                 intent.putExtra(AuthActionActivity.EXTRA_ACTION, AuthActionActivity.ACTION_TOGGLE_CAPTURE);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 int iconRes = captureEnabled ? R.drawable.ic_pause : R.drawable.ic_play_arrow;
+                int glyphColor = captureEnabled ? 0xFFC62828 : 0xFF2E7D32;
+                int bgColor = captureEnabled ? 0xFFFFCDD2 : 0xFFC8E6C9;
+
                 String shortLabel = captureEnabled
                         ? context.getString(R.string.shortcut_pause_capture)
                         : context.getString(R.string.shortcut_resume_capture);
@@ -124,7 +157,7 @@ public class ShortcutHelper {
                 return new ShortcutInfoCompat.Builder(context, ID_TOGGLE_CAPTURE)
                         .setShortLabel(shortLabel)
                         .setLongLabel(longLabel)
-                        .setIcon(IconCompat.createWithResource(context, iconRes))
+                        .setIcon(createStyledShortcutIcon(context, iconRes, glyphColor, bgColor))
                         .setIntent(intent)
                         .setRank(0)
                         .build();
