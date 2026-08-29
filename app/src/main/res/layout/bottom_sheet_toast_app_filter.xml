@@ -68,7 +68,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_apps"
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingHorizontal="16dp"
         android:clipToPadding="false"
         tools:listitem="@layout/item_app" />
@@ -76,7 +77,8 @@
     <TextView
         android:id="@+id/tv_no_apps"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
         android:text="@string/empty_apps_title"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"

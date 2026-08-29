@@ -217,6 +217,22 @@ public class ToastHistoryActivity extends BaseActivity {
             });
         }
 
+        dialog.setOnShowListener(dialogInterface -> {
+            com.google.android.material.bottomsheet.BottomSheetDialog d =
+                    (com.google.android.material.bottomsheet.BottomSheetDialog) dialogInterface;
+            android.widget.FrameLayout bottomSheet =
+                    d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                com.google.android.material.bottomsheet.BottomSheetBehavior<android.widget.FrameLayout> behavior =
+                        com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet);
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                int targetHeight = (int) (screenHeight * 0.80);
+                behavior.setPeekHeight(targetHeight);
+                behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+                bottomSheet.getLayoutParams().height = targetHeight;
+            }
+        });
+
         dialog.show();
     }
 
