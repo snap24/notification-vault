@@ -423,6 +423,13 @@ public class MainActivity extends BaseActivity {
             cardPinSection.setVisibility(android.view.View.GONE);
         }
 
+        dialog.getBehavior().setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        dialog.getBehavior().setSkipCollapsed(true);
+
+        dialog.setOnShowListener(d -> {
+            dialog.getBehavior().setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        });
+
         dialog.show();
     }
 
