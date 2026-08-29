@@ -306,11 +306,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 tvTitle.setAlpha(1.0f);
             }
 
-            // Bind Favorite Icon
+            // Bind Favorite Icon with sleek visual distinction
             if (entity.isFavorite) {
                 btnFavorite.setImageResource(R.drawable.ic_star);
+                btnFavorite.setColorFilter(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.gold_star));
+                btnFavorite.setAlpha(1.0f);
             } else {
                 btnFavorite.setImageResource(R.drawable.ic_star_border);
+                int outlineColor = com.google.android.material.color.MaterialColors.getColor(
+                        itemView, com.google.android.material.R.attr.colorOutline, android.graphics.Color.GRAY);
+                btnFavorite.setColorFilter(outlineColor);
+                btnFavorite.setAlpha(0.6f);
             }
 
             if (listener != null) {
@@ -319,7 +325,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     listener.onItemLongClick(entity);
                     return true;
                 });
-                btnFavorite.setOnClickListener(v -> listener.onFavoriteClick(entity));
+                btnFavorite.setOnClickListener(v -> {
+                    btnFavorite.animate()
+                            .scaleX(1.3f)
+                            .scaleY(1.3f)
+                            .setDuration(120)
+                            .withEndAction(() -> btnFavorite.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start())
+                            .start();
+                    listener.onFavoriteClick(entity);
+                });
             }
         }
     }

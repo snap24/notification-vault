@@ -209,6 +209,7 @@
 
     <!-- Pink Logo Color -->
     <color name="pink_logo">#FF00D6</color>
+    <color name="gold_star">#FFB300</color>
 
     <!-- Pitch Black AMOLED Colors (100% Pure Black #000000, Zero Tint) -->
     <color name="black_dark_background">#000000</color>
