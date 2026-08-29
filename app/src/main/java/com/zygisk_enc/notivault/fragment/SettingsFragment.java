@@ -27,6 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.zygisk_enc.notivault.R;
+import com.zygisk_enc.notivault.util.AppLockManager;
 import com.zygisk_enc.notivault.util.BackupUtil;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.viewmodel.NotificationViewModel;
@@ -37,6 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private final ActivityResultLauncher<String> exportBackupLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument("application/octet-stream"),
             uri -> {
+                AppLockManager.setExpectingActivityResult(false);
                 if (uri != null) {
                     showExportOptionsDialog(uri);
                 }
@@ -46,6 +48,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private final ActivityResultLauncher<String[]> importBackupLauncher = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(),
             uri -> {
+                AppLockManager.setExpectingActivityResult(false);
                 if (uri != null) {
                     showImportPasswordDialog(uri);
                 }
@@ -396,12 +399,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             exportPref.setOnPreferenceClickListener(pref -> {
                 boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                         .getBoolean("biometric_lock", false);
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(() -> {
-                        exportBackupLauncher.launch("notivault_backup_" + System.currentTimeMillis() + ".vault");
-                    }, getString(R.string.auth_export_backup));
-                } else {
+                Runnable proceed = () -> {
+                    AppLockManager.setExpectingActivityResult(true);
                     exportBackupLauncher.launch("notivault_backup_" + System.currentTimeMillis() + ".vault");
+                };
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(proceed, getString(R.string.auth_export_backup));
+                } else {
+                    proceed.run();
                 }
                 return true;
             });
@@ -413,12 +418,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             importPref.setOnPreferenceClickListener(pref -> {
                 boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                         .getBoolean("biometric_lock", false);
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(() -> {
-                        importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
-                    }, getString(R.string.auth_import_backup));
-                } else {
+                Runnable proceed = () -> {
+                    AppLockManager.setExpectingActivityResult(true);
                     importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
+                };
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(proceed, getString(R.string.auth_import_backup));
+                } else {
+                    proceed.run();
                 }
                 return true;
             });

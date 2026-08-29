@@ -43,6 +43,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.zygisk_enc.notivault.BaseActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.adapter.NotificationAdapter;
+import com.zygisk_enc.notivault.util.AppLockManager;
 import com.zygisk_enc.notivault.util.BackupUtil;
 import com.zygisk_enc.notivault.util.EncryptionHelper;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
@@ -80,6 +81,7 @@ public class HistoryFragment extends Fragment {
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
             new ActivityResultContracts.OpenDocumentTree(),
             uri -> {
+                AppLockManager.setExpectingActivityResult(false);
                 if (uri == null) return;
                 // Take persistent read+write permission so WorkManager can write on schedule
                 requireContext().getContentResolver().takePersistableUriPermission(
@@ -918,6 +920,7 @@ public class HistoryFragment extends Fragment {
                 android.widget.Button btnPositive = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
                 btnPositive.setEnabled(false);
                 btnPositive.setOnClickListener(v -> {
+                    AppLockManager.setExpectingActivityResult(true);
                     folderPickerLauncher.launch(null);
                     dialog.dismiss();
                 });
@@ -1067,7 +1070,10 @@ public class HistoryFragment extends Fragment {
                 .setTitle(R.string.cloud_backup_dialog_title)
                 .setView(layout)
                 .setPositiveButton(R.string.save_backup_now, null) // handled below
-                .setNeutralButton(R.string.change_folder, (d, w) -> folderPickerLauncher.launch(null))
+                .setNeutralButton(R.string.change_folder, (d, w) -> {
+                    AppLockManager.setExpectingActivityResult(true);
+                    folderPickerLauncher.launch(null);
+                })
                 .setNegativeButton(R.string.cancel, null)
                 .create();
 

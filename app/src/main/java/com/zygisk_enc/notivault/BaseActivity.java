@@ -249,7 +249,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onPause();
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("biometric_lock", false);
-        if (isBiometricEnabled) {
+        if (isBiometricEnabled && !AppLockManager.isExpectingActivityResult()) {
             dismissAllOpenDialogs();
         }
 
@@ -317,6 +317,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
+        if (AppLockManager.isExpectingActivityResult()) {
+            AppLockManager.setExpectingActivityResult(false);
+        }
         checkBiometricLock();
     }
 
@@ -325,7 +328,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onStop();
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("biometric_lock", false);
-        if (isBiometricEnabled || !AppLockManager.isUnlocked()) {
+        if ((isBiometricEnabled && !AppLockManager.isExpectingActivityResult()) || !AppLockManager.isUnlocked()) {
             dismissAllOpenDialogs();
         }
     }

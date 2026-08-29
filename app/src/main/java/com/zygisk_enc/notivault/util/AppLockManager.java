@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 public class AppLockManager {
 
     private static boolean isUnlocked = false;
+    private static boolean isExpectingActivityResult = false;
     private static final Set<Activity> activeActivities = Collections.newSetFromMap(new WeakHashMap<>());
 
     public static boolean isUnlocked() {
@@ -16,6 +17,14 @@ public class AppLockManager {
 
     public static void setUnlocked(boolean unlocked) {
         isUnlocked = unlocked;
+    }
+
+    public static boolean isExpectingActivityResult() {
+        return isExpectingActivityResult;
+    }
+
+    public static void setExpectingActivityResult(boolean expecting) {
+        isExpectingActivityResult = expecting;
     }
 
     public static void onActivityStarted(Activity activity) {
@@ -27,7 +36,7 @@ public class AppLockManager {
     public static void onActivityStopped(Activity activity) {
         if (activity != null) {
             activeActivities.remove(activity);
-            if (activeActivities.isEmpty() && !activity.isChangingConfigurations()) {
+            if (activeActivities.isEmpty() && !activity.isChangingConfigurations() && !isExpectingActivityResult) {
                 isUnlocked = false;
             }
         }
@@ -35,6 +44,7 @@ public class AppLockManager {
 
     public static void reset() {
         isUnlocked = false;
+        isExpectingActivityResult = false;
         activeActivities.clear();
     }
 }
