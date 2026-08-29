@@ -178,6 +178,7 @@
     <string name="widget_status_paused">Paused</string>
     <string name="status_filters_active">Custom Filters Active</string>
 
+    <string name="tap_to_edit_rule">Tap to edit</string>
     <string name="edit_rule_title">Edit Capture Rule</string>
     <string name="rule_title_format">Rule: %s</string>
     <string name="enable_custom_filter_title">Enable Custom Filter Rule</string>

@@ -376,8 +376,11 @@ public class AppRulesActivity extends BaseActivity {
                 });
             });
 
+            if (holder.tvTapGuide != null) {
+                holder.tvTapGuide.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+            }
+
             View.OnClickListener editClick = v -> listener.onEdit(item);
-            holder.btnSettings.setOnClickListener(editClick);
             holder.itemView.setOnClickListener(editClick);
         }
 
@@ -389,7 +392,7 @@ public class AppRulesActivity extends BaseActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView ivIcon;
             TextView tvName;
-            ImageButton btnSettings;
+            TextView tvTapGuide;
             MaterialSwitch switchCapture;
             com.google.android.material.card.MaterialCardView card;
             TextView tvStatus;
@@ -398,7 +401,7 @@ public class AppRulesActivity extends BaseActivity {
                 super(itemView);
                 ivIcon = itemView.findViewById(R.id.iv_app_icon);
                 tvName = itemView.findViewById(R.id.tv_app_name);
-                btnSettings = itemView.findViewById(R.id.btn_rule_settings);
+                tvTapGuide = itemView.findViewById(R.id.tv_tap_guide);
                 switchCapture = itemView.findViewById(R.id.switch_capture);
                 card = itemView.findViewById(R.id.card_app_rule);
                 tvStatus = itemView.findViewById(R.id.tv_rule_status);

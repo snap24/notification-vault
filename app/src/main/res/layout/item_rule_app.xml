@@ -60,15 +60,19 @@
 
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/btn_rule_settings"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_button_square_ripple"
-            android:src="@drawable/ic_settings"
-            android:contentDescription="@string/desc_configure_keywords"
-            app:tint="?attr/colorPrimary" />
+        <TextView
+            android:id="@+id/tv_tap_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:background="@drawable/bg_tap_guide"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textColor="?attr/colorPrimary"
+            android:textStyle="bold"
+            android:text="@string/tap_to_edit_rule"
+            android:visibility="gone" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switch_capture"
