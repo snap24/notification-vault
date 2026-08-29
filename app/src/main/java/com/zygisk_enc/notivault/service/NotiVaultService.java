@@ -334,8 +334,8 @@ public class NotiVaultService extends NotificationListenerService {
                     db.notificationDao().updatePhotoSession(lastNotif.id, encDisplay, encDisplay, entity.timestamp, updatedImagePath, newCount);
                     isPhotoSessionCoalesced = true;
 
-                // 2. TEXT DUPLICATE MERGING: Only group if BOTH current & previous entries are text
-                } else if (!isIncomingImage && !lastIsImage && !isMediaEvent && titleMatches && textMatches && timeMatches) {
+                // 2. TEXT DUPLICATE MERGING: Group consecutive identical text messages without timer limit
+                } else if (!isIncomingImage && !lastIsImage && !isMediaEvent && titleMatches && textMatches) {
                     isDuplicate = true;
                     db.notificationDao().updateDuplicate(lastNotif.id, lastNotif.duplicateCount + 1, entity.timestamp);
                 }
