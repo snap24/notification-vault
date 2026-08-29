@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.zygisk_enc.notivault.BaseActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.AppSummary;
@@ -26,7 +27,7 @@ import com.zygisk_enc.notivault.util.PreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WidgetFilterActivity extends AppCompatActivity {
+public class WidgetFilterActivity extends BaseActivity {
 
     private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private RecyclerView rvApps;
@@ -34,7 +35,6 @@ public class WidgetFilterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        com.zygisk_enc.notivault.util.ThemeHelper.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_widget_filter);
 

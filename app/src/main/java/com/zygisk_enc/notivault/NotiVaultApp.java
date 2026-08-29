@@ -16,6 +16,17 @@ public class NotiVaultApp extends Application {
         // Initialize dynamic shortcuts on app process start
         ShortcutHelper.updateDynamicShortcuts(this);
 
+        // Immediately lock app when the device screen turns off / power button is pressed
+        android.content.IntentFilter screenOffFilter = new android.content.IntentFilter(android.content.Intent.ACTION_SCREEN_OFF);
+        registerReceiver(new android.content.BroadcastReceiver() {
+            @Override
+            public void onReceive(android.content.Context context, android.content.Intent intent) {
+                if (android.content.Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+                    AppLockManager.setUnlocked(false);
+                }
+            }
+        }, screenOffFilter);
+
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {

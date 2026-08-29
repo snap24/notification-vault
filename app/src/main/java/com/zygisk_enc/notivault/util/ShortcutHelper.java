@@ -45,15 +45,14 @@ public class ShortcutHelper {
                 ID_TOGGLE_CAPTURE
         };
 
-        new MaterialAlertDialogBuilder(context)
+        com.zygisk_enc.notivault.BaseActivity.showDialog(context, new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.dialog_pin_shortcuts_title)
                 .setItems(shortcutTitles, (dialog, which) -> {
                     if (which >= 0 && which < shortcutIds.length) {
                         pinShortcut(context, shortcutIds[which]);
                     }
                 })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+                .setNegativeButton(R.string.cancel, null));
     }
 
     public static void pinShortcut(Context context, String shortcutId) {

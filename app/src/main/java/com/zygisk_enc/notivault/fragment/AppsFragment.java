@@ -102,7 +102,7 @@ public class AppsFragment extends Fragment {
                         ? getString(R.string.delete_app_logs_message_singular, count)
                         : getString(R.string.delete_app_logs_message_plural, count);
 
-                new MaterialAlertDialogBuilder(requireContext())
+                com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.delete_app_logs_title)
                         .setMessage(message)
                         .setPositiveButton(R.string.delete, (dialog, which) -> {
@@ -113,8 +113,7 @@ public class AppsFragment extends Fragment {
                                     : getString(R.string.toast_deleted_apps_logs_plural, count);
                             Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+                        .setNegativeButton(R.string.cancel, null));
             };
 
             boolean isBiometricEnabled = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())

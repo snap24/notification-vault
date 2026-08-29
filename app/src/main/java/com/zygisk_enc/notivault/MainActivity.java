@@ -29,39 +29,14 @@ import com.zygisk_enc.notivault.service.NotiVaultService;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.database.AppDatabase;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Apply theme color
-        String themePref = PreferenceManager.getDefaultSharedPreferences(this).getString("theme_color", "grey");
-        boolean isPitchBlack = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pitch_black", false);
-        boolean isNightMode = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) 
-                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-        
-        if (isPitchBlack && isNightMode) {
-            setTheme(R.style.Theme_NotiVault_Black);
-        } else {
-            if ("blue".equals(themePref)) {
-                setTheme(R.style.Theme_NotiVault_Blue);
-            } else if ("green".equals(themePref)) {
-                setTheme(R.style.Theme_NotiVault_Green);
-            } else if ("orange".equals(themePref)) {
-                setTheme(R.style.Theme_NotiVault_Orange);
-            } else if ("purple".equals(themePref)) {
-                setTheme(R.style.Theme_NotiVault_Purple);
-            } else {
-                setTheme(R.style.Theme_NotiVault_Grey);
-            }
-        }
-
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(savedInstanceState.getBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked()));
-        }
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -255,55 +230,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkBiometricLock() {
-        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean("biometric_lock", false);
-        
-        if (isBiometricEnabled && !com.zygisk_enc.notivault.util.AppLockManager.isUnlocked()) {
-            binding.layoutLockOverlay.setVisibility(android.view.View.VISIBLE);
-            binding.btnUnlock.setOnClickListener(v -> showBiometricPrompt());
-            showBiometricPrompt();
-        } else {
-            binding.layoutLockOverlay.setVisibility(android.view.View.GONE);
-        }
-    }
-
-    private void showBiometricPrompt() {
-        Executor executor = ContextCompat.getMainExecutor(this);
-        BiometricPrompt biometricPrompt = new BiometricPrompt(this,
-                executor, new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-            }
-
-            @Override
-            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                com.zygisk_enc.notivault.util.AppLockManager.setUnlocked(true);
-                binding.layoutLockOverlay.setVisibility(android.view.View.GONE);
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-            }
-        });
-
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.app_lock_prompt_title))
-                .setSubtitle(getString(R.string.auth_confirm_unlock))
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
-                                          BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                .build();
-
-        biometricPrompt.authenticate(promptInfo);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        checkBiometricLock();
         checkPermissionsSequence();
     }
 
@@ -396,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
             }.start();
         });
         
-        activePermissionDialog.show();
+        showDialog(this, activePermissionDialog);
     }
 
     private void showAccessibilityPermissionDialog() {
@@ -417,19 +346,13 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .create();
 
-        activePermissionDialog.show();
+        showDialog(this, activePermissionDialog);
     }
 
     public void setOnDeleteAppsClickListener(android.view.View.OnClickListener listener) {
         if (binding != null && binding.btnDeleteApps != null) {
             binding.btnDeleteApps.setOnClickListener(listener);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("is_authenticated", com.zygisk_enc.notivault.util.AppLockManager.isUnlocked());
     }
 
     @Override

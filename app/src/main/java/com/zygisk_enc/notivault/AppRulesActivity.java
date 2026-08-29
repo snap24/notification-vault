@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class AppRulesActivity extends AppCompatActivity {
+public class AppRulesActivity extends BaseActivity {
 
     private RecyclerView rvApps;
     private TextInputEditText etSearch;
@@ -63,7 +63,6 @@ public class AppRulesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        com.zygisk_enc.notivault.util.ThemeHelper.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_rules);
 

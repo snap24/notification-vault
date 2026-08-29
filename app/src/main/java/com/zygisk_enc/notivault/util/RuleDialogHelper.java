@@ -97,7 +97,7 @@ public class RuleDialogHelper {
                     });
                 });
 
-                dialog.show();
+                com.zygisk_enc.notivault.BaseActivity.showDialog(context, dialog);
             });
         });
     }
@@ -277,7 +277,7 @@ public class RuleDialogHelper {
             }
         });
 
-        dialog.show();
+        com.zygisk_enc.notivault.BaseActivity.showDialog(context, dialog);
     }
 
     private static void updateToggleAllState(MaterialSwitch switchToggleAll, List<AppInfoItem> appItems, CompoundButton.OnCheckedChangeListener listener) {

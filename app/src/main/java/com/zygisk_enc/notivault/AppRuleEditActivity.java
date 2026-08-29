@@ -17,7 +17,7 @@ import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.AppRuleEntity;
 import com.zygisk_enc.notivault.util.AppExecutor;
 
-public class AppRuleEditActivity extends AppCompatActivity {
+public class AppRuleEditActivity extends BaseActivity {
 
     public static final String EXTRA_PACKAGE_NAME = "extra_package_name";
     public static final String EXTRA_APP_NAME = "extra_app_name";
@@ -33,7 +33,6 @@ public class AppRuleEditActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        com.zygisk_enc.notivault.util.ThemeHelper.applyTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_rule_edit);
 

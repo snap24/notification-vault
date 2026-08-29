@@ -40,6 +40,7 @@ import androidx.work.WorkManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.zygisk_enc.notivault.BaseActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.adapter.NotificationAdapter;
 import com.zygisk_enc.notivault.util.BackupUtil;
@@ -447,15 +448,14 @@ public class HistoryFragment extends Fragment {
             String formattedDate = sdf.format(new java.util.Date(start));
 
             Runnable proceedToDeleteDate = () -> {
-                new MaterialAlertDialogBuilder(requireContext())
+                BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getString(R.string.delete_logs_for_date_title, formattedDate))
                         .setMessage(getString(R.string.delete_logs_for_date_message, formattedDate))
                         .setNegativeButton(R.string.cancel, null)
                         .setPositiveButton(R.string.clear, (d, w) -> {
                             viewModel.deleteByDateRange(start, end);
                             showAnchoredSnackbar(Snackbar.make(binding.getRoot(), getString(R.string.snackbar_logs_deleted_date, formattedDate), Snackbar.LENGTH_SHORT));
-                        })
-                        .show();
+                        }));
             };
 
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -472,15 +472,14 @@ public class HistoryFragment extends Fragment {
 
     private void confirmDeleteAll() {
         Runnable proceedToClear = () -> {
-            new MaterialAlertDialogBuilder(requireContext())
+            BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.clear_all_title)
                     .setMessage(R.string.clear_all_message)
                     .setNegativeButton(R.string.cancel, null)
                     .setPositiveButton(R.string.clear, (dialog, which) -> {
                         viewModel.deleteAll();
                         showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.snackbar_all_notifications_cleared, Snackbar.LENGTH_SHORT));
-                    })
-                    .show();
+                    }));
         };
 
         boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -702,7 +701,7 @@ public class HistoryFragment extends Fragment {
 
         scrollView.addView(layout);
 
-        new MaterialAlertDialogBuilder(requireContext())
+        BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(decTitle == null || decTitle.isEmpty() ? entity.appName : decTitle)
                 .setView(scrollView)
                 .setPositiveButton(R.string.close, null)
@@ -712,8 +711,7 @@ public class HistoryFragment extends Fragment {
                             requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setPrimaryClip(ClipData.newPlainText("notification", text));
                     showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
-                })
-                .show();
+                }));
     }
 
     private void saveImageToPublicDirectory(String encImagePath, String appName) {
@@ -880,7 +878,7 @@ public class HistoryFragment extends Fragment {
                 handler.post(runnable);
             });
 
-            dialog.show();
+            BaseActivity.showDialog(ctx, dialog);
         }
     }
 
@@ -1028,7 +1026,7 @@ public class HistoryFragment extends Fragment {
             });
         });
 
-        dialog.show();
+        BaseActivity.showDialog(ctx, dialog);
     }
 
     private void applySchedule(int intervalHours) {

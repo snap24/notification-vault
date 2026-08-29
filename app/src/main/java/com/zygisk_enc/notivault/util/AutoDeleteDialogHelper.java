@@ -136,7 +136,7 @@ public class AutoDeleteDialogHelper {
                         })
                         .create();
 
-                dialog.show();
+                com.zygisk_enc.notivault.BaseActivity.showDialog(context, dialog);
             });
         });
     }
@@ -218,7 +218,7 @@ public class AutoDeleteDialogHelper {
             etDays.setSelection(3);
         });
 
-        new MaterialAlertDialogBuilder(context)
+        com.zygisk_enc.notivault.BaseActivity.showDialog(context, new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.dialog_custom_days_title)
                 .setView(dialogView)
                 .setNegativeButton(R.string.cancel, null)
@@ -228,8 +228,7 @@ public class AutoDeleteDialogHelper {
                     if (onSaved != null) {
                         onSaved.run();
                     }
-                })
-                .show();
+                }));
     }
 
     private static int parseDays(CharSequence text) {
