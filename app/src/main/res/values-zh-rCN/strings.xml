@@ -389,4 +389,5 @@
     <string name="stats_captured_all_time">历史总计捕获</string>
     <string name="stats_tap_bar_to_inspect">点击柱状图进行查看</string>
     <string name="time_yesterday_format">昨天，%1$s</string>
+    <string name="auth_import_backup">确认身份验证以导入备份</string>
 </resources>

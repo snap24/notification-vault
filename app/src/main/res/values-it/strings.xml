@@ -389,4 +389,5 @@
     <string name="stats_captured_all_time">Acquisite totali</string>
     <string name="stats_tap_bar_to_inspect">Tocca la barra per ispezionare</string>
     <string name="time_yesterday_format">Ieri, %1$s</string>
+    <string name="auth_import_backup">Conferma l\'autenticazione per importare il backup</string>
 </resources>

@@ -389,4 +389,5 @@
     <string name="stats_captured_all_time">全期間のキャプチャ</string>
     <string name="stats_tap_bar_to_inspect">バーをタップして詳細を確認</string>
     <string name="time_yesterday_format">昨日、%1$s</string>
+    <string name="auth_import_backup">バックアップをインポートするための認証を確認</string>
 </resources>

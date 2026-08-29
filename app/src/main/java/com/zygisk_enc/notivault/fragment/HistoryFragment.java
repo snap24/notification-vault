@@ -126,9 +126,9 @@ public class HistoryFragment extends Fragment {
         });
 
         binding.chipCloudBackup.setOnClickListener(v -> {
-            boolean isAuthEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("use_biometrics", true);
-            if (isAuthEnabled) {
+            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean("biometric_lock", false);
+            if (isBiometricEnabled) {
                 verifyBiometricsToProceed(this::showCloudBackupDialog, getString(R.string.auth_cloud_backup));
             } else {
                 showCloudBackupDialog();

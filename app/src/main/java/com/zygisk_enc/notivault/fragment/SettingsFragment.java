@@ -411,7 +411,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Preference importPref = findPreference("import_backup");
         if (importPref != null) {
             importPref.setOnPreferenceClickListener(pref -> {
-                importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
+                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .getBoolean("biometric_lock", false);
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(() -> {
+                        importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
+                    }, getString(R.string.auth_import_backup));
+                } else {
+                    importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
+                }
                 return true;
             });
         }
