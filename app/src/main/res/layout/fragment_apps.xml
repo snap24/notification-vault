@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="12dp"
+    android:paddingTop="8dp"
     android:paddingHorizontal="16dp">
 
     <!-- Batch Selection Bar (shown in multi-select mode) -->
@@ -57,13 +57,46 @@
 
     </LinearLayout>
 
+    <!-- Header Stats Banner -->
+    <LinearLayout
+        android:id="@+id/layout_header_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="4dp"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tv_apps_header_summary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tracked Applications"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_total_notifications_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 notifications"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+            android:textColor="?attr/colorPrimary"
+            android:background="@drawable/bg_widget_pill"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp" />
+
+    </LinearLayout>
+
     <!-- Search bar for apps -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_search_apps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/search_tracked_apps_hint"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         app:startIconDrawable="@drawable/ic_search"
         app:endIconMode="clear_text"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -78,9 +111,51 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:maxLines="1"
+            android:paddingStart="48dp"
             android:paddingVertical="10dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Sorting Filter Chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_sort_volume"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔥 Most Alerts"
+                android:checked="true"
+                style="@style/Widget.Material3.Chip.Filter" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_sort_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔤 Name (A–Z)"
+                style="@style/Widget.Material3.Chip.Filter" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_sort_least"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌱 Least Alerts"
+                style="@style/Widget.Material3.Chip.Filter" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"
