@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>Asla</item>
+        <item>7 gün sonra</item>
+        <item>15 gün sonra</item>
+        <item>30 gün sonra</item>
+        <item>90 gün sonra</item>
+        <item>Özel…</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>Tüm Uygulamalar (Genel)</item>
+        <item>Belirli Uygulamalar (Uygulama Bazlı)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>Sistem Varsayılanı</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>Gri (Varsayılan)</item>
+        <item>Mor</item>
+        <item>Mavi</item>
+        <item>Yeşil</item>
+        <item>Turuncu</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>Kapalı (yalnızca manuel)</item>
+        <item>Günlük</item>
+        <item>Haftalık</item>
+        <item>Aylık (30 gün)</item>
     </string-array>
 
 </resources>

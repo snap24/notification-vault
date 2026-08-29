@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>Nigdy</item>
+        <item>Po 7 dniach</item>
+        <item>Po 15 dniach</item>
+        <item>Po 30 dniach</item>
+        <item>Po 90 dniach</item>
+        <item>Własny…</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>Wszystkie aplikacje (Globalnie)</item>
+        <item>Wybrane aplikacje (Wg aplikacji)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>Domyślny systemu</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>Szary (Domyślny)</item>
+        <item>Fioletowy</item>
+        <item>Niebieski</item>
+        <item>Zielony</item>
+        <item>Pomarańczowy</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>Wyłączone (tylko ręcznie)</item>
+        <item>Codziennie</item>
+        <item>Co tydzień</item>
+        <item>Co miesiąc (30 dni)</item>
     </string-array>
 
 </resources>

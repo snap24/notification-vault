@@ -273,6 +273,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 else if (tag.startsWith("ru")) languagePref.setValue("ru");
                 else if (tag.startsWith("pt")) languagePref.setValue("pt-BR");
                 else if (tag.startsWith("zh")) languagePref.setValue("zh-CN");
+                else if (tag.startsWith("it")) languagePref.setValue("it");
+                else if (tag.startsWith("ja")) languagePref.setValue("ja");
+                else if (tag.startsWith("ko")) languagePref.setValue("ko");
+                else if (tag.startsWith("tr")) languagePref.setValue("tr");
+                else if (tag.startsWith("ar")) languagePref.setValue("ar");
+                else if (tag.startsWith("pl")) languagePref.setValue("pl");
+                else if (tag.startsWith("in") || tag.startsWith("id")) languagePref.setValue("in");
                 else if (tag.startsWith("en")) languagePref.setValue("en");
                 else languagePref.setValue("system");
             }

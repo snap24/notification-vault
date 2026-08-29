@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>أبدًا</item>
+        <item>بعد 7 أيام</item>
+        <item>بعد 15 يومًا</item>
+        <item>بعد 30 يومًا</item>
+        <item>بعد 90 يومًا</item>
+        <item>مخصص…</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>جميع التطبيقات (عام)</item>
+        <item>تطبيقات محددة (لكل تطبيق)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>الافتراضي للنظام</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>رمادي (افتراضي)</item>
+        <item>أرجواني</item>
+        <item>أزرق</item>
+        <item>أخضر</item>
+        <item>برتقالي</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>معطل (يدوي فقط)</item>
+        <item>يوميًا</item>
+        <item>أسبوعيًا</item>
+        <item>شهريًا (30 يومًا)</item>
     </string-array>
 
 </resources>

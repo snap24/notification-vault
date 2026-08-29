@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>しない</item>
+        <item>7日後</item>
+        <item>15日後</item>
+        <item>30日後</item>
+        <item>90日後</item>
+        <item>カスタム…</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>すべてのアプリ (グローバル)</item>
+        <item>特定のアプリ (アプリごと)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>システムデフォルト</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>グレー (デフォルト)</item>
+        <item>パープル</item>
+        <item>ブルー</item>
+        <item>グリーン</item>
+        <item>オレンジ</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>オフ (手動のみ)</item>
+        <item>毎日</item>
+        <item>毎週</item>
+        <item>毎月 (30日)</item>
     </string-array>
 
 </resources>

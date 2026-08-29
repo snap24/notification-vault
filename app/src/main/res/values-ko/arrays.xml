@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>안 함</item>
+        <item>1일 후</item>
+        <item>7일 후</item>
+        <item>15일 후</item>
+        <item>30일 후</item>
+        <item>90일 후</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>모든 앱 (전체)</item>
+        <item>특정 앱 (앱별)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>시스템 기본값</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>그레이 (기본)</item>
+        <item>퍼플</item>
+        <item>블루</item>
+        <item>그린</item>
+        <item>오렌지</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>꺼짐 (수동 전용)</item>
+        <item>매일</item>
+        <item>매주</item>
+        <item>매월 (30일)</item>
     </string-array>
 
 </resources>

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="auto_delete_entries">
-        <item>Nie</item>
-        <item>Nach 7 Tagen</item>
-        <item>Nach 15 Tagen</item>
-        <item>Nach 30 Tagen</item>
-        <item>Nach 90 Tagen</item>
-        <item>Benutzerdefiniert…</item>
+        <item>Jangan Pernah</item>
+        <item>Setelah 7 hari</item>
+        <item>Setelah 15 hari</item>
+        <item>Setelah 30 hari</item>
+        <item>Setelah 90 hari</item>
+        <item>Kustom…</item>
     </string-array>
 
     <string-array name="auto_delete_mode_entries">
-        <item>Alle Apps (Global)</item>
-        <item>Bestimmte Apps (Pro App)</item>
+        <item>Semua Aplikasi (Global)</item>
+        <item>Aplikasi Tertentu (Per Aplikasi)</item>
     </string-array>
 
     <string-array name="language_entries">
-        <item>Systemstandard</item>
+        <item>Default Sistem</item>
         <item>English</item>
         <item>Deutsch (German)</item>
         <item>Español (Spanish)</item>
@@ -51,18 +51,18 @@
     </string-array>
 
     <string-array name="theme_color_entries">
-        <item>Grau (Standard)</item>
-        <item>Lila</item>
-        <item>Blau</item>
-        <item>Grün</item>
-        <item>Orange</item>
+        <item>Abu-abu (Default)</item>
+        <item>Ungu</item>
+        <item>Biru</item>
+        <item>Hijau</item>
+        <item>Oranye</item>
     </string-array>
 
     <string-array name="cloud_backup_schedule_entries">
-        <item>Aus (nur manuell)</item>
-        <item>Täglich</item>
-        <item>Wöchentlich</item>
-        <item>Monatlich (30 Tage)</item>
+        <item>Nonaktif (manual saja)</item>
+        <item>Harian</item>
+        <item>Mingguan</item>
+        <item>Bulanan (30 hari)</item>
     </string-array>
 
 </resources>

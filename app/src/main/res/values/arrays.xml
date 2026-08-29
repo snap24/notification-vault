@@ -35,6 +35,13 @@
         <item>Русский (Russian)</item>
         <item>Português (Brasil)</item>
         <item>简体中文 (Chinese)</item>
+        <item>Italiano (Italian)</item>
+        <item>日本語 (Japanese)</item>
+        <item>한국어 (Korean)</item>
+        <item>Türkçe (Turkish)</item>
+        <item>العربية (Arabic)</item>
+        <item>Polski (Polish)</item>
+        <item>Bahasa Indonesia</item>
     </string-array>
     <string-array name="language_values">
         <item>system</item>
@@ -45,6 +52,13 @@
         <item>ru</item>
         <item>pt-BR</item>
         <item>zh-CN</item>
+        <item>it</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>tr</item>
+        <item>ar</item>
+        <item>pl</item>
+        <item>in</item>
     </string-array>
 
     <string-array name="theme_color_entries">

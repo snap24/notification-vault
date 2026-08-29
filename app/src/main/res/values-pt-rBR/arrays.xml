@@ -17,12 +17,19 @@
     <string-array name="language_entries">
         <item>Padrão do sistema</item>
         <item>English</item>
-        <item>Deutsch</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Русский</item>
+        <item>Deutsch (German)</item>
+        <item>Español (Spanish)</item>
+        <item>Français (French)</item>
+        <item>Русский (Russian)</item>
         <item>Português (Brasil)</item>
-        <item>简体中文</item>
+        <item>简体中文 (Chinese)</item>
+        <item>Italiano (Italian)</item>
+        <item>日本語 (Japanese)</item>
+        <item>한국어 (Korean)</item>
+        <item>Türkçe (Turkish)</item>
+        <item>العربية (Arabic)</item>
+        <item>Polski (Polish)</item>
+        <item>Bahasa Indonesia</item>
     </string-array>
 
     <string-array name="language_values">
@@ -34,6 +41,13 @@
         <item>ru</item>
         <item>pt-BR</item>
         <item>zh-CN</item>
+        <item>it</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>tr</item>
+        <item>ar</item>
+        <item>pl</item>
+        <item>in</item>
     </string-array>
 
     <string-array name="theme_color_entries">
