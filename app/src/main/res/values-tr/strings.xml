@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">İpucu: Yerleştirdikten sonra üzerine uzun basarak widget\'ı istediğiniz zaman yeniden boyutlandırabilirsiniz.</string>
     <string name="widgets_add_auto">Otomatik Ekle</string>
     <string name="got_it">Anladım</string>
+    <string name="widgets_available_title">Kullanılabilir Widgetlar</string>
+    <string name="widget_dashboard_name">Kasa Kontrol Paneli</string>
+    <string name="widget_dashboard_desc">İstatistik özeti, uyarı sayısı ve hızlı işlemler</string>
+    <string name="widget_feed_name">Son Bildirimler</string>
+    <string name="widget_feed_desc">Son kaydedilen bildirimlerin canlı akışı</string>
+    <string name="widget_capture_name">Hızlı Yakalama</string>
+    <string name="widget_capture_desc">Kasa yakalamayı duraklatmak veya devam ettirmek için tek dokunuşlu anahtar</string>
+    <string name="widget_add_action">Ekle</string>
 </resources>

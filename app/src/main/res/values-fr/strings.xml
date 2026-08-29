@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Conseil : Vous pouvez redimensionner le widget à tout moment en appuyant longuement dessus après l\'avoir placé.</string>
     <string name="widgets_add_auto">Ajouter automatiquement</string>
     <string name="got_it">Compris</string>
+    <string name="widgets_available_title">Widgets disponibles</string>
+    <string name="widget_dashboard_name">Tableau de bord du coffre</string>
+    <string name="widget_dashboard_desc">Résumé des statistiques, nombre d\'alertes et actions rapides</string>
+    <string name="widget_feed_name">Notifications récentes</string>
+    <string name="widget_feed_desc">Flux en direct des notifications récemment enregistrées</string>
+    <string name="widget_capture_name">Capture rapide</string>
+    <string name="widget_capture_desc">Commutateur en un clic pour suspendre ou reprendre la capture</string>
+    <string name="widget_add_action">Ajouter</string>
 </resources>

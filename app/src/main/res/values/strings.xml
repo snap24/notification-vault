@@ -384,5 +384,13 @@
     <string name="widgets_step_3">3. Search or scroll to NotiVault, choose your widget size, and drag it to your screen.</string>
     <string name="widgets_pro_tip">Tip: You can resize the widget anytime by long-pressing on it after placing.</string>
     <string name="widgets_add_auto">Add Automatically</string>
+    <string name="widgets_available_title">Available Widgets</string>
+    <string name="widget_dashboard_name">Vault Dashboard</string>
+    <string name="widget_dashboard_desc">Stats summary, alerts count, and quick actions</string>
+    <string name="widget_feed_name">Recent Notifications</string>
+    <string name="widget_feed_desc">Live stream of recently logged notifications</string>
+    <string name="widget_capture_name">Quick Capture</string>
+    <string name="widget_capture_desc">One-tap switch to pause or resume vault capture</string>
+    <string name="widget_add_action">Add</string>
     <string name="got_it">Got it</string>
 </resources>

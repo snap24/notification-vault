@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Wskazówka: Możesz zmienić rozmiar widżetu w dowolnym momencie, przytrzymując go po umieszczeniu.</string>
     <string name="widgets_add_auto">Dodaj automatycznie</string>
     <string name="got_it">Rozumiem</string>
+    <string name="widgets_available_title">Dostępne widżety</string>
+    <string name="widget_dashboard_name">Pulpit skarbca</string>
+    <string name="widget_dashboard_desc">Podsumowanie statystyk, liczba powiadomień i szybkie akcje</string>
+    <string name="widget_feed_name">Ostatnie powiadomienia</string>
+    <string name="widget_feed_desc">Strumień na żywo ostatnio zarejestrowanych powiadomień</string>
+    <string name="widget_capture_name">Szybkie przechwytywanie</string>
+    <string name="widget_capture_desc">Przełącznik jednym dotknięciem do wstrzymania lub wznowienia przechwytywania</string>
+    <string name="widget_add_action">Dodaj</string>
 </resources>

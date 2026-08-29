@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">ملاحظة: يمكنك تغيير حجم الأداة في أي وقت بالضغط مطولاً عليها بعد وضعها.</string>
     <string name="widgets_add_auto">إضافة تلقائية</string>
     <string name="got_it">حسناً</string>
+    <string name="widgets_available_title">الأدوات المتاحة</string>
+    <string name="widget_dashboard_name">لوحة تحكم الخزنة</string>
+    <string name="widget_dashboard_desc">ملخص الإحصائيات وعدد التنبيهات والإجراءات السريعة</string>
+    <string name="widget_feed_name">الإشعارات الأخيرة</string>
+    <string name="widget_feed_desc">بث مباشر للإشعارات المسجلة مؤخراً</string>
+    <string name="widget_capture_name">التقاط سريع</string>
+    <string name="widget_capture_desc">مفتاح بلمسة واحدة لإيقاف أو استئناف التقاط الخزنة</string>
+    <string name="widget_add_action">إضافة</string>
 </resources>

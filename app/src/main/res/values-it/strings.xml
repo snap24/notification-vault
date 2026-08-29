@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Suggerimento: puoi ridimensionare il widget in qualsiasi momento tenendolo premuto dopo averlo posizionato.</string>
     <string name="widgets_add_auto">Aggiungi automaticamente</string>
     <string name="got_it">Ho capito</string>
+    <string name="widgets_available_title">Widget disponibili</string>
+    <string name="widget_dashboard_name">Dashboard della cassaforte</string>
+    <string name="widget_dashboard_desc">Riepilogo statistiche, conteggio avvisi e azioni rapide</string>
+    <string name="widget_feed_name">Notifiche recenti</string>
+    <string name="widget_feed_desc">Feed in tempo reale delle notifiche registrate di recente</string>
+    <string name="widget_capture_name">Cattura rapida</string>
+    <string name="widget_capture_desc">Interruttore con un tocco per sospendere o riprendere l\'acquisizione</string>
+    <string name="widget_add_action">Aggiungi</string>
 </resources>

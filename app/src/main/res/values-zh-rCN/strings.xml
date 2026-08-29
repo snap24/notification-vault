@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">提示：放置后随时长按小部件即可调整大小。</string>
     <string name="widgets_add_auto">自动添加</string>
     <string name="got_it">知道了</string>
+    <string name="widgets_available_title">可用小部件</string>
+    <string name="widget_dashboard_name">密码库仪表板</string>
+    <string name="widget_dashboard_desc">统计摘要、警报计数和快速操作</string>
+    <string name="widget_feed_name">最近通知</string>
+    <string name="widget_feed_desc">最近记录通知的实时流</string>
+    <string name="widget_capture_name">快速捕获</string>
+    <string name="widget_capture_desc">一键暂停或恢复密码库捕获的开关</string>
+    <string name="widget_add_action">添加</string>
 </resources>

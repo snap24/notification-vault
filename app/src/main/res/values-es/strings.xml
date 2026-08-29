@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Consejo: Puedes cambiar el tamaño del widget en cualquier momento manteniéndolo pulsado después de colocarlo.</string>
     <string name="widgets_add_auto">Añadir automáticamente</string>
     <string name="got_it">Entendido</string>
+    <string name="widgets_available_title">Widgets disponibles</string>
+    <string name="widget_dashboard_name">Panel de la bóveda</string>
+    <string name="widget_dashboard_desc">Resumen de estadísticas, recuento de alertas y acciones rápidas</string>
+    <string name="widget_feed_name">Notificaciones recientes</string>
+    <string name="widget_feed_desc">Transmisión en vivo de notificaciones registradas recientemente</string>
+    <string name="widget_capture_name">Captura rápida</string>
+    <string name="widget_capture_desc">Interruptor de un toque para pausar o reanudar la captura de la bóveda</string>
+    <string name="widget_add_action">Añadir</string>
 </resources>

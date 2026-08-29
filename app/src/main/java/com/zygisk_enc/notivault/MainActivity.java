@@ -384,22 +384,43 @@ public class MainActivity extends BaseActivity {
 
         android.view.View btnClose = dialogView.findViewById(R.id.btn_close_dialog);
         android.view.View btnGotIt = dialogView.findViewById(R.id.btn_got_it);
-        com.google.android.material.button.MaterialButton btnPin = dialogView.findViewById(R.id.btn_pin_widget);
+        android.view.View cardPinSection = dialogView.findViewById(R.id.card_pin_widgets_section);
+        com.google.android.material.button.MaterialButton btnPinDashboard = dialogView.findViewById(R.id.btn_pin_dashboard);
+        com.google.android.material.button.MaterialButton btnPinFeed = dialogView.findViewById(R.id.btn_pin_feed);
+        com.google.android.material.button.MaterialButton btnPinCapture = dialogView.findViewById(R.id.btn_pin_capture);
 
         if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
         if (btnGotIt != null) btnGotIt.setOnClickListener(v -> dialog.dismiss());
 
-        if (btnPin != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             android.appwidget.AppWidgetManager appWidgetManager =
                     getSystemService(android.appwidget.AppWidgetManager.class);
             if (appWidgetManager != null && appWidgetManager.isRequestPinAppWidgetSupported()) {
-                btnPin.setVisibility(android.view.View.VISIBLE);
-                btnPin.setOnClickListener(v -> {
-                    ComponentName provider = new ComponentName(this, com.zygisk_enc.notivault.widget.VaultDashboardWidgetProvider.class);
-                    appWidgetManager.requestPinAppWidget(provider, null, null);
-                    dialog.dismiss();
-                });
+                if (cardPinSection != null) cardPinSection.setVisibility(android.view.View.VISIBLE);
+
+                if (btnPinDashboard != null) {
+                    btnPinDashboard.setOnClickListener(v -> {
+                        ComponentName provider = new ComponentName(this, com.zygisk_enc.notivault.widget.VaultDashboardWidgetProvider.class);
+                        appWidgetManager.requestPinAppWidget(provider, null, null);
+                    });
+                }
+                if (btnPinFeed != null) {
+                    btnPinFeed.setOnClickListener(v -> {
+                        ComponentName provider = new ComponentName(this, com.zygisk_enc.notivault.widget.NotificationFeedWidgetProvider.class);
+                        appWidgetManager.requestPinAppWidget(provider, null, null);
+                    });
+                }
+                if (btnPinCapture != null) {
+                    btnPinCapture.setOnClickListener(v -> {
+                        ComponentName provider = new ComponentName(this, com.zygisk_enc.notivault.widget.CaptureWidgetProvider.class);
+                        appWidgetManager.requestPinAppWidget(provider, null, null);
+                    });
+                }
+            } else if (cardPinSection != null) {
+                cardPinSection.setVisibility(android.view.View.GONE);
             }
+        } else if (cardPinSection != null) {
+            cardPinSection.setVisibility(android.view.View.GONE);
         }
 
         dialog.show();

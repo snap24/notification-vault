@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Совет: вы можете изменить размер виджета в любое время, удерживая его после добавления.</string>
     <string name="widgets_add_auto">Добавить автоматически</string>
     <string name="got_it">Понятно</string>
+    <string name="widgets_available_title">Доступные виджеты</string>
+    <string name="widget_dashboard_name">Панель хранилища</string>
+    <string name="widget_dashboard_desc">Сводка статистики, количество оповещений и быстрые действия</string>
+    <string name="widget_feed_name">Недавние уведомления</string>
+    <string name="widget_feed_desc">Лента недавно записанных уведомлений в реальном времени</string>
+    <string name="widget_capture_name">Быстрый захват</string>
+    <string name="widget_capture_desc">Переключатель в одно касание для приостановки или возобновления захвата</string>
+    <string name="widget_add_action">Добавить</string>
 </resources>

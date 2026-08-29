@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Tips: Anda dapat mengubah ukuran widget kapan saja dengan menekan lama setelah menempatkannya.</string>
     <string name="widgets_add_auto">Tambah Otomatis</string>
     <string name="got_it">Mengerti</string>
+    <string name="widgets_available_title">Widget yang Tersedia</string>
+    <string name="widget_dashboard_name">Dasbor Brankas</string>
+    <string name="widget_dashboard_desc">Ringkasan statistik, jumlah peringatan, dan tindakan cepat</string>
+    <string name="widget_feed_name">Notifikasi Terbaru</string>
+    <string name="widget_feed_desc">Aliran langsung notifikasi yang baru dicatat</string>
+    <string name="widget_capture_name">Perekaman Cepat</string>
+    <string name="widget_capture_desc">Sakelar sekali ketuk untuk menjeda atau melanjutkan perekaman brankas</string>
+    <string name="widget_add_action">Tambah</string>
 </resources>

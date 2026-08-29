@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">ヒント: 配置後もウィジェットを長押しすることでいつでもサイズ変更できます。</string>
     <string name="widgets_add_auto">自動で追加</string>
     <string name="got_it">了解</string>
+    <string name="widgets_available_title">利用可能なウィジェット</string>
+    <string name="widget_dashboard_name">ボルトダッシュボード</string>
+    <string name="widget_dashboard_desc">統計の概要、アラート数、クイックアクション</string>
+    <string name="widget_feed_name">最近の通知</string>
+    <string name="widget_feed_desc">最近記録された通知のライブストリーム</string>
+    <string name="widget_capture_name">クイックキャプチャ</string>
+    <string name="widget_capture_desc">ボルトのキャプチャを一時停止または再開するワンタップスイッチ</string>
+    <string name="widget_add_action">追加</string>
 </resources>

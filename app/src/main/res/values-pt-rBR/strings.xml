@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Dica: Você pode redimensionar o widget a qualquer momento pressionando-o após posicioná-lo.</string>
     <string name="widgets_add_auto">Adicionar automaticamente</string>
     <string name="got_it">Entendi</string>
+    <string name="widgets_available_title">Widgets disponíveis</string>
+    <string name="widget_dashboard_name">Painel do cofre</string>
+    <string name="widget_dashboard_desc">Resumo de estatísticas, contagem de alertas e ações rápidas</string>
+    <string name="widget_feed_name">Notificações recentes</string>
+    <string name="widget_feed_desc">Transmissão ao vivo de notificações registradas recentemente</string>
+    <string name="widget_capture_name">Captura rápida</string>
+    <string name="widget_capture_desc">Interruptor de um toque para pausar ou retomar a captura do cofre</string>
+    <string name="widget_add_action">Adicionar</string>
 </resources>

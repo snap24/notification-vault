@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">팁: 배치 후에도 위젯을 길게 눌러 언제든지 크기를 조정할 수 있습니다.</string>
     <string name="widgets_add_auto">자동 추가</string>
     <string name="got_it">확인</string>
+    <string name="widgets_available_title">사용 가능한 위젯</string>
+    <string name="widget_dashboard_name">보관함 대시보드</string>
+    <string name="widget_dashboard_desc">통계 요약, 알림 수 및 빠른 작업</string>
+    <string name="widget_feed_name">최근 알림</string>
+    <string name="widget_feed_desc">최근 기록된 알림의 실시간 스트림</string>
+    <string name="widget_capture_name">빠른 캡처</string>
+    <string name="widget_capture_desc">보관함 캡처를 일시 중지하거나 다시 시작하는 원탭 스위치</string>
+    <string name="widget_add_action">추가</string>
 </resources>

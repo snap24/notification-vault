@@ -341,4 +341,12 @@
     <string name="widgets_pro_tip">Tipp: Sie können das Widget jederzeit durch langes Drücken nach dem Platzieren anpassen.</string>
     <string name="widgets_add_auto">Automatisch hinzufügen</string>
     <string name="got_it">Verstanden</string>
+    <string name="widgets_available_title">Verfügbare Widgets</string>
+    <string name="widget_dashboard_name">Tresor-Dashboard</string>
+    <string name="widget_dashboard_desc">Statistikübersicht, Benachrichtigungszähler und Schnellaktionen</string>
+    <string name="widget_feed_name">Neueste Benachrichtigungen</string>
+    <string name="widget_feed_desc">Live-Stream der kürzlich protokollierten Benachrichtigungen</string>
+    <string name="widget_capture_name">Schnellerfassung</string>
+    <string name="widget_capture_desc">Ein-Tipp-Schalter zum Anhalten oder Fortsetzen der Erfassung</string>
+    <string name="widget_add_action">Hinzufügen</string>
 </resources>
