@@ -90,8 +90,16 @@ public class MainActivity extends BaseActivity {
                 } else {
                     binding.btnDeleteApps.setVisibility(android.view.View.GONE);
                 }
+
+                if (destination.getId() == R.id.navigation_settings) {
+                    binding.btnToolbarWidgets.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    binding.btnToolbarWidgets.setVisibility(android.view.View.GONE);
+                }
             });
         }
+
+        binding.btnToolbarWidgets.setOnClickListener(v -> showWidgetsGuideDialog());
 
         com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
                 new androidx.lifecycle.ViewModelProvider(this)
@@ -366,6 +374,35 @@ public class MainActivity extends BaseActivity {
         if (binding != null && binding.btnDeleteApps != null) {
             binding.btnDeleteApps.setOnClickListener(listener);
         }
+    }
+
+    private void showWidgetsGuideDialog() {
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_widgets_guide, null);
+        dialog.setContentView(dialogView);
+
+        android.view.View btnClose = dialogView.findViewById(R.id.btn_close_dialog);
+        android.view.View btnGotIt = dialogView.findViewById(R.id.btn_got_it);
+        com.google.android.material.button.MaterialButton btnPin = dialogView.findViewById(R.id.btn_pin_widget);
+
+        if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
+        if (btnGotIt != null) btnGotIt.setOnClickListener(v -> dialog.dismiss());
+
+        if (btnPin != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            android.appwidget.AppWidgetManager appWidgetManager =
+                    getSystemService(android.appwidget.AppWidgetManager.class);
+            if (appWidgetManager != null && appWidgetManager.isRequestPinAppWidgetSupported()) {
+                btnPin.setVisibility(android.view.View.VISIBLE);
+                btnPin.setOnClickListener(v -> {
+                    ComponentName provider = new ComponentName(this, com.zygisk_enc.notivault.widget.VaultDashboardWidgetProvider.class);
+                    appWidgetManager.requestPinAppWidget(provider, null, null);
+                    dialog.dismiss();
+                });
+            }
+        }
+
+        dialog.show();
     }
 
     @Override

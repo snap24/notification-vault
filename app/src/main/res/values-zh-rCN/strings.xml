@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">最多通知</string>
     <string name="sort_name_az">名称 (A–Z)</string>
     <string name="sort_least_alerts">最少通知</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">小部件</string>
+    <string name="widgets_dialog_title">主屏幕小部件</string>
+    <string name="widgets_how_to_add">如何添加小部件：</string>
+    <string name="widgets_step_1">1. 长按主屏幕上的任意空白区域。</string>
+    <string name="widgets_step_2">2. 在弹出菜单中点击“小部件”。</string>
+    <string name="widgets_step_3">3. 搜索或滑动找到 NotiVault，选择所需的小部件尺寸，然后将其拖动到屏幕上。</string>
+    <string name="widgets_pro_tip">提示：放置后随时长按小部件即可调整大小。</string>
+    <string name="widgets_add_auto">自动添加</string>
+    <string name="got_it">知道了</string>
 </resources>

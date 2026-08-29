@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Najwięcej powiadomień</string>
     <string name="sort_name_az">Nazwa (A–Z)</string>
     <string name="sort_least_alerts">Najmniej powiadomień</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widżety</string>
+    <string name="widgets_dialog_title">Widżety ekranu głównego</string>
+    <string name="widgets_how_to_add">Jak dodać widżet:</string>
+    <string name="widgets_step_1">1. Naciśnij i przytrzymaj puste miejsce na ekranie głównym.</string>
+    <string name="widgets_step_2">2. Dotknij Widżety w menu opcji.</string>
+    <string name="widgets_step_3">3. Wyszukaj lub przewiń do NotiVault, wybierz rozmiar widżetu i przeciągnij go na ekran.</string>
+    <string name="widgets_pro_tip">Wskazówka: Możesz zmienić rozmiar widżetu w dowolnym momencie, przytrzymując go po umieszczeniu.</string>
+    <string name="widgets_add_auto">Dodaj automatycznie</string>
+    <string name="got_it">Rozumiem</string>
 </resources>

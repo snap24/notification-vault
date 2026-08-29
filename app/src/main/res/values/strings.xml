@@ -374,4 +374,15 @@
     <string name="widget_empty_count">0 notifications today</string>
     <string name="widget_notif_today_singular">%d notification today</string>
     <string name="widget_notif_today_plural">%d notifications today</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widgets</string>
+    <string name="widgets_dialog_title">Home Screen Widgets</string>
+    <string name="widgets_how_to_add">How to add the widget:</string>
+    <string name="widgets_step_1">1. Long-press on any empty area of your Home screen.</string>
+    <string name="widgets_step_2">2. Tap Widgets from the menu options.</string>
+    <string name="widgets_step_3">3. Search or scroll to NotiVault, choose your widget size, and drag it to your screen.</string>
+    <string name="widgets_pro_tip">Tip: You can resize the widget anytime by long-pressing on it after placing.</string>
+    <string name="widgets_add_auto">Add Automatically</string>
+    <string name="got_it">Got it</string>
 </resources>

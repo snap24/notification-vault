@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">通知が多い順</string>
     <string name="sort_name_az">名前順 (A–Z)</string>
     <string name="sort_least_alerts">通知が少ない順</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">ウィジェット</string>
+    <string name="widgets_dialog_title">ホーム画面ウィジェット</string>
+    <string name="widgets_how_to_add">ウィジェットの追加方法:</string>
+    <string name="widgets_step_1">1. ホーム画面の何もない場所を長押しします。</string>
+    <string name="widgets_step_2">2. メニューから「ウィジェット」をタップします。</string>
+    <string name="widgets_step_3">3. 「NotiVault」を検索またはスクロールして選択し、希望のサイズを画面にドラッグします。</string>
+    <string name="widgets_pro_tip">ヒント: 配置後もウィジェットを長押しすることでいつでもサイズ変更できます。</string>
+    <string name="widgets_add_auto">自動で追加</string>
+    <string name="got_it">了解</string>
 </resources>

@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Больше всего</string>
     <string name="sort_name_az">По имени (А–Я)</string>
     <string name="sort_least_alerts">Меньше всего</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Виджеты</string>
+    <string name="widgets_dialog_title">Виджеты главного экрана</string>
+    <string name="widgets_how_to_add">Как добавить виджет:</string>
+    <string name="widgets_step_1">1. Нажмите и удерживайте пустое место на главном экране.</string>
+    <string name="widgets_step_2">2. Выберите «Виджеты» в появившемся меню.</string>
+    <string name="widgets_step_3">3. Найдите NotiVault в списке, выберите нужный размер и перетащите его на экран.</string>
+    <string name="widgets_pro_tip">Совет: вы можете изменить размер виджета в любое время, удерживая его после добавления.</string>
+    <string name="widgets_add_auto">Добавить автоматически</string>
+    <string name="got_it">Понятно</string>
 </resources>

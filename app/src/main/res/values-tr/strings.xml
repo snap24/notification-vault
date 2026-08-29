@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">En Çok Bildirim</string>
     <string name="sort_name_az">İsim (A–Z)</string>
     <string name="sort_least_alerts">En Az Bildirim</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widgetlar</string>
+    <string name="widgets_dialog_title">Ana Ekran Widgetları</string>
+    <string name="widgets_how_to_add">Widget nasıl eklenir:</string>
+    <string name="widgets_step_1">1. Ana ekranınızdaki boş bir alana uzun basın.</string>
+    <string name="widgets_step_2">2. Menü seçeneklerinden Widgetlar\'a dokunun.</string>
+    <string name="widgets_step_3">3. NotiVault\'u arayın veya kaydırın, widget boyutunuzu seçin ve ekranınıza sürükleyin.</string>
+    <string name="widgets_pro_tip">İpucu: Yerleştirdikten sonra üzerine uzun basarak widget\'ı istediğiniz zaman yeniden boyutlandırabilirsiniz.</string>
+    <string name="widgets_add_auto">Otomatik Ekle</string>
+    <string name="got_it">Anladım</string>
 </resources>

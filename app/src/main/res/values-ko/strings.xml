@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">알림 많은 순</string>
     <string name="sort_name_az">이름순 (A–Z)</string>
     <string name="sort_least_alerts">알림 적은 순</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">위젯</string>
+    <string name="widgets_dialog_title">홈 화면 위젯</string>
+    <string name="widgets_how_to_add">위젯 추가 방법:</string>
+    <string name="widgets_step_1">1. 홈 화면의 빈 공간을 길게 누릅니다.</string>
+    <string name="widgets_step_2">2. 메뉴 옵션에서 위젯을 탭합니다.</string>
+    <string name="widgets_step_3">3. NotiVault를 검색하거나 스크롤하여 위젯 크기를 선택하고 화면으로 드래그합니다.</string>
+    <string name="widgets_pro_tip">팁: 배치 후에도 위젯을 길게 눌러 언제든지 크기를 조정할 수 있습니다.</string>
+    <string name="widgets_add_auto">자동 추가</string>
+    <string name="got_it">확인</string>
 </resources>

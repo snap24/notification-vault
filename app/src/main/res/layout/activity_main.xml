@@ -68,6 +68,26 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toolbar_widgets"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="20dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:text="@string/widgets_button"
+                app:icon="@drawable/ic_widgets"
+                app:iconSize="14dp"
+                app:iconPadding="4dp"
+                app:cornerRadius="16dp"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_source"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

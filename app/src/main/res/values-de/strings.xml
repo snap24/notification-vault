@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Meiste Benachrichtigungen</string>
     <string name="sort_name_az">Name (A–Z)</string>
     <string name="sort_least_alerts">Wenigste Benachrichtigungen</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widgets</string>
+    <string name="widgets_dialog_title">Startbildschirm-Widgets</string>
+    <string name="widgets_how_to_add">So fügen Sie das Widget hinzu:</string>
+    <string name="widgets_step_1">1. Drücken und halten Sie eine freie Stelle auf Ihrem Startbildschirm.</string>
+    <string name="widgets_step_2">2. Tippen Sie im Menü auf Widgets.</string>
+    <string name="widgets_step_3">3. Suchen oder scrollen Sie zu NotiVault, wählen Sie die Widget-Größe und ziehen Sie es auf Ihren Bildschirm.</string>
+    <string name="widgets_pro_tip">Tipp: Sie können das Widget jederzeit durch langes Drücken nach dem Platzieren anpassen.</string>
+    <string name="widgets_add_auto">Automatisch hinzufügen</string>
+    <string name="got_it">Verstanden</string>
 </resources>

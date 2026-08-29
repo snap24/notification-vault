@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Plus d\'alertes</string>
     <string name="sort_name_az">Nom (A–Z)</string>
     <string name="sort_least_alerts">Moins d\'alertes</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widgets</string>
+    <string name="widgets_dialog_title">Widgets de l\'écran d\'accueil</string>
+    <string name="widgets_how_to_add">Comment ajouter le widget :</string>
+    <string name="widgets_step_1">1. Appuyez longuement sur une zone vide de votre écran d\'accueil.</string>
+    <string name="widgets_step_2">2. Appuyez sur Widgets dans les options du menu.</string>
+    <string name="widgets_step_3">3. Recherchez ou faites défiler jusqu\'à NotiVault, choisissez la taille du widget et faites-le glisser sur votre écran.</string>
+    <string name="widgets_pro_tip">Conseil : Vous pouvez redimensionner le widget à tout moment en appuyant longuement dessus après l\'avoir placé.</string>
+    <string name="widgets_add_auto">Ajouter automatiquement</string>
+    <string name="got_it">Compris</string>
 </resources>

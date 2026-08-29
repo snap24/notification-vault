@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">الأكثر تنبيهات</string>
     <string name="sort_name_az">الاسم (أ–ي)</string>
     <string name="sort_least_alerts">الأقل تنبيهات</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">الأدوات</string>
+    <string name="widgets_dialog_title">أدوات الشاشة الرئيسية</string>
+    <string name="widgets_how_to_add">كيفية إضافة الأداة:</string>
+    <string name="widgets_step_1">1. اضغط مطولاً على أي مساحة فارغة في شاشتك الرئيسية.</string>
+    <string name="widgets_step_2">2. انقر فوق الأدوات من خيارات القائمة.</string>
+    <string name="widgets_step_3">3. ابحث أو مرر للوصول إلى NotiVault، واختر حجم الأداة، واسحبها إلى شاشتك.</string>
+    <string name="widgets_pro_tip">ملاحظة: يمكنك تغيير حجم الأداة في أي وقت بالضغط مطولاً عليها بعد وضعها.</string>
+    <string name="widgets_add_auto">إضافة تلقائية</string>
+    <string name="got_it">حسناً</string>
 </resources>

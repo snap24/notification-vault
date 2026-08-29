@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Paling Banyak</string>
     <string name="sort_name_az">Nama (A–Z)</string>
     <string name="sort_least_alerts">Paling Sedikit</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widget</string>
+    <string name="widgets_dialog_title">Widget Layar Utama</string>
+    <string name="widgets_how_to_add">Cara menambahkan widget:</string>
+    <string name="widgets_step_1">1. Tekan lama pada area kosong di Layar Utama Anda.</string>
+    <string name="widgets_step_2">2. Ketuk Widget dari opsi menu.</string>
+    <string name="widgets_step_3">3. Cari atau gulir ke NotiVault, pilih ukuran widget Anda, dan seret ke layar Anda.</string>
+    <string name="widgets_pro_tip">Tips: Anda dapat mengubah ukuran widget kapan saja dengan menekan lama setelah menempatkannya.</string>
+    <string name="widgets_add_auto">Tambah Otomatis</string>
+    <string name="got_it">Mengerti</string>
 </resources>

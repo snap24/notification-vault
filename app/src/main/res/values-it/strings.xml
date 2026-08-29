@@ -330,4 +330,15 @@
     <string name="sort_most_alerts">Più notifiche</string>
     <string name="sort_name_az">Nome (A–Z)</string>
     <string name="sort_least_alerts">Meno notifiche</string>
+
+    <!-- Widgets Guide Dialog -->
+    <string name="widgets_button">Widget</string>
+    <string name="widgets_dialog_title">Widget Schermata Home</string>
+    <string name="widgets_how_to_add">Come aggiungere il widget:</string>
+    <string name="widgets_step_1">1. Premi a lungo su un\'area vuota della schermata Home.</string>
+    <string name="widgets_step_2">2. Tocca Widget dalle opzioni del menu.</string>
+    <string name="widgets_step_3">3. Cerca o scorri fino a NotiVault, scegli la dimensione del widget e trascinalo sullo schermo.</string>
+    <string name="widgets_pro_tip">Suggerimento: puoi ridimensionare il widget in qualsiasi momento tenendolo premuto dopo averlo posizionato.</string>
+    <string name="widgets_add_auto">Aggiungi automaticamente</string>
+    <string name="got_it">Ho capito</string>
 </resources>
