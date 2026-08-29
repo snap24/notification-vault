@@ -53,7 +53,7 @@ public class PreferenceUtil {
 
     public static boolean isShowReadUnreadEnabled(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(KEY_SHOW_READ_UNREAD, true);
+        return prefs.getBoolean(KEY_SHOW_READ_UNREAD, false);
     }
 
     public static void setShowReadUnreadEnabled(Context context, boolean enabled) {

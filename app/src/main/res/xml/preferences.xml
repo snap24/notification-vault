@@ -63,7 +63,7 @@
             app:key="show_read_unread_status"
             app:title="@string/pref_show_read_unread_title"
             app:summary="@string/pref_show_read_unread_summary"
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
