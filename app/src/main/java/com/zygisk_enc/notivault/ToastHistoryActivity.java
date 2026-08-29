@@ -226,7 +226,8 @@ public class ToastHistoryActivity extends BaseActivity {
                 com.google.android.material.bottomsheet.BottomSheetBehavior<android.widget.FrameLayout> behavior =
                         com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet);
                 int screenHeight = getResources().getDisplayMetrics().heightPixels;
-                int targetHeight = (int) (screenHeight * 0.80);
+                int targetHeight = (int) (screenHeight * 0.90);
+                behavior.setSkipCollapsed(true);
                 behavior.setPeekHeight(targetHeight);
                 behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
                 bottomSheet.getLayoutParams().height = targetHeight;
