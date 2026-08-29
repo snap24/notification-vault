@@ -110,11 +110,12 @@
 
             </LinearLayout>
 
-            <!-- Star Button -->
+            <!-- Star Button (Vertically Centered) -->
             <ImageButton
                 android:id="@+id/btn_favorite"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
                 android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:background="@drawable/bg_button_circle_ripple"
