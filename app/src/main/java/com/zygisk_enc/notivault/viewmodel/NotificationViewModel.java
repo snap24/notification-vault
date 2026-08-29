@@ -97,15 +97,31 @@ public class NotificationViewModel extends AndroidViewModel {
         Long dateEnd = filterDateEnd.getValue();
 
         Boolean favs = filterFavorites.getValue();
-        if (favs != null && favs) {
-            currentSource = repository.getFavorites(limit, dateStart, dateEnd);
-        } else {
-            String pkg = filterPackage.getValue();
-            if (pkg != null && !pkg.isEmpty()) {
-                currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
+        int favsOnly = (favs != null && favs) ? 1 : 0;
+        String pkg = filterPackage.getValue();
+        if (pkg != null && pkg.isEmpty()) pkg = null;
+
+        if (isSearching) {
+            java.util.List<Long> searchHashes = com.zygisk_enc.notivault.util.BlindIndexHelper.extractQueryTokenHashes(rawQuery);
+            if (searchHashes.isEmpty()) {
+                if (favsOnly == 1) {
+                    currentSource = repository.getFavorites(limit, dateStart, dateEnd);
+                } else if (pkg != null) {
+                    currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
+                } else {
+                    currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
+                }
+            } else if (searchHashes.size() == 1) {
+                currentSource = repository.searchByTokenHash(searchHashes.get(0), pkg, favsOnly, limit, dateStart, dateEnd);
             } else {
-                currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
+                currentSource = repository.searchByTokenHashes(searchHashes, searchHashes.size(), pkg, favsOnly, limit, dateStart, dateEnd);
             }
+        } else if (favsOnly == 1) {
+            currentSource = repository.getFavorites(limit, dateStart, dateEnd);
+        } else if (pkg != null) {
+            currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
+        } else {
+            currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
         }
 
         notifications.addSource(currentSource, list -> {

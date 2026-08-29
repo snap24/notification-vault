@@ -348,7 +348,18 @@ public class NotiVaultService extends NotificationListenerService {
                         entity.bigText = EncryptionHelper.encrypt("📷 Photo");
                     }
                 }
-                db.notificationDao().insert(entity);
+                long rowId = db.notificationDao().insert(entity);
+                if (rowId > 0) {
+                    java.util.Set<Long> tokenHashes = com.zygisk_enc.notivault.util.BlindIndexHelper.extractTokenHashesForNotification(
+                            entity.appName, finalTitle, finalText, finalBigText);
+                    if (!tokenHashes.isEmpty()) {
+                        java.util.List<com.zygisk_enc.notivault.database.SearchTokenEntity> tokens = new java.util.ArrayList<>(tokenHashes.size());
+                        for (Long hash : tokenHashes) {
+                            tokens.add(new com.zygisk_enc.notivault.database.SearchTokenEntity(hash, rowId));
+                        }
+                        db.searchTokenDao().insertAll(tokens);
+                    }
+                }
             }
             
             // Throttled auto-deletion (runs at most once every 24 hours)

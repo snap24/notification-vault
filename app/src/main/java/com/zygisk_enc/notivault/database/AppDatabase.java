@@ -5,7 +5,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class}, version = 8, exportSchema = false)
+@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 9, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -13,6 +13,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract NotificationDao notificationDao();
     public abstract AppRuleDao appRuleDao();
     public abstract ToastDao toastDao();
+    public abstract SearchTokenDao searchTokenDao();
 
     public static final androidx.room.migration.Migration MIGRATION_1_8 = new androidx.room.migration.Migration(1, 8) {
         @Override
@@ -62,6 +63,19 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    public static final androidx.room.migration.Migration MIGRATION_8_9 = new androidx.room.migration.Migration(8, 9) {
+        @Override
+        public void migrate(@androidx.annotation.NonNull androidx.sqlite.db.SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `search_tokens` (" +
+                    "`tokenHash` INTEGER NOT NULL, " +
+                    "`notificationId` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`tokenHash`, `notificationId`), " +
+                    "FOREIGN KEY(`notificationId`) REFERENCES `notifications`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_search_tokens_tokenHash` ON `search_tokens` (`tokenHash`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_search_tokens_notificationId` ON `search_tokens` (`notificationId`)");
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -71,7 +85,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "notivault_database"
                     )
-                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8)
+                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9)
                     .build();
                 }
             }

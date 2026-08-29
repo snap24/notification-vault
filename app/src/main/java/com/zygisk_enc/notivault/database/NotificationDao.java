@@ -12,10 +12,10 @@ import java.util.List;
 public interface NotificationDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(NotificationEntity notification);
+    long insert(NotificationEntity notification);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertAll(List<NotificationEntity> notifications);
+    List<Long> insertAll(List<NotificationEntity> notifications);
 
     @Delete
     void delete(NotificationEntity notification);
@@ -75,6 +75,30 @@ public interface NotificationDao {
 
     @Query("SELECT * FROM notifications WHERE (title LIKE '%' || :query || '%' OR text LIKE '%' || :query || '%' OR appName LIKE '%' || :query || '%') ORDER BY timestamp DESC, id DESC")
     LiveData<List<NotificationEntity>> searchNotifications(String query);
+
+    @Query("SELECT * FROM notifications " +
+           "WHERE id IN (SELECT notificationId FROM search_tokens WHERE tokenHash = :tokenHash) " +
+           "AND (:packageName IS NULL OR packageName = :packageName) " +
+           "AND (:isFavoriteOnly = 0 OR isFavorite = 1) " +
+           "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd);
+
+    @Query("SELECT * FROM notifications " +
+           "WHERE id IN (" +
+           "    SELECT notificationId FROM search_tokens " +
+           "    WHERE tokenHash IN (:tokenHashes) " +
+           "    GROUP BY notificationId " +
+           "    HAVING COUNT(DISTINCT tokenHash) >= :tokenCount" +
+           ") " +
+           "AND (:packageName IS NULL OR packageName = :packageName) " +
+           "AND (:isFavoriteOnly = 0 OR isFavorite = 1) " +
+           "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd);
+
+    @Query("SELECT * FROM notifications WHERE id NOT IN (SELECT DISTINCT notificationId FROM search_tokens) ORDER BY id DESC LIMIT :limit")
+    List<NotificationEntity> getUnindexedNotifications(int limit);
 
     @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications GROUP BY packageName ORDER BY count DESC")
     LiveData<List<AppSummary>> getAppSummaries();

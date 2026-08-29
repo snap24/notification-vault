@@ -97,6 +97,9 @@ public class MainActivity extends BaseActivity {
 
         binding.btnToolbarWidgets.setOnClickListener(v -> showWidgetsGuideDialog());
 
+        // Ensure database search tokens are indexed in background
+        com.zygisk_enc.notivault.util.BlindIndexManager.ensureDatabaseIndexed(this);
+
         com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
                 new androidx.lifecycle.ViewModelProvider(this)
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);

@@ -172,6 +172,14 @@ public class NotificationRepository {
         return dao.searchNotifications(query);
     }
 
+    public LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd) {
+        return dao.searchByTokenHash(tokenHash, packageName, isFavoriteOnly, limit, dateStart, dateEnd);
+    }
+
+    public LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd) {
+        return dao.searchByTokenHashes(tokenHashes, tokenCount, packageName, isFavoriteOnly, limit, dateStart, dateEnd);
+    }
+
     public LiveData<List<AppSummary>> getAppSummaries() {
         return dao.getAppSummaries();
     }
