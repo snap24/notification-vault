@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 уведомлений сегодня</string>
     <string name="widget_notif_today_singular">%d уведомление сегодня</string>
     <string name="widget_notif_today_plural">%d уведомлений сегодня</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Правила автоудаления</string>
+    <string name="global_auto_delete_section">Срок хранения по умолчанию</string>
+    <string name="global_auto_delete_section_desc">Применяется ко всем приложениям, если ниже не задано исключение</string>
+    <string name="per_app_auto_delete_section">Исключения для приложений</string>
+    <string name="per_app_auto_delete_section_desc">Настройте индивидуальные сроки хранения для конкретных приложений</string>
+    <string name="rule_use_global">Использовать по умолчанию (%s)</string>
+    <string name="rule_never_auto_delete">Никогда не удалять (Хранить всегда)</string>
+    <string name="filter_customized">Настроенные</string>
+    <string name="auto_delete_summary_format">%1$s • правил для приложений: %2$d</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Блокировка фильтра виджета (Виджет недавних уведомлений)</string>
+    <string name="pref_widget_filter_auth_summary">Требовать биометрическую аутентификацию при нажатии на значок колокольчика для фильтрации уведомлений</string>
 </resources>

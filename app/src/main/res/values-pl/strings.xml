@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 powiadomień dzisiaj</string>
     <string name="widget_notif_today_singular">%d powiadomienie dzisiaj</string>
     <string name="widget_notif_today_plural">%d powiadomień dzisiaj</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Reguły automatycznego usuwania</string>
+    <string name="global_auto_delete_section">Domyślny okres przechowywania</string>
+    <string name="global_auto_delete_section_desc">Stosowane do wszystkich aplikacji, chyba że poniżej ustawiono wyjątek</string>
+    <string name="per_app_auto_delete_section">Wyjątki dla poszczególnych aplikacji</string>
+    <string name="per_app_auto_delete_section_desc">Ustaw indywidualne okresy przechowywania dla wybranych aplikacji</string>
+    <string name="rule_use_global">Użyj domyślnych (%s)</string>
+    <string name="rule_never_auto_delete">Nigdy nie usuwaj (Zachowaj na zawsze)</string>
+    <string name="filter_customized">Dostosowane</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d reguł niestandardowych</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Zablokuj filtr widżetu (Widżet ostatnich powiadomień)</string>
+    <string name="pref_widget_filter_auth_summary">Wymagaj uwierzytelnienia biometrycznego po dotknięciu ikony dzwonka w celu filtrowania powiadomień</string>
 </resources>

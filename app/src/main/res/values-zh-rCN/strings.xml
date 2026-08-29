@@ -313,4 +313,18 @@
     <string name="widget_empty_count">今日 0 条通知</string>
     <string name="widget_notif_today_singular">今日 %d 条通知</string>
     <string name="widget_notif_today_plural">今日 %d 条通知</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">自动清理规则</string>
+    <string name="global_auto_delete_section">默认保留期限</string>
+    <string name="global_auto_delete_section_desc">除非在下方设置了个别应用规则，否则将应用于所有应用</string>
+    <string name="per_app_auto_delete_section">个别应用自定义规则</string>
+    <string name="per_app_auto_delete_section_desc">为特定应用程序设置单独的历史记录保留时间</string>
+    <string name="rule_use_global">使用全局默认 (%s)</string>
+    <string name="rule_never_auto_delete">从不删除 (永久保留)</string>
+    <string name="filter_customized">已自定义</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d 个自定义规则</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">锁定微件过滤器 (最近通知微件)</string>
+    <string name="pref_widget_filter_auth_summary">点击铃铛图标筛选通知时需要生物识别身份验证</string>
 </resources>

@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 Benachrichtigungen heute</string>
     <string name="widget_notif_today_singular">%d Benachrichtigung heute</string>
     <string name="widget_notif_today_plural">%d Benachrichtigungen heute</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Regeln für automatisches Löschen</string>
+    <string name="global_auto_delete_section">Standard-Aufbewahrungszeitraum</string>
+    <string name="global_auto_delete_section_desc">Gilt für alle Apps, sofern unten keine Ausnahme festgelegt ist</string>
+    <string name="per_app_auto_delete_section">Benutzerdefinierte App-Ausnahmen</string>
+    <string name="per_app_auto_delete_section_desc">Spezifische Aufbewahrungsregeln für einzelne Apps festlegen</string>
+    <string name="rule_use_global">Standard verwenden (%s)</string>
+    <string name="rule_never_auto_delete">Nie löschen (Dauerhaft behalten)</string>
+    <string name="filter_customized">Angepasst</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d eigene Regeln</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Widget-Filter sperren (Widget für letzte Benachrichtigungen)</string>
+    <string name="pref_widget_filter_auth_summary">Biometrische Authentifizierung beim Tippen auf das Glockensymbol zur Benachrichtigungsfilterung anfordern</string>
 </resources>

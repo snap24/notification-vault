@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 إشعارات اليوم</string>
     <string name="widget_notif_today_singular">%d إشعار اليوم</string>
     <string name="widget_notif_today_plural">%d إشعارات اليوم</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">قواعد الحذف التلقائي</string>
+    <string name="global_auto_delete_section">فترة الاحتفاظ الافتراضية</string>
+    <string name="global_auto_delete_section_desc">تُطبق على جميع التطبيقات ما لم يتم تعيين استثناء أدناه</string>
+    <string name="per_app_auto_delete_section">استثناءات التطبيقات المخصصة</string>
+    <string name="per_app_auto_delete_section_desc">تعيين فترات احتفاظ مخصصة لتطبيقات محددة</string>
+    <string name="rule_use_global">استخدام الإعداد العام (%s)</string>
+    <string name="rule_never_auto_delete">عدم الحذف أبداً (الاحتفاظ دائماً)</string>
+    <string name="filter_customized">مخصص</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d قواعد مخصصة</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">قفل تصفية الأداة (أداة الإشعارات الأخيرة)</string>
+    <string name="pref_widget_filter_auth_summary">طلب المصادقة الحيوية عند النقر على أيقونة الجرس لتصفية الإشعارات</string>
 </resources>

@@ -313,4 +313,18 @@
     <string name="widget_empty_count">오늘 알림 0건</string>
     <string name="widget_notif_today_singular">오늘 알림 %d건</string>
     <string name="widget_notif_today_plural">오늘 알림 %d건</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">자동 삭제 규칙</string>
+    <string name="global_auto_delete_section">기본 보관 기간</string>
+    <string name="global_auto_delete_section_desc">아래에서 개별 설정을 지정하지 않는 한 모든 앱에 적용됩니다</string>
+    <string name="per_app_auto_delete_section">앱별 맞춤 설정</string>
+    <string name="per_app_auto_delete_section_desc">개별 앱에 대해 특정 보관 기간을 설정합니다</string>
+    <string name="rule_use_global">기본값 사용 (%s)</string>
+    <string name="rule_never_auto_delete">삭제 안 함 (영구 보관)</string>
+    <string name="filter_customized">맞춤 설정됨</string>
+    <string name="auto_delete_summary_format">%1$s • 맞춤 규칙 %2$d개</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">위젯 필터 잠금 (최근 알림 위젯)</string>
+    <string name="pref_widget_filter_auth_summary">알림 필터링을 위해 종 아이콘을 누를 때 생체 인증을 요구합니다</string>
 </resources>

@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 notification aujourd\'hui</string>
     <string name="widget_notif_today_singular">%d notification aujourd\'hui</string>
     <string name="widget_notif_today_plural">%d notifications aujourd\'hui</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Règles de suppression automatique</string>
+    <string name="global_auto_delete_section">Période de rétention par défaut</string>
+    <string name="global_auto_delete_section_desc">Appliqué à toutes les applications sauf si une règle personnalisée est définie ci-dessous</string>
+    <string name="per_app_auto_delete_section">Règles personnalisées par application</string>
+    <string name="per_app_auto_delete_section_desc">Définir des durées de rétention spécifiques pour des applications individuelles</string>
+    <string name="rule_use_global">Utiliser valeur par défaut (%s)</string>
+    <string name="rule_never_auto_delete">Ne jamais supprimer (Conserver toujours)</string>
+    <string name="filter_customized">Personnalisé</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d règles personnalisées</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Verrouiller le filtre du widget (Widget notifications récentes)</string>
+    <string name="pref_widget_filter_auth_summary">Exiger l\'authentification biométrique lors de l\'appui sur la cloche pour filtrer les notifications</string>
 </resources>

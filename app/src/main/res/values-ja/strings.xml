@@ -313,4 +313,18 @@
     <string name="widget_empty_count">本日の通知: 0件</string>
     <string name="widget_notif_today_singular">本日の通知: %d件</string>
     <string name="widget_notif_today_plural">本日の通知: %d件</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">自動削除ルール</string>
+    <string name="global_auto_delete_section">デフォルトの保持期間</string>
+    <string name="global_auto_delete_section_desc">以下でカスタムルールを設定しない限り、すべてのアプリに適用されます</string>
+    <string name="per_app_auto_delete_section">アプリ別のカスタム設定</string>
+    <string name="per_app_auto_delete_section_desc">特定のアプリごとに個別の保持期間を設定します</string>
+    <string name="rule_use_global">グローバルデフォルトを使用 (%s)</string>
+    <string name="rule_never_auto_delete">削除しない (永久に保持)</string>
+    <string name="filter_customized">カスタム済み</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d 個のカスタムルール</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">ウィジェットフィルターをロック (最近の通知ウィジェット)</string>
+    <string name="pref_widget_filter_auth_summary">通知をフィルターするためにベルアイコンをタップした際に生体認証を要求します</string>
 </resources>

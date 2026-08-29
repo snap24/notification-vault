@@ -313,4 +313,18 @@
     <string name="widget_empty_count">0 notifikasi hari ini</string>
     <string name="widget_notif_today_singular">%d notifikasi hari ini</string>
     <string name="widget_notif_today_plural">%d notifikasi hari ini</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Aturan Hapus Otomatis</string>
+    <string name="global_auto_delete_section">Periode Retensi Default</string>
+    <string name="global_auto_delete_section_desc">Diterapkan ke semua aplikasi kecuali ada pengecualian di bawah</string>
+    <string name="per_app_auto_delete_section">Pengecualian Khusus Aplikasi</string>
+    <string name="per_app_auto_delete_section_desc">Atur periode retensi khusus untuk aplikasi tertentu</string>
+    <string name="rule_use_global">Gunakan Default Global (%s)</string>
+    <string name="rule_never_auto_delete">Jangan hapus (Simpan selamanya)</string>
+    <string name="filter_customized">Disesuaikan</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d aturan khusus</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Kunci Filter Widget (Widget Notifikasi Terbaru)</string>
+    <string name="pref_widget_filter_auth_summary">Wajibkan autentikasi biometrik saat mengetuk ikon lonceng untuk memfilter notifikasi</string>
 </resources>

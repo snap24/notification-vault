@@ -313,4 +313,18 @@
     <string name="widget_empty_count">Bugün 0 bildirim</string>
     <string name="widget_notif_today_singular">Bugün %d bildirim</string>
     <string name="widget_notif_today_plural">Bugün %d bildirim</string>
+
+    <!-- Unified Auto-Delete & Widget Filter Translations -->
+    <string name="dialog_unified_auto_delete_title">Otomatik Silme Kuralları</string>
+    <string name="global_auto_delete_section">Varsayılan Saklama Süresi</string>
+    <string name="global_auto_delete_section_desc">Aşağıda özel bir kural belirlenmediği sürece tüm uygulamalara uygulanır</string>
+    <string name="per_app_auto_delete_section">Uygulamaya Özel Kurallar</string>
+    <string name="per_app_auto_delete_section_desc">Belirli uygulamalar için özel saklama süreleri belirleyin</string>
+    <string name="rule_use_global">Varsayılanı Kullan (%s)</string>
+    <string name="rule_never_auto_delete">Asla silme (Sonsuza kadar sakla)</string>
+    <string name="filter_customized">Özelleştirilmiş</string>
+    <string name="auto_delete_summary_format">%1$s • %2$d özel kural</string>
+    <string name="auto_delete_summary_simple">%1$s</string>
+    <string name="pref_widget_filter_auth_title">Widget Filtresini Kilitle (Son Bildirimler Widget\'ı)</string>
+    <string name="pref_widget_filter_auth_summary">Bildirimleri filtrelemek için zil simgesine dokunulduğunda biyometrik doğrulama iste</string>
 </resources>
