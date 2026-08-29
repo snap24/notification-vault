@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
 
 public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHolder> {
 
-    private static final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
-    private final ExecutorService iconExecutor = Executors.newFixedThreadPool(2);
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault());
 
@@ -99,28 +97,9 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
                 tvTimestamp.setText(datePrefix.format(new java.util.Date(toast.timestamp)) + formattedTime);
             }
 
-            // Load and cache App Icon asynchronously
-            ivAppIcon.setTag(toast.packageName);
-            Drawable cachedIcon = iconCache.get(toast.packageName);
-            if (cachedIcon != null) {
-                ivAppIcon.setImageDrawable(cachedIcon);
-            } else {
-                ivAppIcon.setImageResource(R.drawable.ic_code); // Default placeholder
-                iconExecutor.execute(() -> {
-                    try {
-                        Drawable icon = context.getPackageManager().getApplicationIcon(toast.packageName);
-                        iconCache.put(toast.packageName, icon);
-                        
-                        // Set the icon on UI thread if the view wasn't recycled
-                        itemView.post(() -> {
-                            if (toast.packageName.equals(ivAppIcon.getTag())) {
-                                ivAppIcon.setImageDrawable(icon);
-                            }
-                        });
-                    } catch (Exception ignored) {
-                    }
-                });
-            }
+            // Load and cache App Icon asynchronously using memory-safe AppIconLoader
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
+                    ivAppIcon, toast.packageName, R.drawable.ic_code);
         }
     }
 }

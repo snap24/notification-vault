@@ -232,6 +232,12 @@ public class AppRulesActivity extends BaseActivity {
         switchToggleAll.setChecked(allEnabled);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+    }
+
     static class AppInfoItem {
         String packageName;
         String appName;
@@ -241,8 +247,6 @@ public class AppRulesActivity extends BaseActivity {
     }
 
     static class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.ViewHolder> {
-        private static final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
-        private final ExecutorService iconExecutor = Executors.newFixedThreadPool(3);
 
         private final List<AppInfoItem> fullList;
         private final List<AppInfoItem> filteredList;
@@ -295,24 +299,8 @@ public class AppRulesActivity extends BaseActivity {
             AppInfoItem item = filteredList.get(position);
             holder.tvName.setText(item.appName);
 
-            holder.ivIcon.setTag(item.packageName);
-            Drawable cachedIcon = iconCache.get(item.packageName);
-            if (cachedIcon != null) {
-                holder.ivIcon.setImageDrawable(cachedIcon);
-            } else {
-                holder.ivIcon.setImageResource(R.drawable.ic_code);
-                iconExecutor.execute(() -> {
-                    try {
-                        Drawable icon = activity.getPackageManager().getApplicationIcon(item.packageName);
-                        iconCache.put(item.packageName, icon);
-                        activity.runOnUiThread(() -> {
-                            if (item.packageName.equals(holder.ivIcon.getTag())) {
-                                holder.ivIcon.setImageDrawable(icon);
-                            }
-                        });
-                    } catch (Exception ignored) {}
-                });
-            }
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(activity).loadInto(
+                    holder.ivIcon, item.packageName, R.drawable.ic_code);
 
             int statusColorAttr;
             int cardColorAttr;

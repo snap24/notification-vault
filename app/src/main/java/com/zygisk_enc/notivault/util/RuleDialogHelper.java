@@ -302,8 +302,6 @@ public class RuleDialogHelper {
     }
 
     static class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.ViewHolder> {
-        private static final java.util.Map<String, Drawable> iconCache = new java.util.concurrent.ConcurrentHashMap<>();
-        private final java.util.concurrent.ExecutorService iconExecutor = java.util.concurrent.Executors.newFixedThreadPool(3);
 
         private final List<AppInfoItem> fullList;
         private List<AppInfoItem> filteredList;
@@ -354,25 +352,8 @@ public class RuleDialogHelper {
             AppInfoItem item = filteredList.get(position);
             holder.tvName.setText(item.appName);
 
-            // Asynchronously load and cache icon
-            holder.ivIcon.setTag(item.packageName);
-            Drawable cachedIcon = iconCache.get(item.packageName);
-            if (cachedIcon != null) {
-                holder.ivIcon.setImageDrawable(cachedIcon);
-            } else {
-                holder.ivIcon.setImageResource(R.drawable.ic_code);
-                iconExecutor.execute(() -> {
-                    try {
-                        Drawable icon = context.getPackageManager().getApplicationIcon(item.packageName);
-                        iconCache.put(item.packageName, icon);
-                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                            if (item.packageName.equals(holder.ivIcon.getTag())) {
-                                holder.ivIcon.setImageDrawable(icon);
-                            }
-                        });
-                    } catch (Exception ignored) {}
-                });
-            }
+            // Asynchronously load and cache icon using memory-safe AppIconLoader
+            AppIconLoader.getInstance(context).loadInto(holder.ivIcon, item.packageName, R.drawable.ic_code);
             
             // Determine status text and background color dynamically
             int statusColorAttr;

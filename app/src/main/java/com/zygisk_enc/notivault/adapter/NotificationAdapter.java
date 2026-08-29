@@ -91,7 +91,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         differ = new androidx.recyclerview.widget.AsyncListDiffer<>(this, DIFF_CALLBACK);
     }
 
-    private static final java.util.Map<String, Drawable> iconCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.concurrent.ExecutorService imageExecutor = java.util.concurrent.Executors.newFixedThreadPool(3);
     private static final android.util.LruCache<String, Bitmap> imageCache;
     static {
@@ -192,20 +191,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         void bind(NotificationEntity entity, OnItemClickListener listener, boolean showReadUnreadStatus) {
             Context context = itemView.getContext();
 
-            // App icon caching
-            Drawable cachedIcon = iconCache.get(entity.packageName);
-            if (cachedIcon != null) {
-                ivAppIcon.setImageDrawable(cachedIcon);
-            } else {
-                try {
-                    PackageManager pm = context.getPackageManager();
-                    Drawable icon = pm.getApplicationIcon(entity.packageName);
-                    iconCache.put(entity.packageName, icon);
-                    ivAppIcon.setImageDrawable(icon);
-                } catch (PackageManager.NameNotFoundException e) {
-                    ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-                }
-            }
+            // App icon loading with memory-safe AppIconLoader
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
+                    ivAppIcon, entity.packageName, android.R.drawable.sym_def_app_icon);
 
             tvAppName.setText(entity.appName);
 

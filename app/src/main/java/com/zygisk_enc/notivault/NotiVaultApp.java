@@ -71,4 +71,18 @@ public class NotiVaultApp extends Application {
             public void onActivityDestroyed(@NonNull Activity activity) {}
         });
     }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_BACKGROUND) {
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+        }
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+    }
 }

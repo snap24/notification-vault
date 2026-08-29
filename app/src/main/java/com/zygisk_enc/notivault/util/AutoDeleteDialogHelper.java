@@ -351,7 +351,6 @@ public class AutoDeleteDialogHelper {
         private final Map<String, Integer> appRules;
         private final GlobalDaysProvider globalDaysProvider;
         private final List<AppItem> displayList = new ArrayList<>();
-        private final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
         private int filterMode = MODE_USER;
         private String searchQuery = "";
 
@@ -441,23 +440,8 @@ public class AutoDeleteDialogHelper {
 
             holder.itemView.setOnClickListener(v -> showRuleSelectorDialog(item));
 
-            Drawable cachedIcon = iconCache.get(item.packageName);
-            if (cachedIcon != null) {
-                holder.ivAppIcon.setImageDrawable(cachedIcon);
-            } else {
-                holder.ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-                AppExecutor.execute(() -> {
-                    try {
-                        Drawable icon = pm.getApplicationIcon(item.packageName);
-                        iconCache.put(item.packageName, icon);
-                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                            if (holder.getAdapterPosition() == position) {
-                                holder.ivAppIcon.setImageDrawable(icon);
-                            }
-                        });
-                    } catch (Exception ignored) {}
-                });
-            }
+            AppIconLoader.getInstance(context).loadInto(
+                    holder.ivAppIcon, item.packageName, android.R.drawable.sym_def_app_icon);
         }
 
         private void showRuleSelectorDialog(AppItem item) {

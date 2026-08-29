@@ -201,6 +201,12 @@ public class AutoDeleteRulesActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
+    }
+
     static class UnifiedAutoDeleteAdapter extends RecyclerView.Adapter<UnifiedAutoDeleteAdapter.ViewHolder> {
 
         public static final int MODE_USER = 0;
@@ -215,7 +221,6 @@ public class AutoDeleteRulesActivity extends BaseActivity {
         private final Map<String, Integer> appRules;
         private final AutoDeleteDialogHelper.GlobalDaysProvider globalDaysProvider;
         private final List<AutoDeleteDialogHelper.AppItem> displayList = new ArrayList<>();
-        private final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
         private int filterMode = MODE_USER;
         private String searchQuery = "";
 
@@ -303,23 +308,8 @@ public class AutoDeleteRulesActivity extends BaseActivity {
 
             holder.itemView.setOnClickListener(v -> showRuleSelectorDialog(item));
 
-            Drawable cachedIcon = iconCache.get(item.packageName);
-            if (cachedIcon != null) {
-                holder.ivAppIcon.setImageDrawable(cachedIcon);
-            } else {
-                holder.ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-                AppExecutor.execute(() -> {
-                    try {
-                        Drawable icon = pm.getApplicationIcon(item.packageName);
-                        iconCache.put(item.packageName, icon);
-                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                            if (holder.getAdapterPosition() == position) {
-                                holder.ivAppIcon.setImageDrawable(icon);
-                            }
-                        });
-                    } catch (Exception ignored) {}
-                });
-            }
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
+                    holder.ivAppIcon, item.packageName, android.R.drawable.sym_def_app_icon);
         }
 
         private void showRuleSelectorDialog(AutoDeleteDialogHelper.AppItem item) {

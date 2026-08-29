@@ -40,7 +40,6 @@ public class StatsFragment extends Fragment {
     private FragmentStatsBinding binding;
     private Period currentPeriod = Period.TODAY;
     private boolean isShowAllApps = false;
-    private final Map<String, Drawable> iconCache = new ConcurrentHashMap<>();
     private AnalyticsData lastCalculatedData = null;
 
     private static class AnalyticsData {
@@ -492,28 +491,9 @@ public class StatsFragment extends Fragment {
             int progressPercent = maxAppCount > 0 ? (int) (((float) app.count / maxAppCount) * 100) : 0;
             progress.setProgress(progressPercent);
 
-            // Icon loading with cache
-            Drawable cached = iconCache.get(app.packageName);
-            if (cached != null) {
-                ivIcon.setImageDrawable(cached);
-            } else {
-                ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-                final String targetPkg = app.packageName;
-                ivIcon.setTag(targetPkg);
-                AppExecutor.execute(() -> {
-                    try {
-                        Drawable icon = pm.getApplicationIcon(targetPkg);
-                        iconCache.put(targetPkg, icon);
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                if (targetPkg.equals(ivIcon.getTag())) {
-                                    ivIcon.setImageDrawable(icon);
-                                }
-                            });
-                        }
-                    } catch (Exception ignored) {}
-                });
-            }
+            // Icon loading with memory-safe AppIconLoader
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(requireContext()).loadInto(
+                    ivIcon, app.packageName, android.R.drawable.sym_def_app_icon);
         }
 
         // Hide any surplus views already in the container
