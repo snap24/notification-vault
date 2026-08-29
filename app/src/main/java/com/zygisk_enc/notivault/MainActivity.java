@@ -93,6 +93,19 @@ public class MainActivity extends BaseActivity {
             });
         }
 
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
+                new androidx.lifecycle.ViewModelProvider(this)
+                .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+
+        notifViewModel.getLoadProgress().observe(this, progress -> {
+            if (progress == null || progress < 0 || progress >= 100) {
+                binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
+            } else {
+                binding.cardToolbarDecryption.setVisibility(android.view.View.VISIBLE);
+                binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, progress));
+            }
+        });
+
         // Make the bottom navigation card translucent glass-like
         int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
         int glassBgColor = androidx.core.graphics.ColorUtils.setAlphaComponent(surfaceColor, 216); // 85% opacity

@@ -136,21 +136,7 @@
 
     </LinearLayout>
 
-    <!-- 4. Top Micro Hairline Progress Indicator (Zero space wasted) -->
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progress_decryption_hairline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        app:trackCornerRadius="2dp"
-        app:trackThickness="3dp"
-        app:indicatorColor="?attr/colorPrimary"
-        app:trackColor="?attr/colorSurfaceContainerHigh"
-        android:visibility="gone"
-        tools:progress="60"
-        tools:visibility="visible" />
-
-    <!-- 5. Swipe Refresh Layout with Notification Feed & Floating Decryption Pill -->
+    <!-- 4. Swipe Refresh Layout with Notification Feed -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
@@ -173,52 +159,6 @@
                 android:descendantFocusability="blocksDescendants"
                 android:overScrollMode="never"
                 tools:listitem="@layout/item_notification" />
-
-            <!-- Smart Floating Decryption Pill (Floats gracefully over list without shifting content) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_floating_decryption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="3dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp">
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:indicatorSize="14dp"
-                        app:trackThickness="2.5dp"
-                        app:indicatorColor="?attr/colorPrimary"
-                        app:trackColor="?attr/colorSurfaceContainerHigh"
-                        android:indeterminate="true" />
-
-                    <TextView
-                        android:id="@+id/tv_floating_decryption_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Decrypting... 45%"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- Empty State -->
             <LinearLayout
