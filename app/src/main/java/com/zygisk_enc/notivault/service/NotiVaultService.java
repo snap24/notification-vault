@@ -401,6 +401,7 @@ public class NotiVaultService extends NotificationListenerService {
     }
 
     private boolean isExcluded(String packageName) {
+        if (getPackageName().equals(packageName)) return true;
         for (String pkg : EXCLUDED_PACKAGES) {
             if (pkg.equals(packageName)) return true;
         }
