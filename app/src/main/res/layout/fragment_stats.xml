@@ -220,11 +220,15 @@
 
                     <!-- Metric 3: Toast Logs -->
                     <LinearLayout
+                        android:id="@+id/layout_metric_toasts"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless">
 
                         <TextView
                             android:layout_width="wrap_content"

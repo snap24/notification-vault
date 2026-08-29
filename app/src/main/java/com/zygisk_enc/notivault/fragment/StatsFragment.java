@@ -81,6 +81,12 @@ public class StatsFragment extends Fragment {
         setupChartInspector();
         setupMoreAppsButton();
 
+        binding.layoutMetricToasts.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                startActivity(new android.content.Intent(requireContext(), com.zygisk_enc.notivault.ToastHistoryActivity.class));
+            }
+        });
+
         loadAnalytics();
     }
 
