@@ -425,6 +425,10 @@ public class NotificationViewModel extends AndroidViewModel {
         return repository.getRule(packageName);
     }
 
+    public LiveData<String> getFilterPackage() {
+        return filterPackage;
+    }
+
     public LiveData<List<AppRuleEntity>> getAllRules() {
         return repository.getAllRules();
     }

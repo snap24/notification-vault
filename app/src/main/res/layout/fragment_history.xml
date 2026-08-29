@@ -1,225 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="0dp"
-    android:paddingHorizontal="16dp"
-    android:paddingBottom="0dp">
+    android:paddingTop="8dp"
+    android:paddingHorizontal="16dp">
 
+    <!-- 1. Search Bar for Notifications -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/search_hint"
+        android:layout_marginBottom="8dp"
+        app:startIconDrawable="@drawable/ic_search"
+        app:endIconMode="clear_text"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusTopStart="24dp"
+        app:boxCornerRadiusTopEnd="24dp"
+        app:boxCornerRadiusBottomStart="24dp"
+        app:boxCornerRadiusBottomEnd="24dp">
 
-        <!-- Header Search Bar & Actions Container -->
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="48dp"
+            android:paddingVertical="10dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 2. Quick Action Filter Chips Row -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical|start"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="6dp">
+            android:gravity="center_vertical">
 
-            <!-- Search Expand Container (hidden by default) -->
-            <LinearLayout
-                android:id="@+id/layout_search_expanded"
-                android:layout_width="0dp"
+            <!-- Date Filter Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_filter_date"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="2dp"
-                android:visibility="gone">
+                android:text="Date Range"
+                app:chipIcon="@drawable/ic_calendar"
+                app:chipIconSize="18dp"
+                style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/search_hint"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    app:boxCornerRadiusTopStart="24dp"
-                    app:boxCornerRadiusTopEnd="24dp"
-                    app:boxCornerRadiusBottomStart="24dp"
-                    app:boxCornerRadiusBottomEnd="24dp"
-                    app:startIconDrawable="@drawable/ic_search"
-                    app:iconSpaceReserved="false">
+            <!-- App Rules Shortcut Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_app_rules"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Rules"
+                app:chipIcon="@drawable/ic_rules"
+                app:chipIconSize="18dp"
+                style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_search"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionSearch"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:paddingVertical="8dp" />
+            <!-- Clear Logs Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_clear_logs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Clear Logs"
+                app:chipIcon="@drawable/ic_delete_sweep"
+                app:chipIconSize="18dp"
+                style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <!-- Toasts Log Shortcut Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_toasts_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="@string/toasts"
+                app:chipIcon="@drawable/ic_toast_bread"
+                app:chipIconSize="18dp"
+                style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-                <ImageButton
-                    android:id="@+id/btn_close_search"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_button_square_ripple"
-                    android:src="@drawable/ic_close"
-                    android:contentDescription="@string/desc_close_search"
-                    app:tint="?attr/colorPrimary" />
+            <!-- Cloud Backup Shortcut Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_cloud_backup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Backup"
+                app:chipIcon="@drawable/ic_cloud_upload"
+                app:chipIconSize="18dp"
+                style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
-            </LinearLayout>
-
-            <!-- Search Collapsed Container (visible by default) -->
-            <HorizontalScrollView
-                android:id="@+id/layout_search_collapsed"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="0dp"
-                android:scrollbars="none"
-                android:overScrollMode="never"
-                android:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageButton
-                        android:id="@+id/btn_open_search"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_button_square_ripple"
-                        android:src="@drawable/ic_search"
-                        android:contentDescription="@string/desc_search"
-                        app:tint="?attr/colorPrimary" />
-
-                    <ImageButton
-                        android:id="@+id/btn_open_calendar"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="2dp"
-                        android:background="@drawable/bg_button_square_ripple"
-                        android:src="@drawable/ic_calendar"
-                        android:contentDescription="@string/desc_select_date"
-                        app:tint="?attr/colorPrimary" />
-
-                    <ImageButton
-                        android:id="@+id/btn_app_rules"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="2dp"
-                        android:background="@drawable/bg_button_square_ripple"
-                        android:src="@drawable/ic_rules"
-                        android:contentDescription="@string/desc_app_rules"
-                        app:tint="?attr/colorPrimary" />
-
-                    <ImageButton
-                        android:id="@+id/btn_clear_all"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="2dp"
-                        android:background="@drawable/bg_button_square_ripple"
-                        android:src="@drawable/ic_delete_sweep"
-                        android:contentDescription="@string/desc_clear_all"
-                        app:tint="?attr/colorPrimary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_toasts_history"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="2dp"
-                        android:paddingHorizontal="4dp"
-                        android:minWidth="0dp"
-                        android:text="@string/toasts"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        app:icon="@drawable/ic_toast_bread"
-                        app:iconGravity="textEnd" />
-
-                    <!-- Cloud / Drive Backup Button -->
-                    <ImageButton
-                        android:id="@+id/btn_cloud_backup"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="2dp"
-                        android:background="@drawable/bg_button_square_ripple"
-                        android:src="@drawable/ic_cloud_upload"
-                        android:contentDescription="@string/desc_cloud_backup"
-                        app:tint="?attr/colorPrimary" />
-
-                    <!-- Decryption progress indicator (shown to the right of cloud button) -->
-                    <TextView
-                        android:id="@+id/tv_load_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="8dp"
-                        android:singleLine="true"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                        android:textColor="?attr/colorPrimary"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:text="Decrypting... 45%" />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
+            <!-- Decryption progress indicator (shown when reading large chunks) -->
+            <TextView
+                android:id="@+id/tv_load_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="Decrypting... 45%" />
 
         </LinearLayout>
 
-        <!-- Swipe Refresh Layout containing list and empty state -->
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="2dp"
-            android:layout_weight="1">
+    </HorizontalScrollView>
 
-            <FrameLayout
+    <!-- 3. Active Removable Filter Strip (App Filter or Date Filter) -->
+    <LinearLayout
+        android:id="@+id/layout_active_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_active_app_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="App: WhatsApp"
+            app:closeIconVisible="true"
+            android:visibility="gone"
+            style="@style/Widget.Material3.Chip.Input" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_active_date_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="Date: Aug 28"
+            app:closeIconVisible="true"
+            android:visibility="gone"
+            style="@style/Widget.Material3.Chip.Input" />
+
+    </LinearLayout>
+
+    <!-- 4. Swipe Refresh Layout with Notification Feed -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:focusable="true"
-                android:focusableInTouchMode="true">
+                android:clipToPadding="false"
+                android:paddingBottom="120dp"
+                android:descendantFocusability="blocksDescendants"
+                android:overScrollMode="never"
+                tools:listitem="@layout/item_notification" />
 
-                <!-- RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingBottom="80dp"
-                    android:descendantFocusability="blocksDescendants"
-                    tools:listitem="@layout/item_notification" />
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/empty_state"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-                <!-- Empty state -->
-                <LinearLayout
-                    android:id="@+id/empty_state"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:src="@drawable/ic_notification"
+                    app:tint="?attr/colorOutline"
+                    android:layout_marginBottom="16dp"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/empty_history_title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/empty_history_subtitle"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="gone">
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="32dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/empty_history_title"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:textColor="?attr/colorOnSurface" />
+            </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/empty_history_subtitle"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:paddingHorizontal="32dp" />
+        </FrameLayout>
 
-                </LinearLayout>
-
-            </FrameLayout>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

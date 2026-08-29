@@ -117,17 +117,18 @@ public class HistoryFragment extends Fragment {
         setupSwipeToRefresh();
         observeNotifications();
 
-        binding.btnAppRules.setOnClickListener(v -> {
+        binding.chipAppRules.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.AppRulesActivity.class);
             startActivity(intent);
         });
 
-        binding.btnToastsHistory.setOnClickListener(v -> {
+        binding.chipToastsHistory.setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(requireContext(), com.zygisk_enc.notivault.ToastHistoryActivity.class);
             startActivity(intent);
         });
 
-        binding.btnCloudBackup.setOnClickListener(v -> showCloudBackupDialog());
+        binding.chipCloudBackup.setOnClickListener(v -> showCloudBackupDialog());
+        binding.chipClearLogs.setOnClickListener(v -> showDeleteCalendar());
 
         viewModel.getFilterFavorites().observe(getViewLifecycleOwner(), favsOnly -> {
             androidx.appcompat.app.ActionBar actionBar =
@@ -239,65 +240,10 @@ public class HistoryFragment extends Fragment {
         viewModel.getOldestTimestamp().observe(getViewLifecycleOwner(), timestamp -> {
             oldestNotificationTimestamp = timestamp;
         });
-        viewModel.getFilterDateStart().observe(getViewLifecycleOwner(), start -> {
-            if (start != null) {
-                binding.btnOpenCalendar.setColorFilter(requireContext().getColor(android.R.color.holo_red_light));
-            } else {
-                binding.btnOpenCalendar.clearColorFilter();
-            }
-        });
 
-        binding.btnOpenCalendar.setOnClickListener(v -> {
-            Long currentStart = viewModel.getFilterDateStart().getValue();
-            MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-            builder.setTitleText(getString(R.string.desc_select_date));
-            if (currentStart != null) builder.setSelection(currentStart);
-
-            CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-            long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
-            
-            constraintsBuilder.setEnd(todayUtc);
-            
-            long startUtc = todayUtc;
-            if (oldestNotificationTimestamp != null && oldestNotificationTimestamp > 0) {
-                Calendar c = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
-                // We want the UTC midnight that corresponds to the local date of the oldest notification
-                Calendar localOld = Calendar.getInstance();
-                localOld.setTimeInMillis(oldestNotificationTimestamp);
-                c.set(localOld.get(Calendar.YEAR), localOld.get(Calendar.MONTH), localOld.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                c.set(Calendar.MILLISECOND, 0);
-                startUtc = c.getTimeInMillis();
-            }
-            // Ensure start isn't somehow after end
-            if (startUtc > todayUtc) startUtc = todayUtc;
-            
-            constraintsBuilder.setStart(startUtc);
-            
-            java.util.List<CalendarConstraints.DateValidator> validators = new java.util.ArrayList<>();
-            validators.add(DateValidatorPointBackward.before(todayUtc + 1));
-            validators.add(DateValidatorPointForward.from(startUtc - 1));
-            constraintsBuilder.setValidator(CompositeDateValidator.allOf(validators));
-            
-            builder.setCalendarConstraints(constraintsBuilder.build());
-
-            MaterialDatePicker<Long> picker = builder.build();
-            picker.addOnPositiveButtonClickListener(selection -> {
-                // MaterialDatePicker selection is UTC midnight. We want to interpret that date as LOCAL midnight.
-                Calendar utc = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
-                utc.setTimeInMillis(selection);
-                
-                Calendar local = Calendar.getInstance();
-                local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-                local.set(Calendar.MILLISECOND, 0);
-                long start = local.getTimeInMillis();
-                local.add(Calendar.DAY_OF_YEAR, 1);
-                long end = local.getTimeInMillis() - 1;
-                viewModel.setDateFilter(start, end);
-            });
-            picker.show(getParentFragmentManager(), "DATE_PICKER");
-        });
-        
-        binding.btnOpenCalendar.setOnLongClickListener(v -> {
+        // Date filter chip click
+        binding.chipFilterDate.setOnClickListener(v -> openDatePicker());
+        binding.chipFilterDate.setOnLongClickListener(v -> {
             if (viewModel.getFilterDateStart().getValue() != null) {
                 viewModel.setDateFilter(null, null);
                 showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT));
@@ -305,6 +251,16 @@ public class HistoryFragment extends Fragment {
                 showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.hint_long_press_clear_date, Snackbar.LENGTH_SHORT));
             }
             return true;
+        });
+
+        // Observe Date Filter for active chip
+        viewModel.getFilterDateStart().observe(getViewLifecycleOwner(), start -> {
+            updateActiveFilters();
+        });
+
+        // Observe Package Filter for active chip
+        viewModel.getFilterPackage().observe(getViewLifecycleOwner(), pkg -> {
+            updateActiveFilters();
         });
 
         searchBackPressedCallback = new androidx.activity.OnBackPressedCallback(false) {
@@ -315,8 +271,6 @@ public class HistoryFragment extends Fragment {
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), searchBackPressedCallback);
 
-        binding.btnOpenSearch.setOnClickListener(v -> openSearchBox());
-
         viewModel.getOpenSearchEvent().observe(getViewLifecycleOwner(), open -> {
             if (open != null && open) {
                 viewModel.clearOpenSearchEvent();
@@ -324,29 +278,97 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        binding.btnCloseSearch.setOnClickListener(v -> closeSearchBox());
-
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setSearchQuery(s.toString());
+                String query = s != null ? s.toString() : "";
+                viewModel.setSearchQuery(query);
+                if (searchBackPressedCallback != null) {
+                    searchBackPressedCallback.setEnabled(!query.isEmpty());
+                }
             }
         });
+    }
 
-        binding.btnClearAll.setOnClickListener(v -> {
-            showDeleteCalendar();
+    private void updateActiveFilters() {
+        if (binding == null) return;
+        String pkg = viewModel.getFilterPackage().getValue();
+        Long dateStart = viewModel.getFilterDateStart().getValue();
+
+        boolean hasActiveFilter = false;
+
+        if (pkg != null && !pkg.isEmpty()) {
+            hasActiveFilter = true;
+            binding.chipActiveAppFilter.setVisibility(View.VISIBLE);
+            binding.chipActiveAppFilter.setText("App: " + pkg);
+            binding.chipActiveAppFilter.setOnCloseIconClickListener(v -> viewModel.setFilterPackage(null));
+        } else {
+            binding.chipActiveAppFilter.setVisibility(View.GONE);
+        }
+
+        if (dateStart != null) {
+            hasActiveFilter = true;
+            binding.chipActiveDateFilter.setVisibility(View.VISIBLE);
+            binding.chipActiveDateFilter.setText("Date: " + DateUtils.getRelativeTimeLabel(requireContext(), dateStart));
+            binding.chipActiveDateFilter.setOnCloseIconClickListener(v -> viewModel.setDateFilter(null, null));
+        } else {
+            binding.chipActiveDateFilter.setVisibility(View.GONE);
+        }
+
+        binding.layoutActiveFilters.setVisibility(hasActiveFilter ? View.VISIBLE : View.GONE);
+    }
+
+    private void openDatePicker() {
+        Long currentStart = viewModel.getFilterDateStart().getValue();
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+        builder.setTitleText(getString(R.string.desc_select_date));
+        if (currentStart != null) builder.setSelection(currentStart);
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
+        
+        constraintsBuilder.setEnd(todayUtc);
+        
+        long startUtc = todayUtc;
+        if (oldestNotificationTimestamp != null && oldestNotificationTimestamp > 0) {
+            Calendar c = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+            Calendar localOld = Calendar.getInstance();
+            localOld.setTimeInMillis(oldestNotificationTimestamp);
+            c.set(localOld.get(Calendar.YEAR), localOld.get(Calendar.MONTH), localOld.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            startUtc = c.getTimeInMillis();
+        }
+        if (startUtc > todayUtc) startUtc = todayUtc;
+        
+        constraintsBuilder.setStart(startUtc);
+        
+        java.util.List<CalendarConstraints.DateValidator> validators = new java.util.ArrayList<>();
+        validators.add(DateValidatorPointBackward.before(todayUtc + 1));
+        validators.add(DateValidatorPointForward.from(startUtc - 1));
+        constraintsBuilder.setValidator(CompositeDateValidator.allOf(validators));
+        
+        builder.setCalendarConstraints(constraintsBuilder.build());
+
+        MaterialDatePicker<Long> picker = builder.build();
+        picker.addOnPositiveButtonClickListener(selection -> {
+            Calendar utc = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+            utc.setTimeInMillis(selection);
+            
+            Calendar local = Calendar.getInstance();
+            local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            local.set(Calendar.MILLISECOND, 0);
+            long start = local.getTimeInMillis();
+            local.add(Calendar.DAY_OF_YEAR, 1);
+            long end = local.getTimeInMillis() - 1;
+            viewModel.setDateFilter(start, end);
         });
+        picker.show(getParentFragmentManager(), "DATE_PICKER");
     }
 
     private void openSearchBox() {
         if (binding == null || !isAdded()) return;
-        binding.layoutSearchCollapsed.setVisibility(View.GONE);
-        binding.layoutSearchExpanded.setVisibility(View.VISIBLE);
-        if (searchBackPressedCallback != null) {
-            searchBackPressedCallback.setEnabled(true);
-        }
         binding.etSearch.requestFocus();
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
@@ -357,8 +379,6 @@ public class HistoryFragment extends Fragment {
     private void closeSearchBox() {
         if (binding == null) return;
         binding.etSearch.setText("");
-        binding.layoutSearchExpanded.setVisibility(View.GONE);
-        binding.layoutSearchCollapsed.setVisibility(View.VISIBLE);
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
