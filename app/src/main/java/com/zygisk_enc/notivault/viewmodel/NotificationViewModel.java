@@ -216,6 +216,9 @@ public class NotificationViewModel extends AndroidViewModel {
                         chunkResults[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
                     }
 
+                    final boolean isInitialLoad = (limit <= 500);
+                    final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
+
                     for (int c = 0; c < numChunks; c++) {
                         final int chunkIndex = c;
                         final int startIdx = c * chunkSize;
@@ -241,6 +244,23 @@ public class NotificationViewModel extends AndroidViewModel {
 
                                     if (matchesQuery(entity, searchingMode, lowerQuery)) {
                                         chunkResults[chunkIndex].add(entity);
+                                    }
+
+                                    // 10% progressive streaming for initial load (0-500 items) for instant render
+                                    if (isInitialLoad) {
+                                        int milestone = progress / 10;
+                                        boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
+                                        if (milestoneTrigger && runToken == currentRunToken) {
+                                            java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
+                                            for (int k = 0; k < numChunks; k++) {
+                                                synchronized (chunkResults[k]) {
+                                                    snapshot.addAll(chunkResults[k]);
+                                                }
+                                            }
+                                            if (!snapshot.isEmpty() && runToken == currentRunToken) {
+                                                notifications.postValue(snapshot);
+                                            }
+                                        }
                                     }
                                 }
                             } finally {
