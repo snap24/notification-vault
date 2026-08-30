@@ -55,6 +55,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public int getCount() {
             return notifications.size();
         }
+
+        public boolean hasFavorite() {
+            for (NotificationEntity entity : notifications) {
+                if (entity.isFavorite) return true;
+            }
+            return false;
+        }
+
+        public int getFavoriteCount() {
+            int count = 0;
+            for (NotificationEntity entity : notifications) {
+                if (entity.isFavorite) count++;
+            }
+            return count;
+        }
     }
 
     // Wrapper class to hold either a header string, a notification, or a bundle
@@ -121,7 +136,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return oldItem.header.equals(newItem.header);
             } else if (oldItem.type == ListItem.TYPE_BUNDLE) {
                 return oldItem.bundle.getCount() == newItem.bundle.getCount() &&
-                       oldItem.bundle.latestTimestamp == newItem.bundle.latestTimestamp;
+                       oldItem.bundle.latestTimestamp == newItem.bundle.latestTimestamp &&
+                       oldItem.bundle.getFavoriteCount() == newItem.bundle.getFavoriteCount();
             }
             NotificationEntity o = oldItem.entity;
             NotificationEntity n = newItem.entity;

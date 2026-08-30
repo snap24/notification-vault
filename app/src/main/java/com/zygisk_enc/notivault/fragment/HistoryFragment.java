@@ -245,7 +245,10 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onFavoriteClick(NotificationEntity entity) {
-                viewModel.setFavorite(entity.id, !entity.isFavorite);
+                if (entity == null) return;
+                entity.isFavorite = !entity.isFavorite;
+                viewModel.setFavorite(entity.id, entity.isFavorite);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -256,14 +259,7 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onBundleFavoriteClick(NotificationAdapter.NotificationBundle bundle) {
                 if (bundle == null || bundle.notifications == null) return;
-                boolean hasAnyFavorite = false;
-                for (NotificationEntity entity : bundle.notifications) {
-                    if (entity.isFavorite) {
-                        hasAnyFavorite = true;
-                        break;
-                    }
-                }
-                boolean newFav = !hasAnyFavorite;
+                boolean newFav = !bundle.hasFavorite();
                 for (NotificationEntity entity : bundle.notifications) {
                     entity.isFavorite = newFav;
                     viewModel.setFavorite(entity.id, newFav);
@@ -858,14 +854,7 @@ public class HistoryFragment extends Fragment {
         });
 
         // Action: Star All / Unstar All
-        boolean hasAnyFavorite = false;
-        for (NotificationEntity entity : bundle.notifications) {
-            if (entity.isFavorite) {
-                hasAnyFavorite = true;
-                break;
-            }
-        }
-        final boolean[] isStarAll = {hasAnyFavorite};
+        final boolean[] isStarAll = {bundle.hasFavorite()};
         updateStarChip(btnStarAll, isStarAll[0]);
 
         // Setup RecyclerView for bundle items
@@ -880,6 +869,7 @@ public class HistoryFragment extends Fragment {
             }
             updateStarChip(btnStarAll, isStarAll[0]);
             bundleAdapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
         });
 
         // Action: Open App
@@ -943,7 +933,13 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onFavoriteClick(NotificationEntity entity) {
-                viewModel.setFavorite(entity.id, !entity.isFavorite);
+                if (entity == null) return;
+                entity.isFavorite = !entity.isFavorite;
+                viewModel.setFavorite(entity.id, entity.isFavorite);
+                bundleAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
+                isStarAll[0] = bundle.hasFavorite();
+                updateStarChip(btnStarAll, isStarAll[0]);
             }
 
             @Override
@@ -1077,8 +1073,10 @@ public class HistoryFragment extends Fragment {
         updateStarChip(chipStar, isFav[0]);
         chipStar.setOnClickListener(v -> {
             isFav[0] = !isFav[0];
+            entity.isFavorite = isFav[0];
             viewModel.setFavorite(entity.id, isFav[0]);
             updateStarChip(chipStar, isFav[0]);
+            adapter.notifyDataSetChanged();
         });
 
         // Action: Open App
