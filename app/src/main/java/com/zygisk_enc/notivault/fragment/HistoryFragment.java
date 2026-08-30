@@ -649,13 +649,7 @@ public class HistoryFragment extends Fragment {
                             Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                             if (scroll != null && scroll) {
                                 viewModel.clearScrollToTopEvent();
-                                androidx.recyclerview.widget.LinearLayoutManager lm = 
-                                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                                if (lm != null) {
-                                    lm.scrollToPositionWithOffset(0, 0);
-                                } else {
-                                    binding.recyclerView.scrollToPosition(0);
-                                }
+                                animateScrollToTop();
                             }
                         }
                     });
@@ -666,13 +660,7 @@ public class HistoryFragment extends Fragment {
         viewModel.getScrollToTopEvent().observe(getViewLifecycleOwner(), scroll -> {
             if (scroll != null && scroll) {
                 closeSearchBox();
-                androidx.recyclerview.widget.LinearLayoutManager lm = 
-                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                if (lm != null) {
-                    lm.scrollToPositionWithOffset(0, 0);
-                } else {
-                    binding.recyclerView.scrollToPosition(0);
-                }
+                animateScrollToTop();
             }
         });
 
@@ -686,6 +674,27 @@ public class HistoryFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void animateScrollToTop() {
+        if (binding == null) return;
+        androidx.recyclerview.widget.LinearLayoutManager lm = 
+                (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+        if (lm != null) {
+            lm.scrollToPositionWithOffset(0, 0);
+        } else {
+            binding.recyclerView.scrollToPosition(0);
+        }
+
+        float slideDistance = 24 * getResources().getDisplayMetrics().density;
+        binding.recyclerView.setTranslationY(slideDistance);
+        binding.recyclerView.setAlpha(0.3f);
+        binding.recyclerView.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(220)
+                .setInterpolator(new androidx.interpolator.view.animation.FastOutSlowInInterpolator())
+                .start();
     }
 
     private void showRecyclerView(boolean show) {

@@ -82,12 +82,7 @@ public class ToastHistoryActivity extends BaseActivity {
 
         viewModel.getScrollToTopEvent().observe(this, scroll -> {
             if (scroll != null && scroll) {
-                LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                if (lm != null) {
-                    lm.scrollToPositionWithOffset(0, 0);
-                } else {
-                    binding.recyclerView.scrollToPosition(0);
-                }
+                animateScrollToTop();
             }
         });
 
@@ -95,6 +90,25 @@ public class ToastHistoryActivity extends BaseActivity {
         viewModel.getOldestTimestamp().observe(this, timestamp -> {
             oldestToastTimestamp = timestamp;
         });
+    }
+
+    private void animateScrollToTop() {
+        LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
+        if (lm != null) {
+            lm.scrollToPositionWithOffset(0, 0);
+        } else {
+            binding.recyclerView.scrollToPosition(0);
+        }
+
+        float slideDistance = 24 * getResources().getDisplayMetrics().density;
+        binding.recyclerView.setTranslationY(slideDistance);
+        binding.recyclerView.setAlpha(0.3f);
+        binding.recyclerView.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(220)
+                .setInterpolator(new androidx.interpolator.view.animation.FastOutSlowInInterpolator())
+                .start();
     }
 
     private void updateUI() {
@@ -128,12 +142,7 @@ public class ToastHistoryActivity extends BaseActivity {
                 Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                 if (scroll != null && scroll) {
                     viewModel.clearScrollToTopEvent();
-                    LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                    if (lm != null) {
-                        lm.scrollToPositionWithOffset(0, 0);
-                    } else {
-                        binding.recyclerView.scrollToPosition(0);
-                    }
+                    animateScrollToTop();
                 }
             });
         }
