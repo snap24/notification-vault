@@ -45,12 +45,12 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="6dp">
 
-                <!-- Header: App Name + Bundle Tag Badge + Time -->
+                <!-- Header: App Name on Left, Time + Bundle Tag on Right -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="top">
 
                     <TextView
                         android:id="@+id/tv_app_name"
@@ -63,25 +63,34 @@
                         android:maxLines="1"
                         android:ellipsize="end" />
 
-                    <!-- Bundle Tag Badge beside Time -->
-                    <TextView
-                        android:id="@+id/tv_bundle_tag"
+                    <!-- Right Column: Time with Bundle Tag directly underneath -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:background="@drawable/bg_widget_pill"
-                        android:paddingHorizontal="6dp"
-                        android:paddingVertical="1dp"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                        android:textColor="?attr/colorPrimary"
-                        android:textStyle="bold" />
+                        android:orientation="vertical"
+                        android:gravity="end">
 
-                    <TextView
-                        android:id="@+id/tv_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        <TextView
+                            android:id="@+id/tv_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <!-- Bundle Tag: slightly bigger, bold green text -->
+                        <TextView
+                            android:id="@+id/tv_bundle_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2.5dp"
+                            android:background="@drawable/bg_widget_pill"
+                            android:paddingHorizontal="7dp"
+                            android:paddingVertical="1.5dp"
+                            android:textSize="11.5sp"
+                            android:textColor="@color/bundle_tag_green"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
