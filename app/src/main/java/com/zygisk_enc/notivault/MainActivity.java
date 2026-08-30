@@ -105,10 +105,13 @@ public class MainActivity extends BaseActivity {
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
 
         notifViewModel.getOperationProgress().observe(this, op -> {
-            if (op == null || op.progress < 0 || (op.progress >= 100 && op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE)) {
-                binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
-            } else if (op.progress >= 0 && op.progress <= 100) {
-                binding.cardToolbarDecryption.setVisibility(android.view.View.VISIBLE);
+            boolean shouldShow = op != null && op.progress >= 0 && (op.progress < 100 || op.type != com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE);
+            int newVisibility = shouldShow ? android.view.View.VISIBLE : android.view.View.GONE;
+            if (binding.cardToolbarDecryption.getVisibility() != newVisibility) {
+                androidx.transition.TransitionManager.beginDelayedTransition(binding.layoutToolbarPills, new androidx.transition.ChangeBounds().setDuration(200));
+                binding.cardToolbarDecryption.setVisibility(newVisibility);
+            }
+            if (shouldShow) {
                 if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_DELETING) {
                     binding.tvToolbarDecryption.setText(getString(R.string.deleting_progress, op.progress));
                 } else {
@@ -217,12 +220,15 @@ public class MainActivity extends BaseActivity {
     }
 
     private void updateSearchCountPill(String query, java.util.List<?> list) {
-        if (query != null && !query.trim().isEmpty()) {
+        boolean shouldShow = query != null && !query.trim().isEmpty();
+        int newVisibility = shouldShow ? android.view.View.VISIBLE : android.view.View.GONE;
+        if (binding.cardToolbarSearchCount.getVisibility() != newVisibility) {
+            androidx.transition.TransitionManager.beginDelayedTransition(binding.layoutToolbarPills, new androidx.transition.ChangeBounds().setDuration(200));
+            binding.cardToolbarSearchCount.setVisibility(newVisibility);
+        }
+        if (shouldShow) {
             int count = list != null ? list.size() : 0;
-            binding.cardToolbarSearchCount.setVisibility(android.view.View.VISIBLE);
             binding.tvToolbarSearchCount.setText(getString(R.string.search_found_count, count));
-        } else {
-            binding.cardToolbarSearchCount.setVisibility(android.view.View.GONE);
         }
     }
 
