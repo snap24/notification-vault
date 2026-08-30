@@ -51,11 +51,22 @@ public class ToastViewModel extends AndroidViewModel {
         toasts.addSource(filterDateStart, date -> { resetLimit(); updateSource(); });
         toasts.addSource(filterDateEnd, date -> { resetLimit(); updateSource(); });
         toasts.addSource(filterPackage, pkg -> { resetLimit(); updateSource(); });
-        toasts.addSource(filterLimit, limit -> updateSource());
+        toasts.addSource(filterLimit, limit -> {
+            if (!isResettingLimit) {
+                updateSource();
+            }
+        });
     }
 
+    private boolean isResettingLimit = false;
+
     private void resetLimit() {
+        if (filterLimit.getValue() != null && filterLimit.getValue() == 500) {
+            return;
+        }
+        isResettingLimit = true;
         filterLimit.setValue(500);
+        isResettingLimit = false;
     }
 
     public LiveData<Integer> getFilterLimit() {

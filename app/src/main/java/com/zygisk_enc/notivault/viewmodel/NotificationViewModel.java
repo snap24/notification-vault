@@ -96,9 +96,6 @@ public class NotificationViewModel extends AndroidViewModel {
 
         notifications.addSource(searchQuery, query -> {
             if (!isBatchingUpdates) {
-                if (query != null && !query.trim().isEmpty()) {
-                    notifications.setValue(new java.util.ArrayList<>());
-                }
                 resetLimit();
                 updateSource();
             }
@@ -107,11 +104,22 @@ public class NotificationViewModel extends AndroidViewModel {
         notifications.addSource(filterFavorites, favs -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterDateStart, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterDateEnd, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
-        notifications.addSource(filterLimit, limit -> { if (!isBatchingUpdates) { updateSource(); } });
+        notifications.addSource(filterLimit, limit -> {
+            if (!isBatchingUpdates && !isResettingLimit) {
+                updateSource();
+            }
+        });
     }
 
+    private boolean isResettingLimit = false;
+
     private void resetLimit() {
+        if (filterLimit.getValue() != null && filterLimit.getValue() == 500) {
+            return;
+        }
+        isResettingLimit = true;
         filterLimit.setValue(500);
+        isResettingLimit = false;
     }
 
     private void updateSource() {
@@ -359,7 +367,14 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public void setSearchQuery(String query) {
         String current = searchQuery.getValue();
-        if ((query == null && current == null) || (query != null && query.equals(current))) {
+        if (query == null && current == null) {
+            return;
+        }
+        if (query != null && query.equals(current)) {
+            List<NotificationEntity> currentList = notifications.getValue();
+            if (currentList == null || currentList.isEmpty()) {
+                updateSource();
+            }
             return;
         }
         searchQuery.setValue(query);
