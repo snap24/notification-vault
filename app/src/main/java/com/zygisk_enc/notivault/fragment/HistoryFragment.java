@@ -252,6 +252,24 @@ public class HistoryFragment extends Fragment {
             public void onBundleClick(NotificationAdapter.NotificationBundle bundle) {
                 showBundleDetailDialog(bundle);
             }
+
+            @Override
+            public void onBundleFavoriteClick(NotificationAdapter.NotificationBundle bundle) {
+                if (bundle == null || bundle.notifications == null) return;
+                boolean hasAnyFavorite = false;
+                for (NotificationEntity entity : bundle.notifications) {
+                    if (entity.isFavorite) {
+                        hasAnyFavorite = true;
+                        break;
+                    }
+                }
+                boolean newFav = !hasAnyFavorite;
+                for (NotificationEntity entity : bundle.notifications) {
+                    entity.isFavorite = newFav;
+                    viewModel.setFavorite(entity.id, newFav);
+                }
+                adapter.notifyDataSetChanged();
+            }
         });
     }
 
@@ -930,6 +948,11 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onBundleClick(NotificationAdapter.NotificationBundle b) {
+                // Nested bundle no-op
+            }
+
+            @Override
+            public void onBundleFavoriteClick(NotificationAdapter.NotificationBundle b) {
                 // Nested bundle no-op
             }
         });

@@ -34,6 +34,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         void onDeleteClick(NotificationEntity entity);
         void onFavoriteClick(NotificationEntity entity);
         void onBundleClick(NotificationBundle bundle);
+        void onBundleFavoriteClick(NotificationBundle bundle);
     }
 
     public static class NotificationBundle {
@@ -215,31 +216,30 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private final MaterialCardView card;
         private final ImageView ivAppIcon;
         private final TextView tvAppName;
-        private final TextView tvBundleCount;
+        private final TextView tvBundleTag;
         private final TextView tvTime;
         private final TextView tvPreviewTitle;
         private final TextView tvPreviewText;
-        private final TextView tvViewAllAction;
+        private final ImageButton btnFavorite;
 
         BundleViewHolder(@NonNull View itemView) {
             super(itemView);
             card = itemView.findViewById(R.id.card_bundle);
             ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
             tvAppName = itemView.findViewById(R.id.tv_app_name);
-            tvBundleCount = itemView.findViewById(R.id.tv_bundle_count);
+            tvBundleTag = itemView.findViewById(R.id.tv_bundle_tag);
             tvTime = itemView.findViewById(R.id.tv_time);
             tvPreviewTitle = itemView.findViewById(R.id.tv_preview_title);
             tvPreviewText = itemView.findViewById(R.id.tv_preview_text);
-            tvViewAllAction = itemView.findViewById(R.id.tv_view_all_action);
+            btnFavorite = itemView.findViewById(R.id.btn_favorite);
         }
 
         void bind(NotificationBundle bundle, OnItemClickListener listener) {
             if (bundle == null) return;
             Context ctx = itemView.getContext();
             tvAppName.setText(bundle.appName != null && !bundle.appName.isEmpty() ? bundle.appName : bundle.packageName);
-            tvBundleCount.setText(ctx.getString(R.string.bundled_logs_count, bundle.getCount()));
+            tvBundleTag.setText(ctx.getString(R.string.bundle_tag, bundle.getCount()));
             tvTime.setText(DateUtils.getTimeString(ctx, bundle.latestTimestamp));
-            tvViewAllAction.setText(ctx.getString(R.string.view_all_bundled_logs, bundle.getCount()));
 
             if (!bundle.notifications.isEmpty()) {
                 NotificationEntity latest = bundle.notifications.get(0);
@@ -264,11 +264,39 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
             }
 
-            card.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onBundleClick(bundle);
+            // Check if any notification in the bundle is favorited
+            boolean isFavorite = false;
+            for (NotificationEntity entity : bundle.notifications) {
+                if (entity.isFavorite) {
+                    isFavorite = true;
+                    break;
                 }
-            });
+            }
+
+            if (isFavorite) {
+                btnFavorite.setImageResource(R.drawable.ic_star);
+                btnFavorite.setColorFilter(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.gold_star));
+                btnFavorite.setAlpha(1.0f);
+            } else {
+                btnFavorite.setImageResource(R.drawable.ic_star_border);
+                int outlineColor = com.google.android.material.color.MaterialColors.getColor(
+                        itemView, com.google.android.material.R.attr.colorOutline, android.graphics.Color.GRAY);
+                btnFavorite.setColorFilter(outlineColor);
+                btnFavorite.setAlpha(0.6f);
+            }
+
+            if (listener != null) {
+                card.setOnClickListener(v -> listener.onBundleClick(bundle));
+                btnFavorite.setOnClickListener(v -> {
+                    btnFavorite.animate()
+                            .scaleX(1.3f)
+                            .scaleY(1.3f)
+                            .setDuration(120)
+                            .withEndAction(() -> btnFavorite.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start())
+                            .start();
+                    listener.onBundleFavoriteClick(bundle);
+                });
+            }
         }
     }
 

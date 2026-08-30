@@ -47,6 +47,7 @@
     <string name="search_found_count">%1$d found</string>
     <string name="search_found_count_plural">%1$d+ found</string>
     <string name="bundled_logs_count">%1$d logs bundled</string>
+    <string name="bundle_tag">%1$d Bundle</string>
     <string name="view_all_bundled_logs">View all %1$d logs</string>
     <string name="bundle_detail_title">%1$s • %2$d Logs</string>
     <string name="open_app">Open App</string>

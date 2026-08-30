@@ -5,7 +5,7 @@
     android:id="@+id/card_bundle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="3dp"
+    android:layout_marginVertical="2.5dp"
     app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
@@ -17,113 +17,110 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="14dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="9dp">
 
-        <!-- Top Header: App Icon + Name + Bundle Badge + Time -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="top">
 
+            <!-- App Icon -->
             <ImageView
                 android:id="@+id/iv_app_icon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="2dp"
                 android:scaleType="centerCrop"
                 android:importantForAccessibility="no"
                 android:src="@android:drawable/sym_def_app_icon" />
 
+            <!-- Main Content -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="10dp">
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="6dp">
 
-                <TextView
-                    android:id="@+id/tv_app_name"
-                    android:layout_width="wrap_content"
+                <!-- Header: App Name + Bundle Tag Badge + Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                    android:textColor="?attr/colorPrimary"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tv_app_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                    <!-- Bundle Tag Badge beside Time -->
+                    <TextView
+                        android:id="@+id/tv_bundle_tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_widget_pill"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="1dp"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+                <!-- Title (Preview) -->
+                <TextView
+                    android:id="@+id/tv_preview_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
                     android:maxLines="1"
-                    android:ellipsize="end" />
+                    android:ellipsize="end"
+                    android:layout_marginTop="1dp" />
 
+                <!-- Text (Preview) -->
                 <TextView
-                    android:id="@+id/tv_bundle_count"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_preview_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_marginTop="1dp" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
-
-        </LinearLayout>
-
-        <!-- Divider line -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="?attr/colorOutlineVariant"
-            android:alpha="0.5" />
-
-        <!-- Preview of Latest Notification -->
-        <TextView
-            android:id="@+id/tv_preview_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <TextView
-            android:id="@+id/tv_preview_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:maxLines="2"
-            android:ellipsize="end" />
-
-        <!-- Footer Action Button -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tv_view_all_action"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/view_all_bundled_logs"
-                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_arrow_forward"
-                app:tint="?attr/colorPrimary" />
+            <!-- Star / Favorite Button (Vertically Centered) -->
+            <ImageButton
+                android:id="@+id/btn_favorite"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:background="@drawable/bg_button_circle_ripple"
+                android:src="@drawable/ic_star_border"
+                android:contentDescription="@string/desc_star" />
 
         </LinearLayout>
 
