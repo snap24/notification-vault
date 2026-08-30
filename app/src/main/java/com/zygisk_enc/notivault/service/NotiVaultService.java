@@ -138,9 +138,24 @@ public class NotiVaultService extends NotificationListenerService {
 
         // For MessagingStyle (e.g. WhatsApp, Telegram, Signal, Discord):
         if (messages != null && messages.length > 0) {
+            long latestMsgTime = messageTime;
+            for (Parcelable p : messages) {
+                if (p instanceof Bundle) {
+                    long t = ((Bundle) p).getLong("time");
+                    if (t > latestMsgTime) {
+                        latestMsgTime = t;
+                    }
+                }
+            }
+
             for (Parcelable p : messages) {
                 if (p instanceof Bundle) {
                     Bundle msgBundle = (Bundle) p;
+                    long msgTime = msgBundle.getLong("time");
+                    // Only extract photos belonging to the current burst (within 10s of latest message)
+                    if (latestMsgTime > 0 && msgTime > 0 && (latestMsgTime - msgTime) > 10 * 1000L) {
+                        continue; // Skip old unread backlog photos
+                    }
                     String mimeType = msgBundle.getString("type");
                     if (mimeType != null && (mimeType.startsWith("image/") || mimeType.startsWith("sticker/"))) {
                         Uri uri = msgBundle.getParcelable("uri");
