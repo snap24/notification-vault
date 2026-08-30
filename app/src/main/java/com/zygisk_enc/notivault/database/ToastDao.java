@@ -41,6 +41,9 @@ public interface ToastDao {
     @Query("SELECT * FROM toasts WHERE packageName = :packageName ORDER BY timestamp DESC LIMIT 1")
     ToastEntity getLastToastForPackageSync(String packageName);
 
+    @Query("SELECT * FROM toasts ORDER BY timestamp DESC LIMIT 1")
+    ToastEntity getLatestToastSync();
+
     @Query("UPDATE toasts SET duplicateCount = :count, timestamp = :timestamp WHERE id = :id")
     void updateDuplicate(long id, int count, long timestamp);
 }

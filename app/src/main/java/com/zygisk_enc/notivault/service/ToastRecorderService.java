@@ -41,10 +41,11 @@ public class ToastRecorderService extends AccessibilityService {
             try {
                 AppDatabase db = AppDatabase.getInstance(this);
                 long now = System.currentTimeMillis();
-                ToastEntity lastToast = db.toastDao().getLastToastForPackageSync(packageName);
+                ToastEntity lastToast = db.toastDao().getLatestToastSync();
+                boolean pkgMatches = lastToast != null && packageName != null && packageName.equals(lastToast.packageName);
 
                 boolean isDuplicate = false;
-                if (lastToast != null) {
+                if (lastToast != null && pkgMatches) {
                     String lastDecrypted = EncryptionHelper.decrypt(lastToast.text);
                     if (text.equals(lastDecrypted)) {
                         if (Math.abs(now - lastToast.timestamp) <= 1500L) {

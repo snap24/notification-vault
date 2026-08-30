@@ -222,10 +222,10 @@ public class NotiVaultService extends NotificationListenerService {
                 }
             }
 
-            // Check for duplicate consecutive notifications from the same app (within 10 minutes)
-            NotificationEntity lastNotif = db.notificationDao().getLastNotificationForPackage(entity.packageName);
+            // Check for duplicate consecutive notifications against the global latest notification card
+            NotificationEntity lastNotif = db.notificationDao().getLatestNotificationSync();
+            boolean pkgMatches = lastNotif != null && entity.packageName != null && entity.packageName.equals(lastNotif.packageName);
             
-            // Background thread image extraction
             // Background thread image extraction
             Bitmap finalBitmap = null;
             if (finalImageUri != null) {
@@ -243,7 +243,7 @@ public class NotiVaultService extends NotificationListenerService {
             }
 
             // Suppress duplicate image if identical to last notification's saved image (3-tier: Size, URI, SHA-256)
-            if (incomingPlainBytes != null && lastNotif != null && lastNotif.imagePath != null) {
+            if (incomingPlainBytes != null && lastNotif != null && pkgMatches && lastNotif.imagePath != null) {
                 if (isDuplicateImage(incomingPlainBytes, lastNotif.imagePath)) {
                     incomingPlainBytes = null;
                     finalBitmap = null;
@@ -253,10 +253,10 @@ public class NotiVaultService extends NotificationListenerService {
             boolean isDuplicate = false;
             boolean isPhotoSessionCoalesced = false;
             boolean isIncomingImage = (incomingPlainBytes != null);
-            boolean lastIsImage = (lastNotif != null && lastNotif.imagePath != null && !lastNotif.imagePath.isEmpty());
+            boolean lastIsImage = (lastNotif != null && pkgMatches && lastNotif.imagePath != null && !lastNotif.imagePath.isEmpty());
             boolean isMediaEvent = isIncomingImage || isPhotoMessageText(finalText) || isPhotoMessageText(finalBigText);
 
-            if (lastNotif != null) {
+            if (lastNotif != null && pkgMatches) {
                 // Decrypt last recorded values to compare plain texts
                 String lastTitle = EncryptionHelper.decrypt(lastNotif.title);
                 String lastText = EncryptionHelper.decrypt(lastNotif.text);

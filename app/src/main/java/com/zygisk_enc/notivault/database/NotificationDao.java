@@ -163,6 +163,9 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications WHERE packageName = :packageName ORDER BY timestamp DESC LIMIT 1")
     NotificationEntity getLastNotificationForPackage(String packageName);
 
+    @Query("SELECT * FROM notifications ORDER BY timestamp DESC LIMIT 1")
+    NotificationEntity getLatestNotificationSync();
+
     @Query("UPDATE notifications SET duplicateCount = :count, timestamp = :timestamp, isRead = 0 WHERE id = :id")
     void updateDuplicate(long id, int count, long timestamp);
 
