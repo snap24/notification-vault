@@ -246,10 +246,10 @@ public class NotificationViewModel extends AndroidViewModel {
                                         chunkResults[chunkIndex].add(entity);
                                     }
 
-                                    // 10% progressive streaming for initial load (0-500 items) for instant render
-                                    if (isInitialLoad) {
+                                    // 10% progressive streaming for initial load (0-500 items) up to 50% only (10%, 20%, 30%, 40%, 50%)
+                                    if (isInitialLoad && progress <= 50) {
                                         int milestone = progress / 10;
-                                        boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
+                                        boolean milestoneTrigger = (milestone > 0 && milestone <= 5 && milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
                                         if (milestoneTrigger && runToken == currentRunToken) {
                                             java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
                                             for (int k = 0; k < numChunks; k++) {
