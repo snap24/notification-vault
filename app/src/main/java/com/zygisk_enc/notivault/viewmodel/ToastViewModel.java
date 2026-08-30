@@ -150,24 +150,26 @@ public class ToastViewModel extends AndroidViewModel {
                 final Long dateEnd = filterDateEnd.getValue();
                 final String filterPkg = filterPackage.getValue();
 
-                // Aggressive multi-core slicing across all available CPU cores (up to 8 threads)
-                int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 7) / 8));
-                int chunkSize = (total + numChunks - 1) / numChunks;
+                final int BATCH_SIZE = 400;
+                final int phase1Total = Math.min(total, BATCH_SIZE);
+                final boolean hasPhase2 = total > BATCH_SIZE;
+
+                // Phase 1: Decrypt top 400 items across all cores and publish immediately
+                int numChunks1 = Math.min(PARALLEL_THREADS, Math.max(1, (phase1Total + 7) / 8));
+                int chunkSize1 = (phase1Total + numChunks1 - 1) / numChunks1;
 
                 java.util.concurrent.atomic.AtomicInteger processedCount = new java.util.concurrent.atomic.AtomicInteger(0);
-                java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numChunks);
+                java.util.concurrent.CountDownLatch latch1 = new java.util.concurrent.CountDownLatch(numChunks1);
                 @SuppressWarnings("unchecked")
-                final java.util.List<ToastEntity>[] chunkResults = new java.util.List[numChunks];
-                for (int c = 0; c < numChunks; c++) {
-                    chunkResults[c] = java.util.Collections.synchronizedList(new ArrayList<>());
+                final java.util.List<ToastEntity>[] chunkResults1 = new java.util.List[numChunks1];
+                for (int c = 0; c < numChunks1; c++) {
+                    chunkResults1[c] = java.util.Collections.synchronizedList(new ArrayList<>());
                 }
 
-                final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
-
-                for (int c = 0; c < numChunks; c++) {
+                for (int c = 0; c < numChunks1; c++) {
                     final int chunkIndex = c;
-                    final int startIdx = c * chunkSize;
-                    final int endIdx = Math.min(total, startIdx + chunkSize);
+                    final int startIdx = c * chunkSize1;
+                    final int endIdx = Math.min(phase1Total, startIdx + chunkSize1);
 
                     parallelDecryptionPool.execute(() -> {
                         try {
@@ -210,52 +212,119 @@ public class ToastViewModel extends AndroidViewModel {
                                     }
                                 }
 
-                                chunkResults[chunkIndex].add(entity);
-
-                                // Progressive batch streaming for fast visual feedback
-                                int milestone = progress / 10;
-                                boolean milestoneTrigger = (milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
-
-                                if (milestoneTrigger && runToken == currentRunToken) {
-                                    List<ToastEntity> snapshot = new ArrayList<>();
-                                    for (int k = 0; k < numChunks; k++) {
-                                        synchronized (chunkResults[k]) {
-                                            snapshot.addAll(chunkResults[k]);
-                                        }
-                                    }
-                                    if (!snapshot.isEmpty() && runToken == currentRunToken) {
-                                        toasts.postValue(snapshot);
-                                    }
-                                }
+                                chunkResults1[chunkIndex].add(entity);
                             }
                         } finally {
-                            latch.countDown();
+                            latch1.countDown();
                         }
                     });
                 }
 
-                // Wait for all parallel workers
-                latch.await();
-
+                latch1.await();
                 if (runToken != currentRunToken) return;
 
-                // Final complete list in strict order
-                List<ToastEntity> finalMerged = new ArrayList<>(total);
-                for (int k = 0; k < numChunks; k++) {
-                    synchronized (chunkResults[k]) {
-                        finalMerged.addAll(chunkResults[k]);
+                // Assemble Phase 1 matches in strict order
+                List<ToastEntity> phase1Matches = new ArrayList<>(phase1Total);
+                for (int k = 0; k < numChunks1; k++) {
+                    synchronized (chunkResults1[k]) {
+                        phase1Matches.addAll(chunkResults1[k]);
                     }
                 }
 
                 if (runToken == currentRunToken) {
-                    toasts.postValue(finalMerged);
-                    if (showProgress) {
-                        loadProgress.postValue(100);
-                        try { Thread.sleep(250); } catch (InterruptedException ignored) {}
-                    }
-                    loadProgress.postValue(-1);
-                    isLoading.postValue(false);
+                    toasts.postValue(phase1Matches);
                 }
+
+                if (hasPhase2) {
+                    // Phase 2: Decrypt remaining items (401..total) in background and append at the bottom
+                    final int phase2Total = total - BATCH_SIZE;
+                    int numChunks2 = Math.min(PARALLEL_THREADS, Math.max(1, (phase2Total + 7) / 8));
+                    int chunkSize2 = (phase2Total + numChunks2 - 1) / numChunks2;
+
+                    java.util.concurrent.CountDownLatch latch2 = new java.util.concurrent.CountDownLatch(numChunks2);
+                    @SuppressWarnings("unchecked")
+                    final java.util.List<ToastEntity>[] chunkResults2 = new java.util.List[numChunks2];
+                    for (int c = 0; c < numChunks2; c++) {
+                        chunkResults2[c] = java.util.Collections.synchronizedList(new ArrayList<>());
+                    }
+
+                    for (int c = 0; c < numChunks2; c++) {
+                        final int chunkIndex = c;
+                        final int startIdx = BATCH_SIZE + (c * chunkSize2);
+                        final int endIdx = Math.min(total, startIdx + chunkSize2);
+
+                        parallelDecryptionPool.execute(() -> {
+                            try {
+                                for (int i = startIdx; i < endIdx; i++) {
+                                    if (runToken != currentRunToken) return;
+
+                                    ToastEntity entity = list.get(i);
+
+                                    // 1. Filter by date
+                                    if (dateStart != null && dateEnd != null) {
+                                        if (entity.timestamp < dateStart || entity.timestamp > dateEnd) {
+                                            continue;
+                                        }
+                                    }
+
+                                    // 2. Filter by app package
+                                    if (filterPkg != null && !filterPkg.isEmpty()) {
+                                        if (!filterPkg.equalsIgnoreCase(entity.packageName)) {
+                                            continue;
+                                        }
+                                    }
+
+                                    // 3. Check cache / decrypt text
+                                    String cached = decryptedToastCache.get(entity.id);
+                                    if (cached != null) {
+                                        entity.decryptedText = cached;
+                                    } else if (entity.decryptedText == null) {
+                                        entity.decryptedText = EncryptionHelper.decrypt(entity.text);
+                                        if (entity.decryptedText != null) {
+                                            decryptedToastCache.put(entity.id, entity.decryptedText);
+                                        }
+                                    }
+
+                                    int processed = processedCount.incrementAndGet();
+                                    int progress = (processed * 100) / total;
+
+                                    if (showProgress && (processed % 20 == 0 || processed == total)) {
+                                        if (runToken == currentRunToken) {
+                                            loadProgress.postValue(progress);
+                                        }
+                                    }
+
+                                    chunkResults2[chunkIndex].add(entity);
+                                }
+                            } finally {
+                                latch2.countDown();
+                            }
+                        });
+                    }
+
+                    latch2.await();
+                    if (runToken != currentRunToken) return;
+
+                    // Assemble complete merged list: Phase 1 + Phase 2 appended at bottom
+                    List<ToastEntity> finalMerged = new ArrayList<>(total);
+                    finalMerged.addAll(phase1Matches);
+                    for (int k = 0; k < numChunks2; k++) {
+                        synchronized (chunkResults2[k]) {
+                            finalMerged.addAll(chunkResults2[k]);
+                        }
+                    }
+
+                    if (runToken == currentRunToken) {
+                        toasts.postValue(finalMerged);
+                    }
+                }
+
+                if (showProgress) {
+                    loadProgress.postValue(100);
+                    try { Thread.sleep(250); } catch (InterruptedException ignored) {}
+                }
+                loadProgress.postValue(-1);
+                isLoading.postValue(false);
             } catch (Exception e) {
                 e.printStackTrace();
                 if (runToken == currentRunToken) {
