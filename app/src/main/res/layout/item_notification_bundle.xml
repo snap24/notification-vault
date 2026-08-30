@@ -5,8 +5,8 @@
     android:id="@+id/card_bundle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="2.5dp"
-    app:cardCornerRadius="14dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
     app:strokeColor="?attr/colorOutlineVariant"
@@ -17,8 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="9dp">
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="12dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,8 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="6dp">
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp">
 
                 <!-- Header: App Name + Bundle Tag Badge + Time -->
                 <LinearLayout
@@ -68,10 +68,10 @@
                         android:id="@+id/tv_bundle_tag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="8dp"
                         android:background="@drawable/bg_widget_pill"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
+                        android:paddingHorizontal="9dp"
+                        android:paddingVertical="2.5dp"
                         android:textSize="12sp"
                         android:textColor="@color/bundle_tag_green"
                         android:textStyle="bold" />
@@ -95,7 +95,7 @@
                     android:textColor="?attr/colorOnSurface"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:layout_marginTop="1dp" />
+                    android:layout_marginTop="3dp" />
 
                 <!-- Text (Preview) -->
                 <TextView
@@ -106,7 +106,7 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:maxLines="2"
                     android:ellipsize="end"
-                    android:layout_marginTop="1dp" />
+                    android:layout_marginTop="2dp" />
 
             </LinearLayout>
 
