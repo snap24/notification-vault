@@ -24,7 +24,7 @@ public class NotificationViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> openSearchEvent = new MutableLiveData<>(false);
     private final MediatorLiveData<List<NotificationEntity>> notifications = new MediatorLiveData<>();
     private LiveData<List<NotificationEntity>> currentSource = null;
-    private final LiveData<List<AppSummary>> appSummaries;
+    private final MediatorLiveData<List<AppSummary>> appSummaries = new MediatorLiveData<>();
     private final LiveData<Integer> unreadCount;
 
     public static class DecryptedText {
@@ -91,7 +91,9 @@ public class NotificationViewModel extends AndroidViewModel {
     public NotificationViewModel(Application application) {
         super(application);
         repository = new NotificationRepository(application);
-        appSummaries = repository.getAppSummaries();
+        appSummaries.addSource(repository.getAppSummaries(), list -> {
+            appSummaries.setValue(list != null ? list : new java.util.ArrayList<>());
+        });
         unreadCount = repository.getUnreadCount();
 
         notifications.addSource(searchQuery, query -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
@@ -379,6 +381,13 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public LiveData<List<AppSummary>> getAppSummaries() {
         return appSummaries;
+    }
+
+    public void refreshAppSummaries() {
+        coordinatorExecutor.execute(() -> {
+            List<AppSummary> list = repository.getAppSummariesSync();
+            appSummaries.postValue(list != null ? list : new java.util.ArrayList<>());
+        });
     }
 
     public LiveData<Integer> getUnreadCount() {

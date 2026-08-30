@@ -235,6 +235,10 @@ public class NotificationRepository {
         return dao.getAppSummaries();
     }
 
+    public List<AppSummary> getAppSummariesSync() {
+        return dao.getAppSummariesSync();
+    }
+
     public LiveData<Integer> getUnreadCount() {
         return dao.getUnreadCount();
     }

@@ -153,6 +153,7 @@ public class AppsFragment extends Fragment {
                 binding.recyclerView.setVisibility(View.GONE);
                 binding.tvAppsHeaderSummary.setText(R.string.zero_tracked_apps);
                 binding.tvTotalNotificationsBadge.setText(R.string.zero_alerts);
+                adapter.submitList(new ArrayList<>());
                 exitSelectionMode();
             } else {
                 binding.emptyState.setVisibility(View.GONE);
@@ -385,6 +386,14 @@ public class AppsFragment extends Fragment {
                 .build();
 
         biometricPrompt.authenticate(promptInfo);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.refreshAppSummaries();
+        }
     }
 
     @Override
