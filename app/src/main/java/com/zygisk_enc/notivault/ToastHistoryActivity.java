@@ -72,11 +72,11 @@ public class ToastHistoryActivity extends BaseActivity {
         viewModel.getIsLoading().observe(this, loading -> updateUI());
 
         viewModel.getLoadProgress().observe(this, progress -> {
-            if (progress == null || progress < 0) {
-                binding.tvLoadProgress.setVisibility(View.GONE);
+            if (progress == null || progress < 0 || progress >= 100) {
+                binding.cardToolbarDecryption.setVisibility(View.GONE);
             } else {
-                binding.tvLoadProgress.setVisibility(View.VISIBLE);
-                binding.tvLoadProgress.setText(getString(R.string.decrypting_progress, progress));
+                binding.cardToolbarDecryption.setVisibility(View.VISIBLE);
+                binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, progress));
             }
         });
 

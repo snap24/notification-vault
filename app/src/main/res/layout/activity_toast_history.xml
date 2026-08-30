@@ -27,6 +27,49 @@
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:navigationIcon="?attr/homeAsUpIndicator">
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_toolbar_decryption"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="20dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:indicatorSize="12dp"
+                        app:trackThickness="2dp"
+                        app:indicatorColor="?attr/colorOnPrimaryContainer"
+                        app:trackColor="?attr/colorPrimaryContainer"
+                        android:indeterminate="true" />
+
+                    <TextView
+                        android:id="@+id/tv_toolbar_decryption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Decrypting... 45%"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_source"
                 android:layout_width="wrap_content"
@@ -70,20 +113,6 @@
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 android:textColor="?attr/colorSecondary"
                 android:text="@string/showing_all_toasts" />
-
-            <!-- Decryption progress indicator -->
-            <TextView
-                android:id="@+id/tv_load_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="Decrypting... 45%" />
 
             <ImageButton
                 android:id="@+id/btn_filter_app"
