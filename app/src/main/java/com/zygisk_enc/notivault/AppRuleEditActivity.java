@@ -125,7 +125,7 @@ public class AppRuleEditActivity extends BaseActivity {
         AppExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(this);
             AppRuleEntity existing = db.appRuleDao().getRuleSync(packageName);
-            boolean blockAll = existing != null && existing.blockAll;
+            boolean blockAll = isRuleEnabled ? false : (existing != null && existing.blockAll);
 
             AppRuleEntity newRule = new AppRuleEntity(packageName, appName, blockAll, blockKeywords, allowKeywords, isRuleEnabled);
             db.appRuleDao().insert(newRule);

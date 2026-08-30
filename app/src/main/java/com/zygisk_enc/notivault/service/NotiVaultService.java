@@ -215,10 +215,6 @@ public class NotiVaultService extends NotificationListenerService {
             // Check App Rules before inserting (using original plain-text values)
             AppRuleEntity rule = db.appRuleDao().getRuleSync(entity.packageName);
             if (rule != null) {
-                if (rule.blockAll) {
-                    return; // Skip recording entirely
-                }
-                
                 if (rule.isRuleEnabled) {
                     String content = (finalTitle + " " + finalText + " " + (finalBigText != null ? finalBigText : "")).trim();
                     
@@ -246,6 +242,8 @@ public class NotiVaultService extends NotificationListenerService {
                             return; // None of the allow keywords matched, skip recording
                         }
                     }
+                } else if (rule.blockAll) {
+                    return; // Skip recording entirely
                 }
             }
 
