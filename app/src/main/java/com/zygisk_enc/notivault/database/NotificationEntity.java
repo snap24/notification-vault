@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey;
     tableName = "notifications",
     indices = {
         @androidx.room.Index("packageName"),
-        @androidx.room.Index("timestamp")
+        @androidx.room.Index("timestamp"),
+        @androidx.room.Index("bundleId")
     }
 )
 public class NotificationEntity {
@@ -23,6 +24,7 @@ public class NotificationEntity {
     public boolean isFavorite;
     public int duplicateCount;
     public String imagePath;
+    public String bundleId;
 
     @androidx.room.Ignore
     public String decryptedTitle = null;
@@ -43,5 +45,6 @@ public class NotificationEntity {
         this.isFavorite = false;
         this.duplicateCount = 1;
         this.imagePath = null;
+        this.bundleId = null;
     }
 }

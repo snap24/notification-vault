@@ -365,6 +365,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
+        // Bundle missed logs click
+        Preference bundleMissedLogsPref = findPreference("bundle_missed_logs");
+        if (bundleMissedLogsPref != null) {
+            bundleMissedLogsPref.setOnPreferenceClickListener(pref -> {
+                Toast.makeText(requireContext(), R.string.toast_bundling_started, Toast.LENGTH_SHORT).show();
+                com.zygisk_enc.notivault.util.BundleManager.triggerManualBundling(requireContext(), new com.zygisk_enc.notivault.util.BundleManager.BundlingCallback() {
+                    @Override public void onProgress(int progress) {}
+                    @Override
+                    public void onComplete() {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                Toast.makeText(requireContext(), R.string.toast_bundling_complete, Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+                    @Override public void onError(Exception e) {}
+                });
+                return true;
+            });
+        }
+
         // Favorites click listener
         Preference favoritesPref = findPreference("favorites_list");
         if (favoritesPref != null) {

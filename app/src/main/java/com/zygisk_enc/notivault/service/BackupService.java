@@ -165,24 +165,19 @@ public class BackupService extends Service {
                 com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
                         com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING, 100);
 
-                com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
-                    try { Thread.sleep(400); } catch (InterruptedException ignored) {}
-                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
-                            com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE, -1);
-                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+                com.zygisk_enc.notivault.util.BundleManager.triggerPostImportBundling(BackupService.this, () -> {
+                    Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
+                            .setContentTitle(getString(R.string.importing_backup_title))
+                            .setContentText(getString(R.string.backup_import_success))
+                            .setSmallIcon(R.drawable.ic_notification)
+                            .setProgress(0, 0, false)
+                            .setOngoing(false)
+                            .build();
+
+                    notificationManager.notify(NOTIFICATION_ID, successNotification);
+                    stopForeground(STOP_FOREGROUND_DETACH);
+                    stopSelf();
                 });
-
-                Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
-                        .setContentTitle(getString(R.string.importing_backup_title))
-                        .setContentText(getString(R.string.backup_import_success))
-                        .setSmallIcon(R.drawable.ic_notification)
-                        .setProgress(0, 0, false)
-                        .setOngoing(false)
-                        .build();
-
-                notificationManager.notify(NOTIFICATION_ID, successNotification);
-                stopForeground(STOP_FOREGROUND_DETACH);
-                stopSelf();
             }
 
             @Override

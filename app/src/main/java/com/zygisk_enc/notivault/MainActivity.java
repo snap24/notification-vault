@@ -100,6 +100,9 @@ public class MainActivity extends BaseActivity {
         // Ensure database search tokens are indexed in background
         com.zygisk_enc.notivault.util.BlindIndexManager.ensureDatabaseIndexed(this);
 
+        // Check and trigger background database bundling (first 3 opens + weekly maintenance)
+        com.zygisk_enc.notivault.util.BundleManager.checkAndTriggerAppLaunchBundling(this);
+
         com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
                 new androidx.lifecycle.ViewModelProvider(this)
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
@@ -116,6 +119,8 @@ public class MainActivity extends BaseActivity {
                     binding.tvToolbarDecryption.setText(getString(R.string.deleting_progress, op.progress));
                 } else if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING) {
                     binding.tvToolbarDecryption.setText(getString(R.string.importing_progress, op.progress));
+                } else if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_BUNDLING) {
+                    binding.tvToolbarDecryption.setText(getString(R.string.bundling_progress, op.progress));
                 } else {
                     binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, op.progress));
                 }

@@ -5,7 +5,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 10, exportSchema = false)
+@Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 11, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -84,6 +84,14 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    public static final androidx.room.migration.Migration MIGRATION_10_11 = new androidx.room.migration.Migration(10, 11) {
+        @Override
+        public void migrate(@androidx.annotation.NonNull androidx.sqlite.db.SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE `notifications` ADD COLUMN `bundleId` TEXT DEFAULT NULL");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_notifications_bundleId` ON `notifications` (`bundleId`)");
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -93,7 +101,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "notivault_database"
                     )
-                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                     .build();
                 }
             }

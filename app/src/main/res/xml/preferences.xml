@@ -118,6 +118,12 @@
             app:summary="@string/pref_import_backup_summary"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            app:key="bundle_missed_logs"
+            app:title="@string/pref_bundle_missed_logs_title"
+            app:summary="@string/pref_bundle_missed_logs_summary"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/pref_category_rules">

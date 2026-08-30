@@ -50,6 +50,7 @@ public class NotificationViewModel extends AndroidViewModel {
         public static final int TYPE_DECRYPTING = 1;
         public static final int TYPE_DELETING = 2;
         public static final int TYPE_IMPORTING = 3;
+        public static final int TYPE_BUNDLING = 4;
 
         public final int type;
         public final int progress;
@@ -129,7 +130,7 @@ public class NotificationViewModel extends AndroidViewModel {
     private void postDecryptionProgress(long runToken, int progress) {
         if (runToken != currentRunToken) return;
         OperationProgress currentOp = globalOperationProgress.getValue();
-        if (currentOp != null && currentOp.type == OperationProgress.TYPE_IMPORTING && currentOp.progress >= 0) {
+        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
         }
         loadProgress.postValue(progress);
@@ -139,7 +140,7 @@ public class NotificationViewModel extends AndroidViewModel {
     private void clearOperationProgress(long runToken) {
         if (runToken != currentRunToken) return;
         OperationProgress currentOp = globalOperationProgress.getValue();
-        if (currentOp != null && currentOp.type == OperationProgress.TYPE_IMPORTING && currentOp.progress >= 0) {
+        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
         }
         loadProgress.postValue(-1);
@@ -214,6 +215,9 @@ public class NotificationViewModel extends AndroidViewModel {
 
             coordinatorExecutor.execute(() -> {
                 try {
+                    while (com.zygisk_enc.notivault.util.BundleManager.isBundlingInProgress()) {
+                        try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+                    }
                     if (runToken != currentRunToken) return;
 
                     final int total = list.size();
@@ -687,6 +691,7 @@ public class NotificationViewModel extends AndroidViewModel {
                 e1.isFavorite != e2.isFavorite ||
                 e1.duplicateCount != e2.duplicateCount ||
                 e1.timestamp != e2.timestamp ||
+                !equalsNullable(e1.bundleId, e2.bundleId) ||
                 !equalsNullable(e1.imagePath, e2.imagePath)) {
                 return false;
             }

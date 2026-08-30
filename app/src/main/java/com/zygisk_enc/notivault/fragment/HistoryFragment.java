@@ -775,24 +775,43 @@ public class HistoryFragment extends Fragment {
 
             // Process all items in this date group
             while (i < size && DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup)) {
-                String pkg = notifications.get(i).packageName;
-                int streakStart = i;
+                NotificationEntity current = notifications.get(i);
 
-                // Scan consecutive items from the exact same package within the same date group
-                while (i < size &&
-                        DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup) &&
-                        pkg != null && pkg.equals(notifications.get(i).packageName)) {
-                    i++;
-                }
+                if (current.bundleId != null && !current.bundleId.isEmpty()) {
+                    String bundleId = current.bundleId;
+                    String pkg = current.packageName;
+                    int streakStart = i;
 
-                int streakCount = i - streakStart;
-                if (streakCount >= 10) {
+                    while (i < size &&
+                            DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup) &&
+                            bundleId.equals(notifications.get(i).bundleId)) {
+                        i++;
+                    }
+
                     List<NotificationEntity> bundleItems = new ArrayList<>(notifications.subList(streakStart, i));
                     String appName = bundleItems.get(0).appName;
                     result.add(new NotificationAdapter.ListItem(new NotificationAdapter.NotificationBundle(pkg, appName, bundleItems)));
                 } else {
-                    for (int j = streakStart; j < i; j++) {
-                        result.add(new NotificationAdapter.ListItem(notifications.get(j)));
+                    String pkg = current.packageName;
+                    int streakStart = i;
+
+                    // Scan consecutive unbundled items from the exact same package
+                    while (i < size &&
+                            DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup) &&
+                            (notifications.get(i).bundleId == null || notifications.get(i).bundleId.isEmpty()) &&
+                            pkg != null && pkg.equals(notifications.get(i).packageName)) {
+                        i++;
+                    }
+
+                    int streakCount = i - streakStart;
+                    if (streakCount >= 10) {
+                        List<NotificationEntity> bundleItems = new ArrayList<>(notifications.subList(streakStart, i));
+                        String appName = bundleItems.get(0).appName;
+                        result.add(new NotificationAdapter.ListItem(new NotificationAdapter.NotificationBundle(pkg, appName, bundleItems)));
+                    } else {
+                        for (int j = streakStart; j < i; j++) {
+                            result.add(new NotificationAdapter.ListItem(notifications.get(j)));
+                        }
                     }
                 }
             }

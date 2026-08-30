@@ -171,4 +171,23 @@ public interface NotificationDao {
 
     @Query("UPDATE notifications SET text = :text, bigText = :bigText, timestamp = :timestamp, imagePath = :imagePath, duplicateCount = :count, isRead = 0 WHERE id = :id")
     void updatePhotoSession(long id, String text, String bigText, long timestamp, String imagePath, int count);
+
+    public static class BundleScanItem {
+        public long id;
+        public String packageName;
+        public String bundleId;
+        public long timestamp;
+    }
+
+    @Query("SELECT id, packageName, bundleId, timestamp FROM notifications ORDER BY timestamp DESC, id DESC")
+    List<BundleScanItem> getAllBundleScanItemsSync();
+
+    @Query("UPDATE notifications SET bundleId = :bundleId WHERE id IN (:ids)")
+    void updateBundleIdForIds(List<Long> ids, String bundleId);
+
+    @Query("UPDATE notifications SET bundleId = NULL WHERE bundleId IS NOT NULL")
+    void clearAllBundleIds();
+
+    @Query("SELECT * FROM notifications WHERE bundleId = :bundleId ORDER BY timestamp DESC, id DESC")
+    List<NotificationEntity> getNotificationsByBundleIdSync(String bundleId);
 }
