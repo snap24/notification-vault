@@ -637,13 +637,29 @@ public class HistoryFragment extends Fragment {
                         }
                     }
 
-                    adapter.submitList(buildListWithHeaders(notifications));
-
-                    if (layoutManager != null && firstVisiblePos >= 0) {
-                        layoutManager.scrollToPositionWithOffset(firstVisiblePos, topOffset);
-                    }
+                    final int restorePos = firstVisiblePos;
+                    final int restoreOffset = topOffset;
+                    adapter.submitList(buildListWithHeaders(notifications), () -> {
+                        if (binding != null && layoutManager != null && restorePos >= 0) {
+                            layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
+                        }
+                    });
                 } else {
-                    adapter.submitList(buildListWithHeaders(notifications));
+                    adapter.submitList(buildListWithHeaders(notifications), () -> {
+                        if (binding != null) {
+                            Boolean scroll = viewModel.getScrollToTopEvent().getValue();
+                            if (scroll != null && scroll) {
+                                viewModel.clearScrollToTopEvent();
+                                androidx.recyclerview.widget.LinearLayoutManager lm = 
+                                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                                if (lm != null) {
+                                    lm.scrollToPositionWithOffset(0, 0);
+                                } else {
+                                    binding.recyclerView.scrollToPosition(0);
+                                }
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -651,8 +667,13 @@ public class HistoryFragment extends Fragment {
         viewModel.getScrollToTopEvent().observe(getViewLifecycleOwner(), scroll -> {
             if (scroll != null && scroll) {
                 closeSearchBox();
-                binding.recyclerView.scrollToPosition(0);
-                viewModel.clearScrollToTopEvent();
+                androidx.recyclerview.widget.LinearLayoutManager lm = 
+                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                if (lm != null) {
+                    lm.scrollToPositionWithOffset(0, 0);
+                } else {
+                    binding.recyclerView.scrollToPosition(0);
+                }
             }
         });
 

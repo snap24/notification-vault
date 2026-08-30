@@ -119,6 +119,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         differ.submitList(newItems);
     }
 
+    public void submitList(List<ListItem> newItems, Runnable commitCallback) {
+        differ.submitList(newItems, commitCallback);
+    }
+
     public ListItem getItem(int position) {
         return differ.getCurrentList().get(position);
     }
