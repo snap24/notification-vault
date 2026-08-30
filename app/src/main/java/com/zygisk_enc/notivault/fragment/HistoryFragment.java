@@ -304,7 +304,7 @@ public class HistoryFragment extends Fragment {
                     viewModel.setSearchQuery(null);
                 } else {
                     searchDebounceRunnable = () -> viewModel.setSearchQuery(query);
-                    searchDebounceHandler.postDelayed(searchDebounceRunnable, 250);
+                    searchDebounceHandler.postDelayed(searchDebounceRunnable, 100);
                 }
             }
         });
