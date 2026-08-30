@@ -268,11 +268,11 @@ public class NotiVaultService extends NotificationListenerService {
                 
                 boolean titleMatches = (finalTitle == null && lastTitle == null) || (finalTitle != null && finalTitle.equals(lastTitle));
                 boolean textMatches = (finalText == null && lastText == null) || (finalText != null && finalText.equals(lastText));
-                boolean timeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 15 * 1000L;
                 boolean photoTimeMatches = Math.abs(entity.timestamp - lastNotif.timestamp) <= 15 * 1000L;
+                boolean lastIsPhotoPlaceholder = (lastNotif.imagePath == null || lastNotif.imagePath.isEmpty()) && isPhotoMessageText(lastText);
 
-                // 1. IMAGE SESSION COALESCING: Group if previous is an active image card within 15s and current is media/photo update
-                if (lastIsImage && titleMatches && photoTimeMatches && (isIncomingImage || isMediaEvent)) {
+                // 1. IMAGE SESSION COALESCING: Group/upgrade if previous is an active image card or photo placeholder within 15s
+                if ((lastIsImage || lastIsPhotoPlaceholder) && titleMatches && photoTimeMatches && (isIncomingImage || isMediaEvent)) {
                     String updatedImagePath = lastNotif.imagePath;
                     int newCount = lastNotif.duplicateCount;
 
@@ -289,6 +289,8 @@ public class NotiVaultService extends NotificationListenerService {
                         }
                     } else if (updatedImagePath != null && !updatedImagePath.isEmpty()) {
                         newCount = updatedImagePath.split("\\|").length;
+                    } else {
+                        newCount = 1;
                     }
 
                     // Format text to show the aggregate count: "📷 X photos" (or preserve user caption if present)
