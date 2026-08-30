@@ -25,6 +25,8 @@ import android.os.Parcelable;
 import android.util.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.ArrayList;
 
 public class NotiVaultService extends NotificationListenerService {
 
@@ -131,21 +133,27 @@ public class NotiVaultService extends NotificationListenerService {
         }
 
         // Extract picture attachments (if any)
-        Uri imageUri = null;
+        List<Uri> imageUris = new ArrayList<>();
         Bitmap mainPicture = null;
 
         // For MessagingStyle (e.g. WhatsApp, Telegram, Signal, Discord):
         if (messages != null && messages.length > 0) {
-            Parcelable lastMsgParcel = messages[messages.length - 1];
-            if (lastMsgParcel instanceof Bundle) {
-                Bundle msgBundle = (Bundle) lastMsgParcel;
-                String mimeType = msgBundle.getString("type");
-                if (mimeType != null && (mimeType.startsWith("image/") || mimeType.startsWith("sticker/"))) {
-                    imageUri = msgBundle.getParcelable("uri");
+            for (Parcelable p : messages) {
+                if (p instanceof Bundle) {
+                    Bundle msgBundle = (Bundle) p;
+                    String mimeType = msgBundle.getString("type");
+                    if (mimeType != null && (mimeType.startsWith("image/") || mimeType.startsWith("sticker/"))) {
+                        Uri uri = msgBundle.getParcelable("uri");
+                        if (uri != null && !imageUris.contains(uri)) {
+                            imageUris.add(uri);
+                        }
+                    }
                 }
             }
-        } else {
-            // For standard single notifications (e.g. Screenshots, Instagram posts, MMS, etc.)
+        }
+        
+        // Fallback for standard single notifications (e.g. Screenshots, Instagram posts, MMS, etc.)
+        if (imageUris.isEmpty()) {
             if (extras.containsKey(Notification.EXTRA_PICTURE)) {
                 Object picture = extras.get(Notification.EXTRA_PICTURE);
                 if (picture instanceof Bitmap) {
@@ -163,7 +171,7 @@ public class NotiVaultService extends NotificationListenerService {
         }
 
         // Skip truly empty notifications (no text, no bigText, no subText, and no image)
-        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text) && TextUtils.isEmpty(bigText) && mainPicture == null && imageUri == null) {
+        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text) && TextUtils.isEmpty(bigText) && mainPicture == null && imageUris.isEmpty()) {
             return;
         }
 
@@ -182,7 +190,7 @@ public class NotiVaultService extends NotificationListenerService {
         final String finalText = text;
         final String finalBigText = bigText;
 
-        final Uri finalImageUri = imageUri;
+        final List<Uri> finalImageUris = imageUris;
         final Bitmap finalMainPicture = mainPicture;
 
         executor.execute(() -> {
@@ -232,32 +240,35 @@ public class NotiVaultService extends NotificationListenerService {
             boolean pkgMatches = lastNotif != null && entity.packageName != null && entity.packageName.equals(lastNotif.packageName);
             
             // Background thread image extraction
-            Bitmap finalBitmap = null;
-            if (finalImageUri != null) {
-                finalBitmap = getBitmapFromUri(finalImageUri);
-            }
-            if (finalBitmap == null && finalMainPicture != null) {
-                finalBitmap = finalMainPicture;
-            }
-
-            byte[] incomingPlainBytes = null;
-            if (finalBitmap != null) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
-                incomingPlainBytes = baos.toByteArray();
-            }
-
-            // Suppress duplicate image if identical to last notification's saved image (3-tier: Size, URI, SHA-256)
-            if (incomingPlainBytes != null && lastNotif != null && pkgMatches && lastNotif.imagePath != null) {
-                if (isDuplicateImage(incomingPlainBytes, lastNotif.imagePath)) {
-                    incomingPlainBytes = null;
-                    finalBitmap = null;
+            List<byte[]> incomingPlainByteList = new ArrayList<>();
+            if (finalImageUris != null && !finalImageUris.isEmpty()) {
+                for (Uri u : finalImageUris) {
+                    Bitmap bmp = getBitmapFromUri(u);
+                    if (bmp != null) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                        incomingPlainByteList.add(baos.toByteArray());
+                    }
                 }
+            }
+            if (incomingPlainByteList.isEmpty() && finalMainPicture != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                finalMainPicture.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                incomingPlainByteList.add(baos.toByteArray());
+            }
+
+            // Suppress images that are already saved in lastNotif's imagePath
+            List<byte[]> newImagesToSave = new ArrayList<>();
+            for (byte[] b : incomingPlainByteList) {
+                if (lastNotif != null && pkgMatches && lastNotif.imagePath != null && isDuplicateImage(b, lastNotif.imagePath)) {
+                    continue; // Already saved in this album
+                }
+                newImagesToSave.add(b);
             }
 
             boolean isDuplicate = false;
             boolean isPhotoSessionCoalesced = false;
-            boolean isIncomingImage = (incomingPlainBytes != null);
+            boolean isIncomingImage = !incomingPlainByteList.isEmpty();
             boolean lastIsImage = (lastNotif != null && pkgMatches && lastNotif.imagePath != null && !lastNotif.imagePath.isEmpty());
             boolean isMediaEvent = isIncomingImage || isPhotoMessageText(finalText) || isPhotoMessageText(finalBigText);
 
@@ -274,24 +285,18 @@ public class NotiVaultService extends NotificationListenerService {
                 // 1. IMAGE SESSION COALESCING: Group/upgrade if previous is an active image card or photo placeholder within 15s
                 if ((lastIsImage || lastIsPhotoPlaceholder) && titleMatches && photoTimeMatches && (isIncomingImage || isMediaEvent)) {
                     String updatedImagePath = lastNotif.imagePath;
-                    int newCount = lastNotif.duplicateCount;
-
-                    if (incomingPlainBytes != null) {
-                        String newImagePath = saveEncryptedBytesToFile(incomingPlainBytes, entity.packageName);
-                        if (newImagePath != null) {
+                    for (byte[] newBytes : newImagesToSave) {
+                        String savedPath = saveEncryptedBytesToFile(newBytes, entity.packageName);
+                        if (savedPath != null) {
                             if (updatedImagePath == null || updatedImagePath.isEmpty()) {
-                                updatedImagePath = newImagePath;
-                                newCount = 1;
-                            } else if (!updatedImagePath.contains(newImagePath)) {
-                                updatedImagePath = updatedImagePath + "|" + newImagePath;
-                                newCount = updatedImagePath.split("\\|").length;
+                                updatedImagePath = savedPath;
+                            } else if (!updatedImagePath.contains(savedPath)) {
+                                updatedImagePath = updatedImagePath + "|" + savedPath;
                             }
                         }
-                    } else if (updatedImagePath != null && !updatedImagePath.isEmpty()) {
-                        newCount = updatedImagePath.split("\\|").length;
-                    } else {
-                        newCount = 1;
                     }
+                    int newCount = (updatedImagePath != null && !updatedImagePath.isEmpty())
+                            ? updatedImagePath.split("\\|").length : 1;
 
                     // Format text to show the aggregate count: "📷 X photos" (or preserve user caption if present)
                     String displayText;
@@ -319,12 +324,27 @@ public class NotiVaultService extends NotificationListenerService {
             }
 
             if (!isDuplicate && !isPhotoSessionCoalesced) {
-                // Save bitmap to file in background (which will encrypt it)
-                if (incomingPlainBytes != null) {
-                    entity.imagePath = saveEncryptedBytesToFile(incomingPlainBytes, entity.packageName);
-                    if (isGenericPhotoText(finalText) && (finalBigText == null || isGenericPhotoText(finalBigText))) {
-                        entity.text = EncryptionHelper.encrypt("📷 Photo");
-                        entity.bigText = EncryptionHelper.encrypt("📷 Photo");
+                // Save bitmaps to files in background (which will encrypt them)
+                if (!newImagesToSave.isEmpty()) {
+                    StringBuilder imagePathsBuilder = new StringBuilder();
+                    for (byte[] b : newImagesToSave) {
+                        String savedPath = saveEncryptedBytesToFile(b, entity.packageName);
+                        if (savedPath != null) {
+                            if (imagePathsBuilder.length() > 0) imagePathsBuilder.append("|");
+                            imagePathsBuilder.append(savedPath);
+                        }
+                    }
+                    if (imagePathsBuilder.length() > 0) {
+                        entity.imagePath = imagePathsBuilder.toString();
+                        int photoCount = entity.imagePath.split("\\|").length;
+                        if (photoCount > 1) {
+                            entity.duplicateCount = photoCount;
+                        }
+                        if (isGenericPhotoText(finalText) && (finalBigText == null || isGenericPhotoText(finalBigText))) {
+                            String caption = (photoCount > 1 ? "📷 " + photoCount + " photos" : "📷 Photo");
+                            entity.text = EncryptionHelper.encrypt(caption);
+                            entity.bigText = EncryptionHelper.encrypt(caption);
+                        }
                     }
                 }
                 long rowId = db.notificationDao().insert(entity);
@@ -415,7 +435,7 @@ public class NotiVaultService extends NotificationListenerService {
     private String saveEncryptedBytesToFile(byte[] plainBytes, String packageName) {
         if (plainBytes == null || plainBytes.length == 0) return null;
         try {
-            String filename = "img_" + packageName + "_" + System.currentTimeMillis() + ".jpg";
+            String filename = "img_" + packageName + "_" + System.currentTimeMillis() + "_" + System.nanoTime() + ".jpg";
             java.io.File file = new java.io.File(getFilesDir(), filename);
             boolean success = EncryptionHelper.encryptFile(plainBytes, file);
             if (success) {
