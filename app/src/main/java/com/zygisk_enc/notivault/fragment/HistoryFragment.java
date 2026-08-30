@@ -15,6 +15,12 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.ImageButton;
+import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.io.File;
 import android.widget.Toast;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import java.util.Calendar;
@@ -900,81 +906,190 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showDetailDialog(NotificationEntity entity) {
+        if (entity == null) return;
+
         String decTitle = EncryptionHelper.decrypt(entity.title);
         String decText = EncryptionHelper.decrypt(entity.text);
         String decBigText = EncryptionHelper.decrypt(entity.bigText);
+        String content = decBigText != null && !decBigText.isEmpty() ? decBigText : decText;
+        String displayTitle = decTitle != null && !decTitle.isEmpty() ? decTitle : entity.appName;
 
-        String content = decBigText != null && !decBigText.isEmpty()
-                ? decBigText : decText;
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
 
-        android.widget.ScrollView scrollView = new android.widget.ScrollView(requireContext());
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(requireContext());
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        int padding = (int) (20 * requireContext().getResources().getDisplayMetrics().density);
-        layout.setPadding(padding, padding, padding, padding);
+        View sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_notification_detail, null);
 
-        android.widget.TextView textView = new android.widget.TextView(requireContext());
-        textView.setText(content);
-        textView.setTextSize(16);
-        layout.addView(textView);
+        ImageView ivAppIcon = sheetView.findViewById(R.id.iv_detail_app_icon);
+        TextView tvAppName = sheetView.findViewById(R.id.tv_detail_app_name);
+        TextView tvSubInfo = sheetView.findViewById(R.id.tv_detail_sub_info);
+        ImageButton btnClose = sheetView.findViewById(R.id.btn_detail_close);
 
+        com.google.android.material.chip.Chip chipCopy = sheetView.findViewById(R.id.chip_detail_copy);
+        com.google.android.material.chip.Chip chipStar = sheetView.findViewById(R.id.chip_detail_star);
+        com.google.android.material.chip.Chip chipOpenApp = sheetView.findViewById(R.id.chip_detail_open_app);
+        com.google.android.material.chip.Chip chipDelete = sheetView.findViewById(R.id.chip_detail_delete);
+
+        TextView tvTitle = sheetView.findViewById(R.id.tv_detail_title);
+        TextView tvText = sheetView.findViewById(R.id.tv_detail_text);
+        TextView tvDuplicateCount = sheetView.findViewById(R.id.tv_detail_duplicate_count);
+        LinearLayout layoutMedia = sheetView.findViewById(R.id.layout_detail_media);
+
+        // Populate Header
+        tvAppName.setText(entity.appName != null && !entity.appName.isEmpty() ? entity.appName : entity.packageName);
+        String fullTime = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT)
+                .format(new java.util.Date(entity.timestamp));
+        tvSubInfo.setText(entity.packageName + " • " + fullTime);
+
+        try {
+            Drawable icon = requireContext().getPackageManager().getApplicationIcon(entity.packageName);
+            ivAppIcon.setImageDrawable(icon);
+        } catch (Exception e) {
+            ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+        }
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Populate Content
+        tvTitle.setText(displayTitle);
+        tvText.setText(content != null ? content : "");
+
+        if (entity.duplicateCount > 1) {
+            tvDuplicateCount.setVisibility(View.VISIBLE);
+            tvDuplicateCount.setText(getString(R.string.received_times, entity.duplicateCount));
+        } else {
+            tvDuplicateCount.setVisibility(View.GONE);
+        }
+
+        // Action: Copy
+        chipCopy.setOnClickListener(v -> {
+            String fullText = displayTitle + (content.isEmpty() ? "" : "\n" + content);
+            ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(ClipData.newPlainText("notification", fullText));
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
+            }
+        });
+
+        // Action: Star/Favorite
+        final boolean[] isFav = {entity.isFavorite};
+        updateStarChip(chipStar, isFav[0]);
+        chipStar.setOnClickListener(v -> {
+            isFav[0] = !isFav[0];
+            viewModel.setFavorite(entity.id, isFav[0]);
+            updateStarChip(chipStar, isFav[0]);
+        });
+
+        // Action: Open App
+        chipOpenApp.setOnClickListener(v -> {
+            try {
+                Intent launchIntent = requireContext().getPackageManager().getLaunchIntentForPackage(entity.packageName);
+                if (launchIntent != null) {
+                    startActivity(launchIntent);
+                    dialog.dismiss();
+                } else {
+                    showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.app_not_installed, Snackbar.LENGTH_SHORT));
+                }
+            } catch (Exception e) {
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.app_not_installed, Snackbar.LENGTH_SHORT));
+            }
+        });
+
+        // Action: Delete
+        chipDelete.setOnClickListener(v -> {
+            viewModel.deleteById(entity.id);
+            dialog.dismiss();
+            Snackbar snackbar = Snackbar.make(binding.getRoot(), R.string.notification_deleted, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.undo, u -> viewModel.insert(entity));
+            showAnchoredSnackbar(snackbar);
+        });
+
+        // Media Gallery
         if (entity.imagePath != null && !entity.imagePath.isEmpty()) {
             String[] imagePaths = entity.imagePath.split("\\|");
-            int imgIndex = 1;
+            layoutMedia.removeAllViews();
+            boolean hasImages = false;
+
             for (String imgPath : imagePaths) {
                 if (imgPath == null || imgPath.trim().isEmpty()) continue;
                 final String currentPath = imgPath.trim();
                 try {
-                    java.io.File file = new java.io.File(currentPath);
+                    File file = new File(currentPath);
                     byte[] decryptedBytes = EncryptionHelper.decryptFile(file);
                     if (decryptedBytes != null) {
-                        android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(decryptedBytes, 0, decryptedBytes.length);
                         if (bitmap != null) {
-                            android.widget.ImageView imageView = new android.widget.ImageView(requireContext());
-                            android.widget.LinearLayout.LayoutParams imgLp = new android.widget.LinearLayout.LayoutParams(
-                                     android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                                    (int) (240 * requireContext().getResources().getDisplayMetrics().density)
+                            hasImages = true;
+                            com.google.android.material.card.MaterialCardView imgCard = new com.google.android.material.card.MaterialCardView(requireContext());
+                            imgCard.setRadius(14 * getResources().getDisplayMetrics().density);
+                            imgCard.setCardElevation(0);
+                            imgCard.setStrokeWidth(1);
+                            imgCard.setStrokeColor(com.google.android.material.color.MaterialColors.getColor(
+                                    requireContext(), com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.GRAY));
+                            imgCard.setCardBackgroundColor(com.google.android.material.color.MaterialColors.getColor(
+                                    requireContext(), com.google.android.material.R.attr.colorSurfaceContainerLow, android.graphics.Color.WHITE));
+
+                            LinearLayout imgLayout = new LinearLayout(requireContext());
+                            imgLayout.setOrientation(LinearLayout.VERTICAL);
+                            int p = (int) (10 * getResources().getDisplayMetrics().density);
+                            imgLayout.setPadding(p, p, p, p);
+
+                            ImageView iv = new ImageView(requireContext());
+                            LinearLayout.LayoutParams ivLp = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    (int) (240 * getResources().getDisplayMetrics().density)
                             );
-                            imgLp.topMargin = (int) (16 * requireContext().getResources().getDisplayMetrics().density);
-                            imageView.setLayoutParams(imgLp);
-                            imageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-                            imageView.setImageBitmap(bitmap);
-                            layout.addView(imageView);
+                            iv.setLayoutParams(ivLp);
+                            iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                            iv.setImageBitmap(bitmap);
+                            imgLayout.addView(iv);
 
                             com.google.android.material.button.MaterialButton btnSave = new com.google.android.material.button.MaterialButton(requireContext());
-                            android.widget.LinearLayout.LayoutParams btnLp = new android.widget.LinearLayout.LayoutParams(
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                            btnSave.setText(R.string.save_to_gallery);
+                            btnSave.setCornerRadius((int) (12 * getResources().getDisplayMetrics().density));
+                            LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
                             );
-                            btnLp.topMargin = (int) (8 * requireContext().getResources().getDisplayMetrics().density);
-                            btnLp.bottomMargin = (int) (12 * requireContext().getResources().getDisplayMetrics().density);
                             btnLp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+                            btnLp.topMargin = (int) (8 * getResources().getDisplayMetrics().density);
                             btnSave.setLayoutParams(btnLp);
-                            btnSave.setText(R.string.save);
-                            btnSave.setOnClickListener(v -> saveImageToPublicDirectory(currentPath, entity.appName));
-                            layout.addView(btnSave);
-                            imgIndex++;
+                            btnSave.setOnClickListener(sv -> saveImageToPublicDirectory(currentPath, entity.appName));
+                            imgLayout.addView(btnSave);
+
+                            imgCard.addView(imgLayout);
+
+                            LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            cardLp.topMargin = (int) (10 * getResources().getDisplayMetrics().density);
+                            imgCard.setLayoutParams(cardLp);
+                            layoutMedia.addView(imgCard);
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+
+            layoutMedia.setVisibility(hasImages ? View.VISIBLE : View.GONE);
+        } else {
+            layoutMedia.setVisibility(View.GONE);
         }
 
-        scrollView.addView(layout);
+        dialog.setContentView(sheetView);
+        dialog.show();
+    }
 
-        BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(decTitle == null || decTitle.isEmpty() ? entity.appName : decTitle)
-                .setView(scrollView)
-                .setPositiveButton(R.string.close, null)
-                .setNeutralButton(R.string.copy, (d, w) -> {
-                    String text = (decTitle == null || decTitle.isEmpty() ? "" : decTitle + "\n") + content;
-                    ClipboardManager clipboard = (ClipboardManager)
-                            requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                    clipboard.setPrimaryClip(ClipData.newPlainText("notification", text));
-                    showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
-                }));
+    private void updateStarChip(com.google.android.material.chip.Chip chip, boolean isFavorite) {
+        if (chip == null) return;
+        if (isFavorite) {
+            chip.setChipIconResource(R.drawable.ic_star);
+            chip.setChipIconTint(android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold_star)));
+        } else {
+            chip.setChipIconResource(R.drawable.ic_star_border);
+            chip.setChipIconTint(null);
+        }
     }
 
     private void saveImageToPublicDirectory(String encImagePath, String appName) {
