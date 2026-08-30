@@ -117,7 +117,7 @@ public class NotificationViewModel extends AndroidViewModel {
 
         String rawQuery = searchQuery.getValue();
         boolean isSearching = rawQuery != null && !rawQuery.trim().isEmpty();
-        int limit = isSearching ? Integer.MAX_VALUE : (filterLimit.getValue() != null ? filterLimit.getValue() : 500);
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
 
@@ -196,26 +196,22 @@ public class NotificationViewModel extends AndroidViewModel {
                         operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, 0));
                     }
 
-                    final int BATCH_SIZE = 400;
-                    final int phase1Total = Math.min(total, BATCH_SIZE);
-                    final boolean hasPhase2 = total > BATCH_SIZE;
-
-                    // Phase 1: Decrypt top 400 items across all cores and publish immediately
-                    int numChunks1 = Math.min(PARALLEL_THREADS, Math.max(1, (phase1Total + 99) / 100));
-                    int chunkSize1 = (phase1Total + numChunks1 - 1) / numChunks1;
+                    // Slicing current page across parallel threads
+                    int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 99) / 100));
+                    int chunkSize = (total + numChunks - 1) / numChunks;
 
                     java.util.concurrent.atomic.AtomicInteger processedCount = new java.util.concurrent.atomic.AtomicInteger(0);
-                    java.util.concurrent.CountDownLatch latch1 = new java.util.concurrent.CountDownLatch(numChunks1);
+                    java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numChunks);
                     @SuppressWarnings("unchecked")
-                    final java.util.List<NotificationEntity>[] chunkResults1 = new java.util.List[numChunks1];
-                    for (int c = 0; c < numChunks1; c++) {
-                        chunkResults1[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+                    final java.util.List<NotificationEntity>[] chunkResults = new java.util.List[numChunks];
+                    for (int c = 0; c < numChunks; c++) {
+                        chunkResults[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
                     }
 
-                    for (int c = 0; c < numChunks1; c++) {
+                    for (int c = 0; c < numChunks; c++) {
                         final int chunkIndex = c;
-                        final int startIdx = c * chunkSize1;
-                        final int endIdx = Math.min(phase1Total, startIdx + chunkSize1);
+                        final int startIdx = c * chunkSize;
+                        final int endIdx = Math.min(total, startIdx + chunkSize);
 
                         parallelDecryptionPool.execute(() -> {
                             try {
@@ -236,91 +232,29 @@ public class NotificationViewModel extends AndroidViewModel {
                                     }
 
                                     if (matchesQuery(entity, searchingMode, lowerQuery)) {
-                                        chunkResults1[chunkIndex].add(entity);
+                                        chunkResults[chunkIndex].add(entity);
                                     }
                                 }
                             } finally {
-                                latch1.countDown();
+                                latch.countDown();
                             }
                         });
                     }
 
-                    latch1.await();
+                    // Wait for current page decryption to finish
+                    latch.await();
                     if (runToken != currentRunToken) return;
 
-                    // Assemble Phase 1 matches in strict chronological order
-                    java.util.List<NotificationEntity> phase1Matches = new java.util.ArrayList<>(phase1Total);
-                    for (int k = 0; k < numChunks1; k++) {
-                        synchronized (chunkResults1[k]) {
-                            phase1Matches.addAll(chunkResults1[k]);
+                    // Final complete list in strict chronological order
+                    java.util.List<NotificationEntity> finalMerged = new java.util.ArrayList<>(total);
+                    for (int k = 0; k < numChunks; k++) {
+                        synchronized (chunkResults[k]) {
+                            finalMerged.addAll(chunkResults[k]);
                         }
                     }
 
                     if (runToken == currentRunToken) {
-                        notifications.postValue(phase1Matches);
-                    }
-
-                    if (hasPhase2) {
-                        // Phase 2: Decrypt remaining items (401..total) in background and append at the bottom
-                        final int phase2Total = total - BATCH_SIZE;
-                        int numChunks2 = Math.min(PARALLEL_THREADS, Math.max(1, (phase2Total + 99) / 100));
-                        int chunkSize2 = (phase2Total + numChunks2 - 1) / numChunks2;
-
-                        java.util.concurrent.CountDownLatch latch2 = new java.util.concurrent.CountDownLatch(numChunks2);
-                        @SuppressWarnings("unchecked")
-                        final java.util.List<NotificationEntity>[] chunkResults2 = new java.util.List[numChunks2];
-                        for (int c = 0; c < numChunks2; c++) {
-                            chunkResults2[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
-                        }
-
-                        for (int c = 0; c < numChunks2; c++) {
-                            final int chunkIndex = c;
-                            final int startIdx = BATCH_SIZE + (c * chunkSize2);
-                            final int endIdx = Math.min(total, startIdx + chunkSize2);
-
-                            parallelDecryptionPool.execute(() -> {
-                                try {
-                                    for (int i = startIdx; i < endIdx; i++) {
-                                        if (runToken != currentRunToken) return;
-
-                                        NotificationEntity entity = list.get(i);
-                                        decryptEntity(entity);
-
-                                        int processed = processedCount.incrementAndGet();
-                                        int progress = (processed * 100) / total;
-
-                                        if (showProgress && (processed % 25 == 0 || processed == total)) {
-                                            if (runToken == currentRunToken) {
-                                                loadProgress.postValue(progress);
-                                                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, progress));
-                                            }
-                                        }
-
-                                        if (matchesQuery(entity, searchingMode, lowerQuery)) {
-                                            chunkResults2[chunkIndex].add(entity);
-                                        }
-                                    }
-                                } finally {
-                                    latch2.countDown();
-                                }
-                            });
-                        }
-
-                        latch2.await();
-                        if (runToken != currentRunToken) return;
-
-                        // Assemble complete merged list: Phase 1 matches + Phase 2 matches appended at bottom
-                        java.util.List<NotificationEntity> finalMerged = new java.util.ArrayList<>(total);
-                        finalMerged.addAll(phase1Matches);
-                        for (int k = 0; k < numChunks2; k++) {
-                            synchronized (chunkResults2[k]) {
-                                finalMerged.addAll(chunkResults2[k]);
-                            }
-                        }
-
-                        if (runToken == currentRunToken) {
-                            notifications.postValue(finalMerged);
-                        }
+                        notifications.postValue(finalMerged);
                     }
 
                     if (showProgress) {
