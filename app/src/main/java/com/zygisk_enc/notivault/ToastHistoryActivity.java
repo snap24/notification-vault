@@ -164,7 +164,9 @@ public class ToastHistoryActivity extends BaseActivity {
 
                 if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
                     Integer currentLimit = viewModel.getFilterLimit().getValue();
-                    if (currentLimit != null && totalCount >= currentLimit) {
+                    java.util.List<com.zygisk_enc.notivault.database.ToastEntity> currentList = viewModel.getToasts().getValue();
+                    int currentRawCount = currentList != null ? currentList.size() : totalCount;
+                    if (currentLimit != null && currentRawCount >= currentLimit) {
                         viewModel.loadNextPage();
                     }
                 }

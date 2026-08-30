@@ -82,6 +82,7 @@ public class HistoryFragment extends Fragment {
     private androidx.activity.OnBackPressedCallback searchBackPressedCallback;
     private final android.os.Handler searchDebounceHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable searchDebounceRunnable;
+    private int rawNotificationCount = 0;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -170,7 +171,7 @@ public class HistoryFragment extends Fragment {
                     if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
                         Integer currentLimit = viewModel.getFilterLimit().getValue();
                         // Guard against concurrent multiple updates until current limit is loaded
-                        if (currentLimit != null && totalCount >= currentLimit) {
+                        if (currentLimit != null && rawNotificationCount >= currentLimit) {
                             // Capture the exact position and offset at trigger time
                             lockedPosition = firstVisiblePos;
                             android.view.View firstVisibleView = layout.findViewByPosition(firstVisiblePos);
@@ -650,6 +651,7 @@ public class HistoryFragment extends Fragment {
 
     private void observeNotifications() {
         viewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            rawNotificationCount = notifications != null ? notifications.size() : 0;
             if (binding != null) {
                 binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
                 binding.swipeRefresh.setRefreshing(false);
