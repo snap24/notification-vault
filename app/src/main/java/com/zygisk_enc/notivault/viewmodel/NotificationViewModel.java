@@ -37,7 +37,7 @@ public class NotificationViewModel extends AndroidViewModel {
             this.bigText = bigText;
         }
     }
-    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(25000);
+    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(500);
     private static final MutableLiveData<Long> cacheInvalidationEvent = new MutableLiveData<>(0L);
 
     public static void clearDecryptedCache() {
