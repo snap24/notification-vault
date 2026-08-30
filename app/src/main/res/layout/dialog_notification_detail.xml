@@ -76,61 +76,90 @@
 
             </LinearLayout>
 
-            <!-- Action Chips Row -->
-            <HorizontalScrollView
+            <!-- Action Buttons Row (Single Line, 4 Equal Columns) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:scrollbars="none">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/chip_detail_copy"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:text="@string/copy"
+                    android:textSize="11.5sp"
+                    android:paddingHorizontal="2dp"
+                    android:paddingVertical="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_copy"
+                    app:iconSize="14dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="3dp"
+                    app:cornerRadius="10dp"
+                    style="@style/Widget.Material3.Button.TonalButton" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_detail_copy"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/copy"
-                        app:chipIcon="@drawable/ic_copy"
-                        app:chipIconSize="16dp"
-                        style="@style/Widget.Material3.Chip.Assist.Elevated" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/chip_detail_star"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/desc_star"
+                    android:textSize="11.5sp"
+                    android:paddingHorizontal="2dp"
+                    android:paddingVertical="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_star_border"
+                    app:iconSize="14dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="3dp"
+                    app:cornerRadius="10dp"
+                    style="@style/Widget.Material3.Button.TonalButton" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_detail_star"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="@string/desc_star"
-                        app:chipIcon="@drawable/ic_star_border"
-                        app:chipIconSize="16dp"
-                        style="@style/Widget.Material3.Chip.Assist.Elevated" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/chip_detail_open_app"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/open_app"
+                    android:textSize="11.5sp"
+                    android:paddingHorizontal="2dp"
+                    android:paddingVertical="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_open_in_new"
+                    app:iconSize="14dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="3dp"
+                    app:cornerRadius="10dp"
+                    style="@style/Widget.Material3.Button.TonalButton" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_detail_open_app"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="@string/open_app"
-                        app:chipIcon="@drawable/ic_open_in_new"
-                        app:chipIconSize="16dp"
-                        style="@style/Widget.Material3.Chip.Assist.Elevated" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/chip_detail_delete"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/delete"
+                    android:textSize="11.5sp"
+                    android:paddingHorizontal="2dp"
+                    android:paddingVertical="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_delete_sweep"
+                    app:iconSize="14dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="3dp"
+                    app:cornerRadius="10dp"
+                    style="@style/Widget.Material3.Button.TonalButton" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_detail_delete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="@string/delete"
-                        app:chipIcon="@drawable/ic_delete_sweep"
-                        app:chipIconSize="16dp"
-                        style="@style/Widget.Material3.Chip.Assist.Elevated" />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
+            </LinearLayout>
 
             <!-- Message Body Card -->
             <com.google.android.material.card.MaterialCardView

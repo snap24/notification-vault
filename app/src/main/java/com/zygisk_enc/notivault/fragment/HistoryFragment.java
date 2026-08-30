@@ -924,10 +924,10 @@ public class HistoryFragment extends Fragment {
         TextView tvSubInfo = dialogView.findViewById(R.id.tv_detail_sub_info);
         ImageButton btnClose = dialogView.findViewById(R.id.btn_detail_close);
 
-        com.google.android.material.chip.Chip chipCopy = dialogView.findViewById(R.id.chip_detail_copy);
-        com.google.android.material.chip.Chip chipStar = dialogView.findViewById(R.id.chip_detail_star);
-        com.google.android.material.chip.Chip chipOpenApp = dialogView.findViewById(R.id.chip_detail_open_app);
-        com.google.android.material.chip.Chip chipDelete = dialogView.findViewById(R.id.chip_detail_delete);
+        com.google.android.material.button.MaterialButton chipCopy = dialogView.findViewById(R.id.chip_detail_copy);
+        com.google.android.material.button.MaterialButton chipStar = dialogView.findViewById(R.id.chip_detail_star);
+        com.google.android.material.button.MaterialButton chipOpenApp = dialogView.findViewById(R.id.chip_detail_open_app);
+        com.google.android.material.button.MaterialButton chipDelete = dialogView.findViewById(R.id.chip_detail_delete);
 
         TextView tvTitle = dialogView.findViewById(R.id.tv_detail_title);
         TextView tvText = dialogView.findViewById(R.id.tv_detail_text);
@@ -1113,14 +1113,14 @@ public class HistoryFragment extends Fragment {
         BaseActivity.showDialog(requireContext(), dialog);
     }
 
-    private void updateStarChip(com.google.android.material.chip.Chip chip, boolean isFavorite) {
+    private void updateStarChip(com.google.android.material.button.MaterialButton chip, boolean isFavorite) {
         if (chip == null) return;
         if (isFavorite) {
-            chip.setChipIconResource(R.drawable.ic_star);
-            chip.setChipIconTint(android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold_star)));
+            chip.setIconResource(R.drawable.ic_star);
+            chip.setIconTint(android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.gold_star)));
         } else {
-            chip.setChipIconResource(R.drawable.ic_star_border);
-            chip.setChipIconTint(null);
+            chip.setIconResource(R.drawable.ic_star_border);
+            chip.setIconTint(null);
         }
     }
 
