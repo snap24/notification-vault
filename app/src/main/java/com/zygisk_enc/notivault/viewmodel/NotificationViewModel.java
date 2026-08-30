@@ -38,9 +38,11 @@ public class NotificationViewModel extends AndroidViewModel {
         }
     }
     private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(5000);
+    private static final MutableLiveData<Long> cacheInvalidationEvent = new MutableLiveData<>(0L);
 
     public static void clearDecryptedCache() {
         decryptedCache.evictAll();
+        cacheInvalidationEvent.postValue(System.currentTimeMillis());
     }
 
     public static class OperationProgress {
@@ -116,6 +118,32 @@ public class NotificationViewModel extends AndroidViewModel {
                 updateSource();
             }
         });
+        notifications.addSource(cacheInvalidationEvent, token -> {
+            if (token != null && token > 0) {
+                lastRawList = null;
+                updateSource();
+            }
+        });
+    }
+
+    private void postDecryptionProgress(long runToken, int progress) {
+        if (runToken != currentRunToken) return;
+        OperationProgress currentOp = globalOperationProgress.getValue();
+        if (currentOp != null && currentOp.type == OperationProgress.TYPE_IMPORTING && currentOp.progress >= 0) {
+            return;
+        }
+        loadProgress.postValue(progress);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, progress));
+    }
+
+    private void clearOperationProgress(long runToken) {
+        if (runToken != currentRunToken) return;
+        OperationProgress currentOp = globalOperationProgress.getValue();
+        if (currentOp != null && currentOp.type == OperationProgress.TYPE_IMPORTING && currentOp.progress >= 0) {
+            return;
+        }
+        loadProgress.postValue(-1);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
     }
 
     private boolean isResettingLimit = false;
@@ -213,8 +241,7 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     final boolean showProgress = itemsToDecrypt > 0;
                     if (showProgress && runToken == currentRunToken) {
-                        loadProgress.postValue(0);
-                        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, 0));
+                        postDecryptionProgress(runToken, 0);
                     }
 
                     // Slicing current page across parallel threads
@@ -250,10 +277,7 @@ public class NotificationViewModel extends AndroidViewModel {
                                     int progress = (processed * 100) / total;
 
                                     if (showProgress && (processed % 15 == 0 || processed == total)) {
-                                        if (runToken == currentRunToken) {
-                                            loadProgress.postValue(progress);
-                                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, progress));
-                                        }
+                                        postDecryptionProgress(runToken, progress);
                                     }
 
                                     if (matchesQuery(entity, searchingMode, lowerQuery)) {
@@ -285,7 +309,10 @@ public class NotificationViewModel extends AndroidViewModel {
 
                     // Wait for current page decryption to finish
                     latch.await();
-                    if (runToken != currentRunToken) return;
+                    if (runToken != currentRunToken) {
+                        clearOperationProgress(runToken);
+                        return;
+                    }
 
                     // Final complete list in strict chronological order
                     java.util.List<NotificationEntity> finalMerged = new java.util.ArrayList<>(total);
@@ -300,27 +327,15 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
 
                     if (showProgress) {
-                        if (runToken == currentRunToken) {
-                            loadProgress.postValue(100);
-                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, 100));
-                        }
+                        postDecryptionProgress(runToken, 100);
                         try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-                        if (runToken == currentRunToken) {
-                            loadProgress.postValue(-1);
-                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                        }
+                        clearOperationProgress(runToken);
                     } else {
-                        if (runToken == currentRunToken) {
-                            loadProgress.postValue(-1);
-                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                        }
+                        clearOperationProgress(runToken);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    if (runToken == currentRunToken) {
-                        loadProgress.postValue(-1);
-                        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                    }
+                    clearOperationProgress(runToken);
                 }
             });
         });

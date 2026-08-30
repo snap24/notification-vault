@@ -164,9 +164,13 @@ public class BackupService extends Service {
             public void onSuccess() {
                 com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
                         com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING, 100);
-                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
-                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE, -1);
-                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+
+                com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+                    try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                            com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE, -1);
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+                });
 
                 Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
                         .setContentTitle(getString(R.string.importing_backup_title))
