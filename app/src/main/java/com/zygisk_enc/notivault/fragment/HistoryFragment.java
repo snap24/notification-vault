@@ -968,38 +968,7 @@ public class HistoryFragment extends Fragment {
         }
 
         dialog.setContentView(dialogView);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            dialog.getWindow().setDimAmount(0.55f);
-
-            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
-            dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-                dialog.getWindow().getAttributes().setBlurBehindRadius(35);
-            }
-        }
-
-        // Apply GPU Gaussian Blur to Activity background while dialog is active
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && getActivity() != null) {
-            android.view.View contentRoot = getActivity().findViewById(android.R.id.content);
-            if (contentRoot != null) {
-                try {
-                    contentRoot.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(
-                            25f, 25f, android.graphics.Shader.TileMode.CLAMP));
-                } catch (Exception ignored) {}
-            }
-            dialog.setOnDismissListener(d -> {
-                if (contentRoot != null) {
-                    try {
-                        contentRoot.setRenderEffect(null);
-                    } catch (Exception ignored) {}
-                }
-            });
-        }
-
+        setupDialogWindowAndBlur(dialog);
         BaseActivity.showDialog(requireContext(), dialog);
     }
 
@@ -1178,6 +1147,15 @@ public class HistoryFragment extends Fragment {
         }
 
         dialog.setContentView(dialogView);
+        setupDialogWindowAndBlur(dialog);
+        BaseActivity.showDialog(requireContext(), dialog);
+    }
+
+    private int activeBlurDialogCount = 0;
+
+    private void setupDialogWindowAndBlur(android.app.Dialog dialog) {
+        if (dialog == null) return;
+
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
             dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -1192,8 +1170,9 @@ public class HistoryFragment extends Fragment {
             }
         }
 
-        // Apply GPU Gaussian Blur to Activity background while dialog is active
+        // Apply GPU Gaussian Blur to Activity background while any dialog is active
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && getActivity() != null) {
+            activeBlurDialogCount++;
             android.view.View contentRoot = getActivity().findViewById(android.R.id.content);
             if (contentRoot != null) {
                 try {
@@ -1201,16 +1180,19 @@ public class HistoryFragment extends Fragment {
                             25f, 25f, android.graphics.Shader.TileMode.CLAMP));
                 } catch (Exception ignored) {}
             }
+
             dialog.setOnDismissListener(d -> {
-                if (contentRoot != null) {
-                    try {
-                        contentRoot.setRenderEffect(null);
-                    } catch (Exception ignored) {}
+                activeBlurDialogCount = Math.max(0, activeBlurDialogCount - 1);
+                if (activeBlurDialogCount == 0 && getActivity() != null) {
+                    android.view.View root = getActivity().findViewById(android.R.id.content);
+                    if (root != null) {
+                        try {
+                            root.setRenderEffect(null);
+                        } catch (Exception ignored) {}
+                    }
                 }
             });
         }
-
-        BaseActivity.showDialog(requireContext(), dialog);
     }
 
     private void updateStarChip(com.google.android.material.button.MaterialButton chip, boolean isFavorite) {
