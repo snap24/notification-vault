@@ -113,7 +113,6 @@ public class NotificationViewModel extends AndroidViewModel {
             notifications.removeSource(currentSource);
         }
 
-        final long runToken = ++currentRunToken;
         lastRawList = null;
 
         String rawQuery = searchQuery.getValue();
@@ -151,13 +150,13 @@ public class NotificationViewModel extends AndroidViewModel {
         }
 
         notifications.addSource(currentSource, list -> {
+            final long runToken = ++currentRunToken;
+
             if (list == null) {
                 notifications.setValue(null);
                 lastRawList = null;
                 return;
             }
-
-            if (runToken != currentRunToken) return;
 
             if (isListIdentical(list, lastRawList)) {
                 return;
@@ -523,6 +522,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     try { Thread.sleep(300); } catch (InterruptedException ignored) {}
                     operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                 }
+                refreshAppSummaries();
             }
         });
     }
@@ -549,6 +549,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     try { Thread.sleep(300); } catch (InterruptedException ignored) {}
                     operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                 }
+                refreshAppSummaries();
             }
         });
     }
@@ -614,6 +615,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     try { Thread.sleep(300); } catch (InterruptedException ignored) {}
                     operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
                 }
+                refreshAppSummaries();
             }
         });
     }
