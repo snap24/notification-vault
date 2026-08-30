@@ -37,7 +37,7 @@ public class NotificationViewModel extends AndroidViewModel {
             this.bigText = bigText;
         }
     }
-    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(5000);
+    private static final android.util.LruCache<Long, DecryptedText> decryptedCache = new android.util.LruCache<>(25000);
     private static final MutableLiveData<Long> cacheInvalidationEvent = new MutableLiveData<>(0L);
 
     public static void clearDecryptedCache() {
@@ -133,8 +133,9 @@ public class NotificationViewModel extends AndroidViewModel {
         if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
         }
-        loadProgress.postValue(progress);
-        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, progress));
+        int clampedProgress = Math.min(100, Math.max(0, progress));
+        loadProgress.postValue(clampedProgress);
+        operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DECRYPTING, clampedProgress));
     }
 
     private void clearOperationProgress(long runToken) {
@@ -233,11 +234,13 @@ public class NotificationViewModel extends AndroidViewModel {
                     final String lowerQuery = query != null ? query.toLowerCase().trim() : "";
                     final boolean searchingMode = !lowerQuery.isEmpty();
 
-                    // Count how many items actually need decryption (not in cache)
+                    // Pre-mark exact items that actually need decryption (not in cache)
                     int itemsToDecrypt = 0;
+                    final boolean[] needsDecryption = new boolean[total];
                     for (int i = 0; i < total; i++) {
                         if (runToken != currentRunToken) return;
                         if (decryptedCache.get(list.get(i).id) == null) {
+                            needsDecryption[i] = true;
                             itemsToDecrypt++;
                         }
                     }
@@ -277,14 +280,13 @@ public class NotificationViewModel extends AndroidViewModel {
                                     if (runToken != currentRunToken) return;
 
                                     NotificationEntity entity = list.get(i);
-                                    boolean wasCached = (decryptedCache.get(entity.id) != null);
                                     decryptEntity(entity);
 
                                     int processed = processedCount.incrementAndGet();
 
-                                    if (showProgress && !wasCached) {
+                                    if (showProgress && needsDecryption[i]) {
                                         int decrypted = newlyDecryptedCount.incrementAndGet();
-                                        int progress = (decrypted * 100) / totalToDecrypt;
+                                        int progress = Math.min(100, (decrypted * 100) / totalToDecrypt);
                                         if (decrypted % 15 == 0 || decrypted == totalToDecrypt) {
                                             postDecryptionProgress(runToken, progress);
                                         }
