@@ -38,9 +38,7 @@ public class ToastViewModel extends AndroidViewModel {
                 private final java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(1);
                 @Override
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r, "NotiVault-ToastDecryptor-" + count.getAndIncrement());
-                    t.setPriority(Thread.NORM_PRIORITY - 1);
-                    return t;
+                    return new Thread(r, "NotiVault-ToastDecryptor-" + count.getAndIncrement());
                 }
             });
     private volatile long currentRunToken = 0;
@@ -197,6 +195,7 @@ public class ToastViewModel extends AndroidViewModel {
                     final int endIdx = Math.min(total, startIdx + chunkSize);
 
                     parallelDecryptionPool.execute(() -> {
+                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
                         try {
                             for (int i = startIdx; i < endIdx; i++) {
                                 if (runToken != currentRunToken) return;

@@ -69,9 +69,7 @@ public class NotificationViewModel extends AndroidViewModel {
                 private final java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(1);
                 @Override
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r, "NotiVault-Decryptor-" + count.getAndIncrement());
-                    t.setPriority(Thread.NORM_PRIORITY - 1);
-                    return t;
+                    return new Thread(r, "NotiVault-Decryptor-" + count.getAndIncrement());
                 }
             });
     private long currentRunToken = 0;
@@ -225,6 +223,7 @@ public class NotificationViewModel extends AndroidViewModel {
                         final int endIdx = Math.min(total, startIdx + chunkSize);
 
                         parallelDecryptionPool.execute(() -> {
+                            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
                             try {
                                 for (int i = startIdx; i < endIdx; i++) {
                                     if (runToken != currentRunToken) return;
