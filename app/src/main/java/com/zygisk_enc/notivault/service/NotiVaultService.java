@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class NotiVaultService extends NotificationListenerService {
 
@@ -219,14 +220,13 @@ public class NotiVaultService extends NotificationListenerService {
                 }
                 
                 if (rule.isRuleEnabled) {
-                    String content = (finalTitle + " " + finalText + " " + (finalBigText != null ? finalBigText : "")).toLowerCase();
+                    String content = (finalTitle + " " + finalText + " " + (finalBigText != null ? finalBigText : "")).trim();
                     
                     // Check block keywords (blacklist)
                     if (rule.blockKeywords != null && !rule.blockKeywords.trim().isEmpty()) {
                         String[] blockWords = rule.blockKeywords.split(",");
                         for (String word : blockWords) {
-                            String cleanWord = word.trim().toLowerCase();
-                            if (!cleanWord.isEmpty() && content.contains(cleanWord)) {
+                            if (containsWord(content, word)) {
                                 return; // Skip recording
                             }
                         }
@@ -237,8 +237,7 @@ public class NotiVaultService extends NotificationListenerService {
                         String[] allowWords = rule.allowKeywords.split(",");
                         boolean matched = false;
                         for (String word : allowWords) {
-                            String cleanWord = word.trim().toLowerCase();
-                            if (!cleanWord.isEmpty() && content.contains(cleanWord)) {
+                            if (containsWord(content, word)) {
                                 matched = true;
                                 break;
                             }
@@ -555,6 +554,20 @@ public class NotiVaultService extends NotificationListenerService {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private boolean containsWord(String content, String keyword) {
+        if (content == null || keyword == null) return false;
+        String cleanKeyword = keyword.trim();
+        if (cleanKeyword.isEmpty()) return false;
+        try {
+            // Match standalone whole word surrounded by start/end of string, whitespace, or punctuation
+            String regex = "(?i)(^|[\\s\\p{Punct}])" + Pattern.quote(cleanKeyword) + "([\\s\\p{Punct}]|$)";
+            Pattern pattern = Pattern.compile(regex, Pattern.UNICODE_CHARACTER_CLASS | Pattern.CASE_INSENSITIVE);
+            return pattern.matcher(content).find();
+        } catch (Exception e) {
+            return content.toLowerCase().contains(cleanKeyword.toLowerCase());
+        }
     }
 
     @Override
