@@ -17,6 +17,12 @@ public interface ToastDao {
     @Query("SELECT * FROM toasts ORDER BY timestamp DESC")
     LiveData<List<ToastEntity>> getAllToasts();
 
+    @Query("SELECT * FROM toasts " +
+           "WHERE (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "AND (:packageName IS NULL OR packageName = :packageName) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    LiveData<List<ToastEntity>> getFilteredToasts(int limit, Long dateStart, Long dateEnd, String packageName);
+
     @Query("SELECT * FROM toasts ORDER BY timestamp DESC")
     List<ToastEntity> getAllToastsSync();
 

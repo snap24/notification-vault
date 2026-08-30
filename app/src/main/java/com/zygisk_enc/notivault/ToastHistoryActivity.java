@@ -141,8 +141,26 @@ public class ToastHistoryActivity extends BaseActivity {
 
     private void setupRecyclerView() {
         adapter = new ToastAdapter();
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
+
+        binding.recyclerView.addOnScrollListener(new androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull androidx.recyclerview.widget.RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleCount = layoutManager.getChildCount();
+                int totalCount = layoutManager.getItemCount();
+                int firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
+
+                if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
+                    Integer currentLimit = viewModel.getFilterLimit().getValue();
+                    if (currentLimit != null && totalCount >= currentLimit) {
+                        viewModel.loadNextPage();
+                    }
+                }
+            }
+        });
     }
 
     private void setupAppPicker() {
