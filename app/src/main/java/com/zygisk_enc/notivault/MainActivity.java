@@ -117,6 +117,10 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        // Observe search query and notifications to update search count pill
+        notifViewModel.getSearchQuery().observe(this, query -> updateSearchCountPill(query, notifViewModel.getNotifications().getValue()));
+        notifViewModel.getNotifications().observe(this, list -> updateSearchCountPill(notifViewModel.getSearchQuery().getValue(), list));
+
         // Make the bottom navigation card translucent glass-like
         int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
         int glassBgColor = androidx.core.graphics.ColorUtils.setAlphaComponent(surfaceColor, 216); // 85% opacity
@@ -209,6 +213,16 @@ public class MainActivity extends BaseActivity {
             authIntent.putExtra(com.zygisk_enc.notivault.util.AuthActionActivity.EXTRA_ACTION,
                     com.zygisk_enc.notivault.util.AuthActionActivity.ACTION_TOGGLE_CAPTURE);
             startActivity(authIntent);
+        }
+    }
+
+    private void updateSearchCountPill(String query, java.util.List<?> list) {
+        if (query != null && !query.trim().isEmpty()) {
+            int count = list != null ? list.size() : 0;
+            binding.cardToolbarSearchCount.setVisibility(android.view.View.VISIBLE);
+            binding.tvToolbarSearchCount.setText(getString(R.string.search_found_count, count));
+        } else {
+            binding.cardToolbarSearchCount.setVisibility(android.view.View.GONE);
         }
     }
 
