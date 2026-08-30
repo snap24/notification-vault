@@ -303,6 +303,7 @@ public class HistoryFragment extends Fragment {
                 if (query.isEmpty()) {
                     viewModel.setSearchQuery(null);
                 } else {
+                    adapter.submitList(new java.util.ArrayList<>());
                     searchDebounceRunnable = () -> viewModel.setSearchQuery(query);
                     searchDebounceHandler.postDelayed(searchDebounceRunnable, 100);
                 }

@@ -96,7 +96,15 @@ public class NotificationViewModel extends AndroidViewModel {
         });
         unreadCount = repository.getUnreadCount();
 
-        notifications.addSource(searchQuery, query -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(searchQuery, query -> {
+            if (!isBatchingUpdates) {
+                if (query != null && !query.trim().isEmpty()) {
+                    notifications.setValue(new java.util.ArrayList<>());
+                }
+                resetLimit();
+                updateSource();
+            }
+        });
         notifications.addSource(filterPackage, pkg -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterFavorites, favs -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterDateStart, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
