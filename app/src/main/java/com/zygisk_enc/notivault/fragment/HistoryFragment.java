@@ -914,25 +914,25 @@ public class HistoryFragment extends Fragment {
         String content = decBigText != null && !decBigText.isEmpty() ? decBigText : decText;
         String displayTitle = decTitle != null && !decTitle.isEmpty() ? decTitle : entity.appName;
 
-        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
-                new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        android.app.Dialog dialog = new android.app.Dialog(requireContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
 
-        View sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_notification_detail, null);
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_notification_detail, null);
 
-        ImageView ivAppIcon = sheetView.findViewById(R.id.iv_detail_app_icon);
-        TextView tvAppName = sheetView.findViewById(R.id.tv_detail_app_name);
-        TextView tvSubInfo = sheetView.findViewById(R.id.tv_detail_sub_info);
-        ImageButton btnClose = sheetView.findViewById(R.id.btn_detail_close);
+        ImageView ivAppIcon = dialogView.findViewById(R.id.iv_detail_app_icon);
+        TextView tvAppName = dialogView.findViewById(R.id.tv_detail_app_name);
+        TextView tvSubInfo = dialogView.findViewById(R.id.tv_detail_sub_info);
+        ImageButton btnClose = dialogView.findViewById(R.id.btn_detail_close);
 
-        com.google.android.material.chip.Chip chipCopy = sheetView.findViewById(R.id.chip_detail_copy);
-        com.google.android.material.chip.Chip chipStar = sheetView.findViewById(R.id.chip_detail_star);
-        com.google.android.material.chip.Chip chipOpenApp = sheetView.findViewById(R.id.chip_detail_open_app);
-        com.google.android.material.chip.Chip chipDelete = sheetView.findViewById(R.id.chip_detail_delete);
+        com.google.android.material.chip.Chip chipCopy = dialogView.findViewById(R.id.chip_detail_copy);
+        com.google.android.material.chip.Chip chipStar = dialogView.findViewById(R.id.chip_detail_star);
+        com.google.android.material.chip.Chip chipOpenApp = dialogView.findViewById(R.id.chip_detail_open_app);
+        com.google.android.material.chip.Chip chipDelete = dialogView.findViewById(R.id.chip_detail_delete);
 
-        TextView tvTitle = sheetView.findViewById(R.id.tv_detail_title);
-        TextView tvText = sheetView.findViewById(R.id.tv_detail_text);
-        TextView tvDuplicateCount = sheetView.findViewById(R.id.tv_detail_duplicate_count);
-        LinearLayout layoutMedia = sheetView.findViewById(R.id.layout_detail_media);
+        TextView tvTitle = dialogView.findViewById(R.id.tv_detail_title);
+        TextView tvText = dialogView.findViewById(R.id.tv_detail_text);
+        TextView tvDuplicateCount = dialogView.findViewById(R.id.tv_detail_duplicate_count);
+        LinearLayout layoutMedia = dialogView.findViewById(R.id.layout_detail_media);
 
         // Populate Header
         tvAppName.setText(entity.appName != null && !entity.appName.isEmpty() ? entity.appName : entity.packageName);
@@ -1077,8 +1077,13 @@ public class HistoryFragment extends Fragment {
             layoutMedia.setVisibility(View.GONE);
         }
 
-        dialog.setContentView(sheetView);
-        dialog.show();
+        dialog.setContentView(dialogView);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+            dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        BaseActivity.showDialog(requireContext(), dialog);
     }
 
     private void updateStarChip(com.google.android.material.chip.Chip chip, boolean isFavorite) {
