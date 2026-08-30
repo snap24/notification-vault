@@ -52,6 +52,11 @@ public class NotiVaultService extends NotificationListenerService {
         Notification notification = sbn.getNotification();
         if (notification == null) return;
 
+        // Ignore synthetic Android OS group summary containers (e.g. "WhatsApp", "2 new messages")
+        if ((notification.flags & Notification.FLAG_GROUP_SUMMARY) != 0) {
+            return;
+        }
+
         Bundle extras = notification.extras;
         if (extras == null) return;
 
