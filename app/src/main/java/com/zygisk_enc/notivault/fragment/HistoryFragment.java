@@ -241,6 +241,11 @@ public class HistoryFragment extends Fragment {
             public void onFavoriteClick(NotificationEntity entity) {
                 viewModel.setFavorite(entity.id, !entity.isFavorite);
             }
+
+            @Override
+            public void onBundleClick(NotificationAdapter.NotificationBundle bundle) {
+                showBundleDetailBottomSheet(bundle);
+            }
         });
     }
 
@@ -590,6 +595,19 @@ public class HistoryFragment extends Fragment {
                                 }
                             });
                     showAnchoredSnackbar(snackbar);
+                } else if (item.type == NotificationAdapter.ListItem.TYPE_BUNDLE && item.bundle != null) {
+                    List<NotificationEntity> list = new ArrayList<>(item.bundle.notifications);
+                    for (NotificationEntity entity : list) {
+                        viewModel.deleteById(entity.id);
+                    }
+                    String msg = getString(R.string.bundled_logs_count, list.size()) + " deleted";
+                    Snackbar snackbar = Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.undo, v -> {
+                                for (NotificationEntity entity : list) {
+                                    viewModel.insert(entity);
+                                }
+                            });
+                    showAnchoredSnackbar(snackbar);
                 }
             }
 
@@ -723,16 +741,162 @@ public class HistoryFragment extends Fragment {
 
     private List<NotificationAdapter.ListItem> buildListWithHeaders(List<NotificationEntity> notifications) {
         List<NotificationAdapter.ListItem> result = new ArrayList<>();
-        String lastGroup = null;
-        for (NotificationEntity entity : notifications) {
-            String group = DateUtils.getDateGroupKey(entity.timestamp);
-            if (!group.equals(lastGroup)) {
-                result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(getContext(), entity.timestamp)));
-                lastGroup = group;
+        if (notifications == null || notifications.isEmpty()) return result;
+
+        int i = 0;
+        int size = notifications.size();
+
+        while (i < size) {
+            NotificationEntity first = notifications.get(i);
+            String currentDateGroup = DateUtils.getDateGroupKey(first.timestamp);
+            result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(getContext(), first.timestamp)));
+
+            // Process all items in this date group
+            while (i < size && DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup)) {
+                String pkg = notifications.get(i).packageName;
+                int streakStart = i;
+
+                // Scan consecutive items from the exact same package within the same date group
+                while (i < size &&
+                        DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup) &&
+                        pkg != null && pkg.equals(notifications.get(i).packageName)) {
+                    i++;
+                }
+
+                int streakCount = i - streakStart;
+                if (streakCount >= 10) {
+                    List<NotificationEntity> bundleItems = new ArrayList<>(notifications.subList(streakStart, i));
+                    String appName = bundleItems.get(0).appName;
+                    result.add(new NotificationAdapter.ListItem(new NotificationAdapter.NotificationBundle(pkg, appName, bundleItems)));
+                } else {
+                    for (int j = streakStart; j < i; j++) {
+                        result.add(new NotificationAdapter.ListItem(notifications.get(j)));
+                    }
+                }
             }
-            result.add(new NotificationAdapter.ListItem(entity));
         }
         return result;
+    }
+
+    private void showBundleDetailBottomSheet(NotificationAdapter.NotificationBundle bundle) {
+        if (bundle == null || bundle.notifications == null || bundle.notifications.isEmpty()) return;
+
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(requireContext());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        root.setPadding(padding, (int) (12 * getResources().getDisplayMetrics().density), padding, padding);
+
+        // Header: Icon + Title + Subtitle
+        android.widget.LinearLayout headerLayout = new android.widget.LinearLayout(requireContext());
+        headerLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        headerLayout.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+        android.widget.ImageView ivIcon = new android.widget.ImageView(requireContext());
+        int iconSize = (int) (32 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout.LayoutParams iconLp = new android.widget.LinearLayout.LayoutParams(iconSize, iconSize);
+        ivIcon.setLayoutParams(iconLp);
+        try {
+            android.graphics.drawable.Drawable icon = requireContext().getPackageManager().getApplicationIcon(bundle.packageName);
+            ivIcon.setImageDrawable(icon);
+        } catch (Exception e) {
+            ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+        }
+        headerLayout.addView(ivIcon);
+
+        android.widget.LinearLayout titleLayout = new android.widget.LinearLayout(requireContext());
+        titleLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        android.widget.LinearLayout.LayoutParams titleLp = new android.widget.LinearLayout.LayoutParams(
+                0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        titleLp.setMarginStart((int) (10 * getResources().getDisplayMetrics().density));
+        titleLayout.setLayoutParams(titleLp);
+
+        android.widget.TextView tvTitle = new android.widget.TextView(requireContext());
+        tvTitle.setText(getString(R.string.bundle_detail_title, bundle.appName != null ? bundle.appName : bundle.packageName, bundle.getCount()));
+        tvTitle.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium);
+        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        titleLayout.addView(tvTitle);
+
+        android.widget.TextView tvSubtitle = new android.widget.TextView(requireContext());
+        tvSubtitle.setText(DateUtils.getRelativeTimeLabel(requireContext(), bundle.latestTimestamp));
+        tvSubtitle.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelSmall);
+        titleLayout.addView(tvSubtitle);
+
+        headerLayout.addView(titleLayout);
+        root.addView(headerLayout);
+
+        // Divider
+        android.view.View divider = new android.view.View(requireContext());
+        android.widget.LinearLayout.LayoutParams divLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        divLp.topMargin = (int) (12 * getResources().getDisplayMetrics().density);
+        divLp.bottomMargin = (int) (12 * getResources().getDisplayMetrics().density);
+        divider.setLayoutParams(divLp);
+        divider.setBackgroundColor(com.google.android.material.color.MaterialColors.getColor(
+                requireContext(), com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY));
+        root.addView(divider);
+
+        // RecyclerView for bundle items
+        androidx.recyclerview.widget.RecyclerView rv = new androidx.recyclerview.widget.RecyclerView(requireContext());
+        rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+        NotificationAdapter bundleAdapter = new NotificationAdapter();
+        boolean showStatus = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("show_read_unread_status", true);
+        bundleAdapter.setShowReadUnreadStatus(showStatus);
+        bundleAdapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(NotificationEntity entity) {
+                dialog.dismiss();
+                showDetailDialog(entity);
+            }
+
+            @Override
+            public void onItemLongClick(NotificationEntity entity) {
+                String decTitle = EncryptionHelper.decrypt(entity.title);
+                String decText = EncryptionHelper.decrypt(entity.text);
+                String content = decTitle + (decText.isEmpty() ? "" : "\n" + decText);
+                ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("notification", content);
+                clipboard.setPrimaryClip(clip);
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
+            }
+
+            @Override
+            public void onDeleteClick(NotificationEntity entity) {
+                viewModel.deleteById(entity.id);
+            }
+
+            @Override
+            public void onFavoriteClick(NotificationEntity entity) {
+                viewModel.setFavorite(entity.id, !entity.isFavorite);
+            }
+
+            @Override
+            public void onBundleClick(NotificationAdapter.NotificationBundle b) {
+                // Nested bundle no-op
+            }
+        });
+
+        List<NotificationAdapter.ListItem> listItems = new ArrayList<>();
+        for (NotificationEntity entity : bundle.notifications) {
+            listItems.add(new NotificationAdapter.ListItem(entity));
+        }
+        bundleAdapter.submitList(listItems);
+        rv.setAdapter(bundleAdapter);
+
+        int maxRvHeight = (int) (400 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout.LayoutParams rvLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                maxRvHeight
+        );
+        rv.setLayoutParams(rvLp);
+        rv.setNestedScrollingEnabled(true);
+        root.addView(rv);
+
+        dialog.setContentView(root);
+        dialog.show();
     }
 
     private void showDetailDialog(NotificationEntity entity) {

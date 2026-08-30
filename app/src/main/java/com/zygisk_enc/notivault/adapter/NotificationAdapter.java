@@ -26,32 +26,66 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_NOTIFICATION = 1;
+    public static final int TYPE_BUNDLE = 2;
 
     public interface OnItemClickListener {
         void onItemClick(NotificationEntity entity);
         void onItemLongClick(NotificationEntity entity);
         void onDeleteClick(NotificationEntity entity);
         void onFavoriteClick(NotificationEntity entity);
+        void onBundleClick(NotificationBundle bundle);
     }
 
-    // Wrapper class to hold either a header string or a notification
+    public static class NotificationBundle {
+        public final String packageName;
+        public final String appName;
+        public final List<NotificationEntity> notifications;
+        public final long latestTimestamp;
+        public final long oldestTimestamp;
+
+        public NotificationBundle(String packageName, String appName, List<NotificationEntity> notifications) {
+            this.packageName = packageName;
+            this.appName = appName;
+            this.notifications = notifications != null ? notifications : new ArrayList<>();
+            this.latestTimestamp = !this.notifications.isEmpty() ? this.notifications.get(0).timestamp : 0;
+            this.oldestTimestamp = !this.notifications.isEmpty() ? this.notifications.get(this.notifications.size() - 1).timestamp : 0;
+        }
+
+        public int getCount() {
+            return notifications.size();
+        }
+    }
+
+    // Wrapper class to hold either a header string, a notification, or a bundle
     public static class ListItem {
         public static final int TYPE_HEADER = 0;
         public static final int TYPE_NOTIFICATION = 1;
+        public static final int TYPE_BUNDLE = 2;
+
         public final int type;
         public final String header;
         public final NotificationEntity entity;
+        public final NotificationBundle bundle;
 
         public ListItem(String header) {
             this.type = TYPE_HEADER;
             this.header = header;
             this.entity = null;
+            this.bundle = null;
         }
 
         public ListItem(NotificationEntity entity) {
             this.type = TYPE_NOTIFICATION;
             this.header = null;
             this.entity = entity;
+            this.bundle = null;
+        }
+
+        public ListItem(NotificationBundle bundle) {
+            this.type = TYPE_BUNDLE;
+            this.header = null;
+            this.entity = null;
+            this.bundle = bundle;
         }
     }
 
@@ -72,6 +106,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             if (oldItem.type != newItem.type) return false;
             if (oldItem.type == ListItem.TYPE_HEADER) {
                 return oldItem.header.equals(newItem.header);
+            } else if (oldItem.type == ListItem.TYPE_BUNDLE) {
+                return oldItem.bundle.packageName.equals(newItem.bundle.packageName) &&
+                       oldItem.bundle.latestTimestamp == newItem.bundle.latestTimestamp &&
+                       oldItem.bundle.getCount() == newItem.bundle.getCount();
             }
             return oldItem.entity.id == newItem.entity.id;
         }
@@ -80,6 +118,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public boolean areContentsTheSame(@NonNull ListItem oldItem, @NonNull ListItem newItem) {
             if (oldItem.type == ListItem.TYPE_HEADER) {
                 return oldItem.header.equals(newItem.header);
+            } else if (oldItem.type == ListItem.TYPE_BUNDLE) {
+                return oldItem.bundle.getCount() == newItem.bundle.getCount() &&
+                       oldItem.bundle.latestTimestamp == newItem.bundle.latestTimestamp;
             }
             NotificationEntity o = oldItem.entity;
             NotificationEntity n = newItem.entity;
@@ -129,7 +170,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        return differ.getCurrentList().get(position).type == ListItem.TYPE_HEADER ? TYPE_HEADER : TYPE_NOTIFICATION;
+        ListItem item = differ.getCurrentList().get(position);
+        if (item.type == ListItem.TYPE_HEADER) return TYPE_HEADER;
+        if (item.type == ListItem.TYPE_BUNDLE) return TYPE_BUNDLE;
+        return TYPE_NOTIFICATION;
     }
 
     @NonNull
@@ -139,6 +183,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (viewType == TYPE_HEADER) {
             View view = inflater.inflate(R.layout.item_date_header, parent, false);
             return new HeaderViewHolder(view);
+        } else if (viewType == TYPE_BUNDLE) {
+            View view = inflater.inflate(R.layout.item_notification_bundle, parent, false);
+            return new BundleViewHolder(view);
         } else {
             View view = inflater.inflate(R.layout.item_notification, parent, false);
             return new NotificationViewHolder(view);
@@ -150,6 +197,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         ListItem item = differ.getCurrentList().get(position);
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).bind(item.header);
+        } else if (holder instanceof BundleViewHolder) {
+            ((BundleViewHolder) holder).bind(item.bundle, listener);
         } else if (holder instanceof NotificationViewHolder) {
             ((NotificationViewHolder) holder).bind(item.entity, listener, showReadUnreadStatus);
         }
@@ -161,6 +210,67 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     // --- ViewHolders ---
+
+    static class BundleViewHolder extends RecyclerView.ViewHolder {
+        private final MaterialCardView card;
+        private final ImageView ivAppIcon;
+        private final TextView tvAppName;
+        private final TextView tvBundleCount;
+        private final TextView tvTime;
+        private final TextView tvPreviewTitle;
+        private final TextView tvPreviewText;
+        private final TextView tvViewAllAction;
+
+        BundleViewHolder(@NonNull View itemView) {
+            super(itemView);
+            card = itemView.findViewById(R.id.card_bundle);
+            ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
+            tvAppName = itemView.findViewById(R.id.tv_app_name);
+            tvBundleCount = itemView.findViewById(R.id.tv_bundle_count);
+            tvTime = itemView.findViewById(R.id.tv_time);
+            tvPreviewTitle = itemView.findViewById(R.id.tv_preview_title);
+            tvPreviewText = itemView.findViewById(R.id.tv_preview_text);
+            tvViewAllAction = itemView.findViewById(R.id.tv_view_all_action);
+        }
+
+        void bind(NotificationBundle bundle, OnItemClickListener listener) {
+            if (bundle == null) return;
+            Context ctx = itemView.getContext();
+            tvAppName.setText(bundle.appName != null && !bundle.appName.isEmpty() ? bundle.appName : bundle.packageName);
+            tvBundleCount.setText(ctx.getString(R.string.bundled_logs_count, bundle.getCount()));
+            tvTime.setText(DateUtils.getTimeString(ctx, bundle.latestTimestamp));
+            tvViewAllAction.setText(ctx.getString(R.string.view_all_bundled_logs, bundle.getCount()));
+
+            if (!bundle.notifications.isEmpty()) {
+                NotificationEntity latest = bundle.notifications.get(0);
+                String title = latest.title != null ? EncryptionHelper.decrypt(latest.title) : "";
+                String text = latest.text != null ? EncryptionHelper.decrypt(latest.text) : "";
+                String bigText = latest.bigText != null ? EncryptionHelper.decrypt(latest.bigText) : null;
+                String displayContent = bigText != null && !bigText.isEmpty() ? bigText : text;
+
+                tvPreviewTitle.setText(title != null && !title.isEmpty() ? title : (latest.appName != null ? latest.appName : ""));
+                tvPreviewText.setText(displayContent != null ? displayContent : "");
+                tvPreviewTitle.setVisibility(View.VISIBLE);
+                tvPreviewText.setVisibility(View.VISIBLE);
+            } else {
+                tvPreviewTitle.setVisibility(View.GONE);
+                tvPreviewText.setVisibility(View.GONE);
+            }
+
+            try {
+                Drawable icon = ctx.getPackageManager().getApplicationIcon(bundle.packageName);
+                ivAppIcon.setImageDrawable(icon);
+            } catch (Exception e) {
+                ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+            }
+
+            card.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onBundleClick(bundle);
+                }
+            });
+        }
+    }
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvDate;
