@@ -83,6 +83,7 @@ public class HistoryFragment extends Fragment {
     private final android.os.Handler searchDebounceHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable searchDebounceRunnable;
     private int rawNotificationCount = 0;
+    private boolean isLoadingPage = false;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -167,11 +168,13 @@ public class HistoryFragment extends Fragment {
                     int totalCount = layout.getItemCount();
                     int firstVisiblePos = layout.findFirstVisibleItemPosition();
 
-                    // Prefetch threshold: trigger next page load when 100 items remain
-                    if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
+                    // Prefetch threshold: trigger next page load when 250 items remain
+                    int threshold = Math.max(0, totalCount - 250);
+                    if ((visibleCount + firstVisiblePos) >= threshold && firstVisiblePos >= 0) {
                         Integer currentLimit = viewModel.getFilterLimit().getValue();
                         // Guard against concurrent multiple updates until current limit is loaded
-                        if (currentLimit != null && rawNotificationCount >= currentLimit) {
+                        if (!isLoadingPage && currentLimit != null && rawNotificationCount >= currentLimit) {
+                            isLoadingPage = true;
                             // Capture the exact position and offset at trigger time
                             lockedPosition = firstVisiblePos;
                             android.view.View firstVisibleView = layout.findViewByPosition(firstVisiblePos);
@@ -679,12 +682,14 @@ public class HistoryFragment extends Fragment {
                     final int restorePos = firstVisiblePos;
                     final int restoreOffset = topOffset;
                     adapter.submitList(buildListWithHeaders(notifications), () -> {
+                        isLoadingPage = false;
                         if (binding != null && layoutManager != null && restorePos >= 0) {
                             layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
                         }
                     });
                 } else {
                     adapter.submitList(buildListWithHeaders(notifications), () -> {
+                        isLoadingPage = false;
                         if (binding != null) {
                             Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                             if (scroll != null && scroll) {

@@ -33,6 +33,7 @@ public class ToastHistoryActivity extends BaseActivity {
     private ToastAdapter adapter;
     private Long oldestToastTimestamp = null;
     private String formattedDateFilter = null;
+    private boolean isLoadingPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +140,7 @@ public class ToastHistoryActivity extends BaseActivity {
             binding.recyclerView.setVisibility(View.VISIBLE);
             binding.emptyState.setVisibility(View.GONE);
             adapter.submitList(toasts, () -> {
+                isLoadingPage = false;
                 Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                 if (scroll != null && scroll) {
                     viewModel.clearScrollToTopEvent();
@@ -162,11 +164,13 @@ public class ToastHistoryActivity extends BaseActivity {
                 int totalCount = layoutManager.getItemCount();
                 int firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
 
-                if ((visibleCount + firstVisiblePos) >= totalCount - 100 && firstVisiblePos >= 0) {
+                int threshold = Math.max(0, totalCount - 250);
+                if ((visibleCount + firstVisiblePos) >= threshold && firstVisiblePos >= 0) {
                     Integer currentLimit = viewModel.getFilterLimit().getValue();
                     java.util.List<com.zygisk_enc.notivault.database.ToastEntity> currentList = viewModel.getToasts().getValue();
                     int currentRawCount = currentList != null ? currentList.size() : totalCount;
-                    if (currentLimit != null && currentRawCount >= currentLimit) {
+                    if (!isLoadingPage && currentLimit != null && currentRawCount >= currentLimit) {
+                        isLoadingPage = true;
                         viewModel.loadNextPage();
                     }
                 }

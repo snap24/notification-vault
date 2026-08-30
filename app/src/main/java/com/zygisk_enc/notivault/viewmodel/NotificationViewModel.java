@@ -138,7 +138,6 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     private void clearOperationProgress(long runToken) {
-        if (runToken != currentRunToken) return;
         OperationProgress currentOp = globalOperationProgress.getValue();
         if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
@@ -244,6 +243,9 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
 
                     final boolean showProgress = itemsToDecrypt > 0;
+                    final int totalToDecrypt = Math.max(1, itemsToDecrypt);
+                    final java.util.concurrent.atomic.AtomicInteger newlyDecryptedCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
                     if (showProgress && runToken == currentRunToken) {
                         postDecryptionProgress(runToken, 0);
                     }
@@ -275,13 +277,17 @@ public class NotificationViewModel extends AndroidViewModel {
                                     if (runToken != currentRunToken) return;
 
                                     NotificationEntity entity = list.get(i);
+                                    boolean wasCached = (decryptedCache.get(entity.id) != null);
                                     decryptEntity(entity);
 
                                     int processed = processedCount.incrementAndGet();
-                                    int progress = (processed * 100) / total;
 
-                                    if (showProgress && (processed % 15 == 0 || processed == total)) {
-                                        postDecryptionProgress(runToken, progress);
+                                    if (showProgress && !wasCached) {
+                                        int decrypted = newlyDecryptedCount.incrementAndGet();
+                                        int progress = (decrypted * 100) / totalToDecrypt;
+                                        if (decrypted % 15 == 0 || decrypted == totalToDecrypt) {
+                                            postDecryptionProgress(runToken, progress);
+                                        }
                                     }
 
                                     if (matchesQuery(entity, searchingMode, lowerQuery)) {
@@ -289,8 +295,9 @@ public class NotificationViewModel extends AndroidViewModel {
                                     }
 
                                     // 10% progressive streaming for initial load (0-500 items) up to 50% only (10%, 20%, 30%, 40%, 50%)
-                                    if (isInitialLoad && progress <= 50) {
-                                        int milestone = progress / 10;
+                                    if (isInitialLoad && processed <= (total / 2)) {
+                                        int streamProgress = (processed * 100) / total;
+                                        int milestone = streamProgress / 10;
                                         boolean milestoneTrigger = (milestone > 0 && milestone <= 5 && milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
                                         if (milestoneTrigger && runToken == currentRunToken) {
                                             java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
