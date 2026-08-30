@@ -147,16 +147,27 @@ public class BackupService extends Service {
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
         }
 
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING, 0);
+
         BackupUtil.importBackup(this, uri, password, new BackupUtil.BackupProgressListener() {
             @Override
             public void onProgress(int progress) {
                 notificationBuilder.setContentText(getString(R.string.importing_backup_title) + "... " + progress + "%")
                         .setProgress(100, progress, false);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING, progress);
             }
 
             @Override
             public void onSuccess() {
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING, 100);
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE, -1);
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+
                 Notification successNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
                         .setContentTitle(getString(R.string.importing_backup_title))
                         .setContentText(getString(R.string.backup_import_success))
@@ -172,6 +183,9 @@ public class BackupService extends Service {
 
             @Override
             public void onFailure(Exception e) {
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.setGlobalOperationProgress(
+                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE, -1);
+
                 Notification failureNotification = new NotificationCompat.Builder(BackupService.this, CHANNEL_ID)
                         .setContentTitle(getString(R.string.importing_backup_title))
                         .setContentText(getString(R.string.backup_import_failed, e.getMessage()))

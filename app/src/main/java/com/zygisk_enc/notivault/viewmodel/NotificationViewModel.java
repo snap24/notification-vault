@@ -47,6 +47,7 @@ public class NotificationViewModel extends AndroidViewModel {
         public static final int TYPE_NONE = 0;
         public static final int TYPE_DECRYPTING = 1;
         public static final int TYPE_DELETING = 2;
+        public static final int TYPE_IMPORTING = 3;
 
         public final int type;
         public final int progress;
@@ -57,9 +58,15 @@ public class NotificationViewModel extends AndroidViewModel {
         }
     }
 
-    private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
-    private final MutableLiveData<OperationProgress> operationProgress =
+    private static final MutableLiveData<OperationProgress> globalOperationProgress =
             new MutableLiveData<>(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+
+    public static void setGlobalOperationProgress(int type, int progress) {
+        globalOperationProgress.postValue(new OperationProgress(type, progress));
+    }
+
+    private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
+    private final MutableLiveData<OperationProgress> operationProgress = globalOperationProgress;
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int PARALLEL_THREADS = Math.max(2, Math.min(8, CPU_COUNT));
     private final java.util.concurrent.ExecutorService coordinatorExecutor =

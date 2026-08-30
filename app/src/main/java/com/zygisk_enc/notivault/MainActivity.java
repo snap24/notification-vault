@@ -114,6 +114,8 @@ public class MainActivity extends BaseActivity {
             if (shouldShow) {
                 if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_DELETING) {
                     binding.tvToolbarDecryption.setText(getString(R.string.deleting_progress, op.progress));
+                } else if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING) {
+                    binding.tvToolbarDecryption.setText(getString(R.string.importing_progress, op.progress));
                 } else {
                     binding.tvToolbarDecryption.setText(getString(R.string.decrypting_progress, op.progress));
                 }
