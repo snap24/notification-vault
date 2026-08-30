@@ -250,7 +250,7 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onBundleClick(NotificationAdapter.NotificationBundle bundle) {
-                showBundleDetailBottomSheet(bundle);
+                showBundleDetailDialog(bundle);
             }
         });
     }
@@ -784,69 +784,78 @@ public class HistoryFragment extends Fragment {
         return result;
     }
 
-    private void showBundleDetailBottomSheet(NotificationAdapter.NotificationBundle bundle) {
+    private void showBundleDetailDialog(NotificationAdapter.NotificationBundle bundle) {
         if (bundle == null || bundle.notifications == null || bundle.notifications.isEmpty()) return;
 
-        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
-                new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        android.app.Dialog dialog = new android.app.Dialog(requireContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
 
-        android.widget.LinearLayout root = new android.widget.LinearLayout(requireContext());
-        root.setOrientation(android.widget.LinearLayout.VERTICAL);
-        int padding = (int) (16 * getResources().getDisplayMetrics().density);
-        root.setPadding(padding, (int) (12 * getResources().getDisplayMetrics().density), padding, padding);
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bundle_detail, null);
 
-        // Header: Icon + Title + Subtitle
-        android.widget.LinearLayout headerLayout = new android.widget.LinearLayout(requireContext());
-        headerLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-        headerLayout.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        ImageView ivAppIcon = dialogView.findViewById(R.id.iv_bundle_app_icon);
+        TextView tvAppName = dialogView.findViewById(R.id.tv_bundle_app_name);
+        TextView tvSubInfo = dialogView.findViewById(R.id.tv_bundle_sub_info);
+        ImageButton btnClose = dialogView.findViewById(R.id.btn_bundle_close);
+        com.google.android.material.button.MaterialButton btnCopyAll = dialogView.findViewById(R.id.btn_bundle_copy_all);
+        com.google.android.material.button.MaterialButton btnDeleteAll = dialogView.findViewById(R.id.btn_bundle_delete_all);
+        RecyclerView rv = dialogView.findViewById(R.id.rv_bundle_items);
 
-        android.widget.ImageView ivIcon = new android.widget.ImageView(requireContext());
-        int iconSize = (int) (32 * getResources().getDisplayMetrics().density);
-        android.widget.LinearLayout.LayoutParams iconLp = new android.widget.LinearLayout.LayoutParams(iconSize, iconSize);
-        ivIcon.setLayoutParams(iconLp);
+        // Header
+        tvAppName.setText(bundle.appName != null && !bundle.appName.isEmpty() ? bundle.appName : bundle.packageName);
+        String relativeTime = DateUtils.getRelativeTimeLabel(requireContext(), bundle.latestTimestamp);
+        tvSubInfo.setText(getString(R.string.bundled_logs_count, bundle.getCount()) + " • " + relativeTime);
+
         try {
-            android.graphics.drawable.Drawable icon = requireContext().getPackageManager().getApplicationIcon(bundle.packageName);
-            ivIcon.setImageDrawable(icon);
+            Drawable icon = requireContext().getPackageManager().getApplicationIcon(bundle.packageName);
+            ivAppIcon.setImageDrawable(icon);
         } catch (Exception e) {
-            ivIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+            ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
         }
-        headerLayout.addView(ivIcon);
 
-        android.widget.LinearLayout titleLayout = new android.widget.LinearLayout(requireContext());
-        titleLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        android.widget.LinearLayout.LayoutParams titleLp = new android.widget.LinearLayout.LayoutParams(
-                0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        titleLp.setMarginStart((int) (10 * getResources().getDisplayMetrics().density));
-        titleLayout.setLayoutParams(titleLp);
+        btnClose.setOnClickListener(v -> dialog.dismiss());
 
-        android.widget.TextView tvTitle = new android.widget.TextView(requireContext());
-        tvTitle.setText(getString(R.string.bundle_detail_title, bundle.appName != null ? bundle.appName : bundle.packageName, bundle.getCount()));
-        tvTitle.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium);
-        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
-        titleLayout.addView(tvTitle);
+        // Action: Copy All
+        btnCopyAll.setOnClickListener(v -> {
+            StringBuilder sb = new StringBuilder();
+            for (NotificationEntity entity : bundle.notifications) {
+                String title = entity.title != null ? EncryptionHelper.decrypt(entity.title) : "";
+                String text = entity.text != null ? EncryptionHelper.decrypt(entity.text) : "";
+                String bigText = entity.bigText != null ? EncryptionHelper.decrypt(entity.bigText) : null;
+                String msg = bigText != null && !bigText.isEmpty() ? bigText : text;
+                String timeStr = DateUtils.getTimeString(requireContext(), entity.timestamp);
 
-        android.widget.TextView tvSubtitle = new android.widget.TextView(requireContext());
-        tvSubtitle.setText(DateUtils.getRelativeTimeLabel(requireContext(), bundle.latestTimestamp));
-        tvSubtitle.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelSmall);
-        titleLayout.addView(tvSubtitle);
+                if (sb.length() > 0) sb.append("\n\n---\n\n");
+                sb.append("[").append(timeStr).append("] ");
+                if (!title.isEmpty()) sb.append(title).append("\n");
+                sb.append(msg);
+            }
 
-        headerLayout.addView(titleLayout);
-        root.addView(headerLayout);
+            ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(ClipData.newPlainText("bundle_notifications", sb.toString()));
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
+            }
+        });
 
-        // Divider
-        android.view.View divider = new android.view.View(requireContext());
-        android.widget.LinearLayout.LayoutParams divLp = new android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1);
-        divLp.topMargin = (int) (12 * getResources().getDisplayMetrics().density);
-        divLp.bottomMargin = (int) (12 * getResources().getDisplayMetrics().density);
-        divider.setLayoutParams(divLp);
-        divider.setBackgroundColor(com.google.android.material.color.MaterialColors.getColor(
-                requireContext(), com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY));
-        root.addView(divider);
+        // Action: Delete All
+        btnDeleteAll.setOnClickListener(v -> {
+            List<NotificationEntity> list = new ArrayList<>(bundle.notifications);
+            for (NotificationEntity entity : list) {
+                viewModel.deleteById(entity.id);
+            }
+            dialog.dismiss();
+            String msg = getString(R.string.bundled_logs_count, list.size()) + " deleted";
+            Snackbar snackbar = Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.undo, u -> {
+                        for (NotificationEntity entity : list) {
+                            viewModel.insert(entity);
+                        }
+                    });
+            showAnchoredSnackbar(snackbar);
+        });
 
-        // RecyclerView for bundle items
-        androidx.recyclerview.widget.RecyclerView rv = new androidx.recyclerview.widget.RecyclerView(requireContext());
-        rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+        // Setup RecyclerView for bundle items
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         NotificationAdapter bundleAdapter = new NotificationAdapter();
         boolean showStatus = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("show_read_unread_status", true);
@@ -865,7 +874,9 @@ public class HistoryFragment extends Fragment {
                 String content = decTitle + (decText.isEmpty() ? "" : "\n" + decText);
                 ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("notification", content);
-                clipboard.setPrimaryClip(clip);
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(clip);
+                }
                 showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT));
             }
 
@@ -892,17 +903,47 @@ public class HistoryFragment extends Fragment {
         bundleAdapter.submitList(listItems);
         rv.setAdapter(bundleAdapter);
 
-        int maxRvHeight = (int) (400 * getResources().getDisplayMetrics().density);
-        android.widget.LinearLayout.LayoutParams rvLp = new android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                maxRvHeight
-        );
-        rv.setLayoutParams(rvLp);
-        rv.setNestedScrollingEnabled(true);
-        root.addView(rv);
+        int maxRvHeight = (int) (380 * getResources().getDisplayMetrics().density);
+        ViewGroup.LayoutParams rvLp = rv.getLayoutParams();
+        if (rvLp != null) {
+            rvLp.height = maxRvHeight;
+            rv.setLayoutParams(rvLp);
+        }
 
-        dialog.setContentView(root);
-        dialog.show();
+        dialog.setContentView(dialogView);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            dialog.getWindow().setDimAmount(0.55f);
+
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+            dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+                dialog.getWindow().getAttributes().setBlurBehindRadius(35);
+            }
+        }
+
+        // Apply GPU Gaussian Blur to Activity background while dialog is active
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && getActivity() != null) {
+            android.view.View contentRoot = getActivity().findViewById(android.R.id.content);
+            if (contentRoot != null) {
+                try {
+                    contentRoot.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(
+                            25f, 25f, android.graphics.Shader.TileMode.CLAMP));
+                } catch (Exception ignored) {}
+            }
+            dialog.setOnDismissListener(d -> {
+                if (contentRoot != null) {
+                    try {
+                        contentRoot.setRenderEffect(null);
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+
+        BaseActivity.showDialog(requireContext(), dialog);
     }
 
     private void showDetailDialog(NotificationEntity entity) {

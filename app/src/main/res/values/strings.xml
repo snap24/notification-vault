@@ -53,6 +53,8 @@
     <string name="received_times">Received %1$d times</string>
     <string name="save_to_gallery">Save Image</string>
     <string name="app_not_installed">App is not installed</string>
+    <string name="copy_all">Copy All</string>
+    <string name="delete_all">Delete All</string>
 
     <!-- Empty States -->
     <string name="empty_history_title">No notifications yet</string>
