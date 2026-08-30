@@ -131,85 +131,135 @@ public class BackupUtil {
 
     public static void exportBackup(Context context, Uri fileUri, String password, boolean includeMedia, BackupCallback callback) {
         AppExecutor.execute(() -> {
+            int cores = Math.max(2, Math.min(8, Runtime.getRuntime().availableProcessors()));
+            ExecutorService threadPool = Executors.newFixedThreadPool(cores, r -> new Thread(() -> {
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
+                r.run();
+            }, "NotiVault-ExportWorker"));
+
             try {
                 List<NotificationEntity> notifications = AppDatabase.getInstance(context)
                         .notificationDao().getAllNotificationsSync();
+                List<ToastEntity> toasts = AppDatabase.getInstance(context)
+                        .toastDao().getAllToastsSync();
 
-                JSONArray jsonArray = new JSONArray();
-                Map<String, byte[]> mediaFiles = new HashMap<>();
+                final int notifTotal = notifications.size();
+                final int toastTotal = toasts.size();
+                final int totalItems = notifTotal + toastTotal;
+                final AtomicInteger processedCounter = new AtomicInteger(0);
 
-                int total = notifications.size();
-                for (int i = 0; i < total; i++) {
-                    NotificationEntity notif = notifications.get(i);
-                    JSONObject obj = new JSONObject();
-                    obj.put("packageName", notif.packageName);
-                    obj.put("appName", notif.appName);
-                    
-                    String decryptedTitle = EncryptionHelper.decrypt(notif.title);
-                    String decryptedText = EncryptionHelper.decrypt(notif.text);
-                    String decryptedBigText = notif.bigText != null ? EncryptionHelper.decrypt(notif.bigText) : null;
+                final JSONObject[] exportNotifs = new JSONObject[notifTotal];
+                final Map<String, byte[]> mediaFiles = new ConcurrentHashMap<>();
+                List<Future<?>> tasks = new ArrayList<>();
 
-                    obj.put("title", decryptedTitle);
-                    obj.put("text", decryptedText);
-                    obj.put("bigText", decryptedBigText != null ? decryptedBigText : JSONObject.NULL);
-                    
-                    obj.put("timestamp", notif.timestamp);
-                    obj.put("isRead", notif.isRead ? 1 : 0);
-                    obj.put("isFavorite", notif.isFavorite ? 1 : 0);
+                int notifChunkSize = Math.max(50, (notifTotal + cores - 1) / cores);
+                for (int i = 0; i < notifTotal; i += notifChunkSize) {
+                    final int start = i;
+                    final int end = Math.min(i + notifChunkSize, notifTotal);
+                    tasks.add(threadPool.submit(() -> {
+                        for (int j = start; j < end; j++) {
+                            NotificationEntity notif = notifications.get(j);
+                            JSONObject obj = new JSONObject();
+                            try {
+                                obj.put("packageName", notif.packageName);
+                                obj.put("appName", notif.appName);
 
-                    if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
-                        String[] paths = notif.imagePath.split("\\|");
-                        StringBuilder savedFileNames = new StringBuilder();
-                        for (String p : paths) {
-                            if (p != null && !p.trim().isEmpty()) {
-                                File imgFile = new File(p.trim());
-                                if (imgFile.exists()) {
-                                    byte[] decryptedImageBytes = EncryptionHelper.decryptFile(imgFile);
-                                    if (decryptedImageBytes != null) {
-                                        String fileName = imgFile.getName();
-                                        mediaFiles.put(fileName, decryptedImageBytes);
-                                        if (savedFileNames.length() > 0) savedFileNames.append("|");
-                                        savedFileNames.append(fileName);
+                                String decryptedTitle = EncryptionHelper.decrypt(notif.title);
+                                String decryptedText = EncryptionHelper.decrypt(notif.text);
+                                String decryptedBigText = notif.bigText != null ? EncryptionHelper.decrypt(notif.bigText) : null;
+
+                                obj.put("title", decryptedTitle);
+                                obj.put("text", decryptedText);
+                                obj.put("bigText", decryptedBigText != null ? decryptedBigText : JSONObject.NULL);
+
+                                obj.put("timestamp", notif.timestamp);
+                                obj.put("isRead", notif.isRead ? 1 : 0);
+                                obj.put("isFavorite", notif.isFavorite ? 1 : 0);
+
+                                if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
+                                    String[] paths = notif.imagePath.split("\\|");
+                                    StringBuilder savedFileNames = new StringBuilder();
+                                    for (String p : paths) {
+                                        if (p != null && !p.trim().isEmpty()) {
+                                            File imgFile = new File(p.trim());
+                                            if (imgFile.exists()) {
+                                                byte[] decryptedImageBytes = EncryptionHelper.decryptFile(imgFile);
+                                                if (decryptedImageBytes != null) {
+                                                    String fileName = imgFile.getName();
+                                                    mediaFiles.put(fileName, decryptedImageBytes);
+                                                    if (savedFileNames.length() > 0) savedFileNames.append("|");
+                                                    savedFileNames.append(fileName);
+                                                }
+                                            }
+                                        }
                                     }
+                                    if (savedFileNames.length() > 0) {
+                                        obj.put("imagePath", savedFileNames.toString());
+                                    } else {
+                                        obj.put("imagePath", JSONObject.NULL);
+                                    }
+                                } else {
+                                    obj.put("imagePath", JSONObject.NULL);
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            exportNotifs[j] = obj;
+                            int count = processedCounter.incrementAndGet();
+                            if (callback instanceof BackupProgressListener && totalItems > 0) {
+                                int progress = (count * 90) / totalItems;
+                                ((BackupProgressListener) callback).onProgress(progress);
                             }
                         }
-                        if (savedFileNames.length() > 0) {
-                            obj.put("imagePath", savedFileNames.toString());
-                        } else {
-                            obj.put("imagePath", JSONObject.NULL);
-                        }
-                    } else {
-                        obj.put("imagePath", JSONObject.NULL);
-                    }
-                    
-                    jsonArray.put(obj);
+                    }));
+                }
 
-                    if (callback instanceof BackupProgressListener) {
-                        int progress = ((i + 1) * 100) / (total > 0 ? total : 1);
-                        ((BackupProgressListener) callback).onProgress(progress);
-                    }
+                final JSONObject[] exportToasts = new JSONObject[toastTotal];
+                int toastChunkSize = Math.max(50, (toastTotal + cores - 1) / cores);
+                for (int i = 0; i < toastTotal; i += toastChunkSize) {
+                    final int start = i;
+                    final int end = Math.min(i + toastChunkSize, toastTotal);
+                    tasks.add(threadPool.submit(() -> {
+                        for (int j = start; j < end; j++) {
+                            ToastEntity toast = toasts.get(j);
+                            JSONObject obj = new JSONObject();
+                            try {
+                                obj.put("packageName", toast.packageName);
+                                obj.put("appName", toast.appName);
+                                obj.put("text", EncryptionHelper.decrypt(toast.text));
+                                obj.put("timestamp", toast.timestamp);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            exportToasts[j] = obj;
+                            int count = processedCounter.incrementAndGet();
+                            if (callback instanceof BackupProgressListener && totalItems > 0) {
+                                int progress = (count * 90) / totalItems;
+                                ((BackupProgressListener) callback).onProgress(progress);
+                            }
+                        }
+                    }));
+                }
+
+                for (Future<?> task : tasks) {
+                    task.get();
+                }
+
+                JSONArray jsonArray = new JSONArray();
+                for (JSONObject obj : exportNotifs) {
+                    if (obj != null) jsonArray.put(obj);
+                }
+
+                JSONArray toastsArray = new JSONArray();
+                for (JSONObject obj : exportToasts) {
+                    if (obj != null) toastsArray.put(obj);
                 }
 
                 JSONObject rootJson = new JSONObject();
                 rootJson.put("version", 2);
                 rootJson.put("notifications", jsonArray);
-
-                JSONArray toastsArray = new JSONArray();
-                try {
-                    List<ToastEntity> toasts = AppDatabase.getInstance(context)
-                            .toastDao().getAllToastsSync();
-                    for (ToastEntity toast : toasts) {
-                        JSONObject obj = new JSONObject();
-                        obj.put("packageName", toast.packageName);
-                        obj.put("appName", toast.appName);
-                        obj.put("text", EncryptionHelper.decrypt(toast.text));
-                        obj.put("timestamp", toast.timestamp);
-                        toastsArray.put(obj);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 rootJson.put("toasts", toastsArray);
 
                 String jsonString = rootJson.toString(2);
@@ -241,6 +291,9 @@ public class BackupUtil {
                 try (OutputStream os = context.getContentResolver().openOutputStream(fileUri)) {
                     if (os != null) {
                         os.write(encryptedData);
+                        if (callback instanceof BackupProgressListener) {
+                            ((BackupProgressListener) callback).onProgress(100);
+                        }
                         callback.onSuccess();
                     } else {
                         callback.onFailure(new Exception("Output stream is null"));
@@ -248,14 +301,19 @@ public class BackupUtil {
                 }
             } catch (Exception e) {
                 callback.onFailure(e);
+            } finally {
+                threadPool.shutdown();
             }
         });
     }
 
     public static void importBackup(Context context, Uri fileUri, String password, BackupCallback callback) {
         AppExecutor.execute(() -> {
-            int cores = Math.max(2, Runtime.getRuntime().availableProcessors());
-            ExecutorService threadPool = Executors.newFixedThreadPool(cores);
+            int cores = Math.max(2, Math.min(8, Runtime.getRuntime().availableProcessors()));
+            ExecutorService threadPool = Executors.newFixedThreadPool(cores, r -> new Thread(() -> {
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
+                r.run();
+            }, "NotiVault-ImportWorker"));
             try {
                 byte[] fileBytes;
                 try (InputStream is = context.getContentResolver().openInputStream(fileUri)) {
