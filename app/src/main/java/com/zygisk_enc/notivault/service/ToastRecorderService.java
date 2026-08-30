@@ -47,6 +47,10 @@ public class ToastRecorderService extends AccessibilityService {
                 if (lastToast != null) {
                     String lastDecrypted = EncryptionHelper.decrypt(lastToast.text);
                     if (text.equals(lastDecrypted)) {
+                        if (Math.abs(now - lastToast.timestamp) <= 1500L) {
+                            // System accessibility redraw of the same toast within 1.5s -> ignore
+                            return;
+                        }
                         isDuplicate = true;
                         int newCount = Math.max(1, lastToast.duplicateCount) + 1;
                         db.toastDao().updateDuplicate(lastToast.id, newCount, now);
