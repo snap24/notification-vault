@@ -165,11 +165,13 @@ public final class BundleManager {
                 while (currentStreakStart < totalItems) {
                     BundleScanItem firstInStreak = allItems.get(currentStreakStart);
                     String pkg = firstInStreak.packageName;
+                    String currentDateGroup = DateUtils.getDateGroupKey(firstInStreak.timestamp);
                     int streakEnd = currentStreakStart + 1;
 
                     while (streakEnd < totalItems) {
                         BundleScanItem next = allItems.get(streakEnd);
-                        if (pkg != null && pkg.equals(next.packageName)) {
+                        if (pkg != null && pkg.equals(next.packageName) &&
+                                currentDateGroup.equals(DateUtils.getDateGroupKey(next.timestamp))) {
                             streakEnd++;
                         } else {
                             break;
