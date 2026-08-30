@@ -797,6 +797,8 @@ public class HistoryFragment extends Fragment {
         TextView tvSubInfo = dialogView.findViewById(R.id.tv_bundle_sub_info);
         ImageButton btnClose = dialogView.findViewById(R.id.btn_bundle_close);
         com.google.android.material.button.MaterialButton btnCopyAll = dialogView.findViewById(R.id.btn_bundle_copy_all);
+        com.google.android.material.button.MaterialButton btnStarAll = dialogView.findViewById(R.id.btn_bundle_star_all);
+        com.google.android.material.button.MaterialButton btnOpenApp = dialogView.findViewById(R.id.btn_bundle_open_app);
         com.google.android.material.button.MaterialButton btnDeleteAll = dialogView.findViewById(R.id.btn_bundle_delete_all);
         RecyclerView rv = dialogView.findViewById(R.id.rv_bundle_items);
 
@@ -837,6 +839,46 @@ public class HistoryFragment extends Fragment {
             }
         });
 
+        // Action: Star All / Unstar All
+        boolean hasAnyFavorite = false;
+        for (NotificationEntity entity : bundle.notifications) {
+            if (entity.isFavorite) {
+                hasAnyFavorite = true;
+                break;
+            }
+        }
+        final boolean[] isStarAll = {hasAnyFavorite};
+        updateStarChip(btnStarAll, isStarAll[0]);
+
+        // Setup RecyclerView for bundle items
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        NotificationAdapter bundleAdapter = new NotificationAdapter();
+
+        btnStarAll.setOnClickListener(v -> {
+            isStarAll[0] = !isStarAll[0];
+            for (NotificationEntity entity : bundle.notifications) {
+                entity.isFavorite = isStarAll[0];
+                viewModel.setFavorite(entity.id, isStarAll[0]);
+            }
+            updateStarChip(btnStarAll, isStarAll[0]);
+            bundleAdapter.notifyDataSetChanged();
+        });
+
+        // Action: Open App
+        btnOpenApp.setOnClickListener(v -> {
+            try {
+                Intent launchIntent = requireContext().getPackageManager().getLaunchIntentForPackage(bundle.packageName);
+                if (launchIntent != null) {
+                    startActivity(launchIntent);
+                    dialog.dismiss();
+                } else {
+                    showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.app_not_installed, Snackbar.LENGTH_SHORT));
+                }
+            } catch (Exception e) {
+                showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.app_not_installed, Snackbar.LENGTH_SHORT));
+            }
+        });
+
         // Action: Delete All
         btnDeleteAll.setOnClickListener(v -> {
             List<NotificationEntity> list = new ArrayList<>(bundle.notifications);
@@ -853,10 +895,6 @@ public class HistoryFragment extends Fragment {
                     });
             showAnchoredSnackbar(snackbar);
         });
-
-        // Setup RecyclerView for bundle items
-        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        NotificationAdapter bundleAdapter = new NotificationAdapter();
         boolean showStatus = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("show_read_unread_status", true);
         bundleAdapter.setShowReadUnreadStatus(showStatus);
