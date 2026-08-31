@@ -1022,8 +1022,15 @@ public class HistoryFragment extends Fragment {
         bundleAdapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(NotificationEntity entity) {
-                dialog.dismiss();
-                showDetailDialog(entity);
+                showDetailDialog(entity, () -> {
+                    bundleAdapter.notifyDataSetChanged();
+                    isStarAll[0] = bundle.hasFavorite();
+                    updateStarChip(btnStarAll, isStarAll[0]);
+                    tvSubInfo.setText(getString(R.string.bundled_logs_count, bundle.getCount()) + " • " + DateUtils.getRelativeTimeLabel(requireContext(), bundle.latestTimestamp));
+                    if (bundle.notifications.isEmpty()) {
+                        dialog.dismiss();
+                    }
+                });
             }
 
             @Override
@@ -1041,7 +1048,16 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onDeleteClick(NotificationEntity entity) {
+                bundle.notifications.remove(entity);
                 viewModel.deleteById(entity.id);
+                bundleAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
+                isStarAll[0] = bundle.hasFavorite();
+                updateStarChip(btnStarAll, isStarAll[0]);
+                tvSubInfo.setText(getString(R.string.bundled_logs_count, bundle.getCount()) + " • " + DateUtils.getRelativeTimeLabel(requireContext(), bundle.latestTimestamp));
+                if (bundle.notifications.isEmpty()) {
+                    dialog.dismiss();
+                }
             }
 
             @Override
@@ -1150,6 +1166,10 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showDetailDialog(NotificationEntity entity) {
+        showDetailDialog(entity, null);
+    }
+
+    private void showDetailDialog(NotificationEntity entity, Runnable onDismissCallback) {
         if (entity == null) return;
 
         String decTitle = EncryptionHelper.decrypt(entity.title);
@@ -1199,6 +1219,12 @@ public class HistoryFragment extends Fragment {
             });
         }
 
+        dialog.setOnDismissListener(d -> {
+            if (onDismissCallback != null) {
+                onDismissCallback.run();
+            }
+        });
+
         // Populate Content
         tvTitle.setText(displayTitle);
         tvText.setText(content != null ? content : "");
@@ -1229,6 +1255,9 @@ public class HistoryFragment extends Fragment {
             viewModel.setFavorite(entity.id, isFav[0]);
             updateStarChip(chipStar, isFav[0]);
             adapter.notifyDataSetChanged();
+            if (onDismissCallback != null) {
+                onDismissCallback.run();
+            }
         });
 
         // Action: Open App
@@ -1251,7 +1280,12 @@ public class HistoryFragment extends Fragment {
             viewModel.deleteById(entity.id);
             dialog.dismiss();
             Snackbar snackbar = Snackbar.make(binding.getRoot(), R.string.notification_deleted, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.undo, u -> viewModel.insert(entity));
+                    .setAction(R.string.undo, u -> {
+                        viewModel.insert(entity);
+                        if (onDismissCallback != null) {
+                            onDismissCallback.run();
+                        }
+                    });
             showAnchoredSnackbar(snackbar);
         });
 
