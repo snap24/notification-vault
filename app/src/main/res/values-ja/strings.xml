@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">未記録</string>
     <string name="badge_personal">個人</string>
     <string name="btn_metadata">メタデータ</string>
+    <string name="auth_toggle_metadata_capture">メタデータ取得の切り替えを認証</string>
 </resources>

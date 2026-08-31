@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">Nicht aufgezeichnet</string>
     <string name="badge_personal">Privat</string>
     <string name="btn_metadata">Metadaten</string>
+    <string name="auth_toggle_metadata_capture">Authentifizieren, um die Metadatenerfassung umzuschalten</string>
 </resources>

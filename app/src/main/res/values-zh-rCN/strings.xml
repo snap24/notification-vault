@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">未记录</string>
     <string name="badge_personal">个人</string>
     <string name="btn_metadata">元数据</string>
+    <string name="auth_toggle_metadata_capture">验证身份以切换元数据捕获</string>
 </resources>

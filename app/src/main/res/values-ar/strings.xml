@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">غير مسجل</string>
     <string name="badge_personal">شخصي</string>
     <string name="btn_metadata">البيانات الوصفية</string>
+    <string name="auth_toggle_metadata_capture">المصادقة للتبديل بين التقاط البيانات الوصفية</string>
 </resources>

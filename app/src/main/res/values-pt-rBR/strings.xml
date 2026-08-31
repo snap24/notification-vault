@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">Não registrado</string>
     <string name="badge_personal">Pessoal</string>
     <string name="btn_metadata">Metadados</string>
+    <string name="auth_toggle_metadata_capture">Autentique para alternar a captura de metadados</string>
 </resources>

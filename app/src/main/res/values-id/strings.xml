@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">Tidak terekam</string>
     <string name="badge_personal">Pribadi</string>
     <string name="btn_metadata">Metadata</string>
+    <string name="auth_toggle_metadata_capture">Autentikasi untuk mengalihkan pengambilan metadata</string>
 </resources>

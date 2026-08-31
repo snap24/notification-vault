@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">Не записано</string>
     <string name="badge_personal">Личный</string>
     <string name="btn_metadata">Метаданные</string>
+    <string name="auth_toggle_metadata_capture">Подтвердите личность для переключения сбора метаданных</string>
 </resources>

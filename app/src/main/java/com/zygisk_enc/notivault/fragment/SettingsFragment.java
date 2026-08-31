@@ -327,6 +327,30 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
+        // Extended Metadata Capture switch with biometric authentication
+        Preference metadataCapturePref = findPreference("capture_extended_metadata");
+        if (metadataCapturePref != null) {
+            metadataCapturePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabled = (boolean) newValue;
+                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .getBoolean("biometric_lock", false);
+
+                Runnable applyChange = () -> {
+                    if (preference instanceof SwitchPreferenceCompat) {
+                        ((SwitchPreferenceCompat) preference).setChecked(enabled);
+                    }
+                    PreferenceUtil.setExtendedMetadataEnabled(requireContext(), enabled);
+                };
+
+                if (isBiometricEnabled) {
+                    verifyBiometricsToProceed(applyChange, getString(R.string.auth_toggle_metadata_capture));
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        }
+
         // Export backup click
         Preference exportPref = findPreference("export_backup");
         if (exportPref != null) {

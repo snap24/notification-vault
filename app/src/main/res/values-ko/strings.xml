@@ -460,4 +460,5 @@
     <string name="meta_not_recorded">기록되지 않음</string>
     <string name="badge_personal">개인</string>
     <string name="btn_metadata">메타데이터</string>
+    <string name="auth_toggle_metadata_capture">메타데이터 캡처를 전환하려면 인증하세요</string>
 </resources>
