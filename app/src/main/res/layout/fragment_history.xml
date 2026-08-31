@@ -57,6 +57,9 @@
                 android:text="@string/chip_date_range"
                 app:chipIcon="@drawable/ic_calendar"
                 app:chipIconSize="18dp"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
             <!-- App Rules Shortcut Chip -->
@@ -68,6 +71,9 @@
                 android:text="@string/chip_rules"
                 app:chipIcon="@drawable/ic_rules"
                 app:chipIconSize="18dp"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
             <!-- Clear Logs Chip -->
@@ -79,6 +85,9 @@
                 android:text="@string/chip_clear_logs"
                 app:chipIcon="@drawable/ic_delete_sweep"
                 app:chipIconSize="18dp"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
             <!-- Toasts Log Shortcut Chip -->
@@ -90,6 +99,9 @@
                 android:text="@string/toasts"
                 app:chipIcon="@drawable/ic_toast_bread"
                 app:chipIconSize="18dp"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
             <!-- Cloud Backup Shortcut Chip -->
@@ -101,6 +113,9 @@
                 android:text="@string/chip_cloud_backup"
                 app:chipIcon="@drawable/ic_cloud_upload"
                 app:chipIconSize="18dp"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
         </LinearLayout>
