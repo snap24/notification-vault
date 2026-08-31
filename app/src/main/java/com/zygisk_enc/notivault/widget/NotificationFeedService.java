@@ -49,7 +49,7 @@ public class NotificationFeedService extends RemoteViewsService {
             try {
                 boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(context);
                 int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
-                String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, appWidgetId);
+                String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, appWidgetId, profileMode);
                 if (filterPkg != null && !"ALL".equals(filterPkg)) {
                     notifications = AppDatabase.getInstance(context)
                             .notificationDao()

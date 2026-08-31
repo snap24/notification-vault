@@ -62,15 +62,14 @@ public class WidgetFilterActivity extends BaseActivity {
     }
 
     private void loadApps() {
-        String currentPkg = PreferenceUtil.getWidgetFeedPackage(this, appWidgetId);
+        boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
+        int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(this) : 0;
+        String currentPkg = PreferenceUtil.getWidgetFeedPackage(this, appWidgetId, profileMode);
 
         AppExecutor.execute(() -> {
-            boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
-            int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(this) : -1;
-
             List<AppSummary> summaries = AppDatabase.getInstance(this)
                     .notificationDao()
-                    .getAppSummariesSync(profileMode);
+                    .getAppSummariesSync(hasWorkProfile ? profileMode : -1);
 
             PackageManager pm = getPackageManager();
             List<FilterItem> items = new ArrayList<>();
@@ -113,7 +112,7 @@ public class WidgetFilterActivity extends BaseActivity {
 
             runOnUiThread(() -> {
                 adapter = new AppFilterAdapter(items, item -> {
-                    PreferenceUtil.setWidgetFeedPackage(this, appWidgetId, item.packageName);
+                    PreferenceUtil.setWidgetFeedPackage(this, appWidgetId, item.packageName, profileMode);
                     
                     AppWidgetManager manager = AppWidgetManager.getInstance(this);
                     if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {

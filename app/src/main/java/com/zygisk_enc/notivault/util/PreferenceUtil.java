@@ -223,13 +223,32 @@ public class PreferenceUtil {
     // ── Widget Feed Filter Preferences ──────────────────────────────────────
 
     public static String getWidgetFeedPackage(Context context, int appWidgetId) {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("widget_feed_filter_pkg_" + appWidgetId, null);
+        boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
+        int profileMode = hasWorkProfile ? getActiveProfileMode(context) : 0;
+        return getWidgetFeedPackage(context, appWidgetId, profileMode);
+    }
+
+    public static String getWidgetFeedPackage(Context context, int appWidgetId, int profileMode) {
+        if (context == null) return null;
+        String key = "widget_feed_filter_pkg_" + profileMode + "_" + appWidgetId;
+        String val = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null);
+        if (val == null && profileMode <= 0) {
+            val = PreferenceManager.getDefaultSharedPreferences(context).getString("widget_feed_filter_pkg_" + appWidgetId, null);
+        }
+        return val;
     }
 
     public static void setWidgetFeedPackage(Context context, int appWidgetId, String packageName) {
+        boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
+        int profileMode = hasWorkProfile ? getActiveProfileMode(context) : 0;
+        setWidgetFeedPackage(context, appWidgetId, packageName, profileMode);
+    }
+
+    public static void setWidgetFeedPackage(Context context, int appWidgetId, String packageName, int profileMode) {
+        if (context == null) return;
+        String key = "widget_feed_filter_pkg_" + profileMode + "_" + appWidgetId;
         PreferenceManager.getDefaultSharedPreferences(context)
-                .edit().putString("widget_feed_filter_pkg_" + appWidgetId, packageName).apply();
+                .edit().putString(key, packageName).commit();
     }
 
     public static boolean isAccessibilityServiceEnabled(Context context) {

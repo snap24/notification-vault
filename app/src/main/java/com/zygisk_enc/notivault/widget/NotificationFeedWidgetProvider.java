@@ -65,7 +65,7 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
         views.setEmptyView(R.id.lv_widget_notifications, R.id.tv_widget_feed_empty);
 
         // Check dynamic title based on selected app filter
-        String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, id);
+        String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, id, profileMode);
         if (filterPkg != null && !"ALL".equals(filterPkg)) {
             String appTitle = filterPkg;
             try {
