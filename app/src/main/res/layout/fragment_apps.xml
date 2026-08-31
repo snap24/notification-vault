@@ -9,86 +9,122 @@
     android:paddingHorizontal="16dp">
 
     <!-- Batch Selection Bar (shown in multi-select mode) -->
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_batch_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
         android:visibility="gone">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cb_select_all"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/select_all"
-            android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp">
 
-        <TextView
-            android:id="@+id/tv_selected_count"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="@string/selected_count_format"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_select_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_all"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_delete_selected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delete"
-            style="@style/Widget.Material3.Button.TonalButton"
-            app:icon="@drawable/ic_delete_sweep"
-            app:iconTint="?attr/colorError"
-            android:textColor="?attr/colorError"
-            android:layout_marginEnd="6dp" />
+            <TextView
+                android:id="@+id/tv_selected_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@string/selected_count_format"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <ImageButton
-            android:id="@+id/btn_cancel_selection"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@drawable/bg_button_square_ripple"
-            android:src="@drawable/ic_close"
-            android:contentDescription="@string/desc_cancel_selection"
-            app:tint="?attr/colorPrimary" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_selected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:icon="@drawable/ic_trash_bin"
+                app:iconTint="?attr/colorError"
+                android:textColor="?attr/colorError"
+                app:cornerRadius="12dp"
+                android:layout_marginEnd="6dp" />
 
-    </LinearLayout>
+            <ImageButton
+                android:id="@+id/btn_cancel_selection"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_button_circle_ripple"
+                android:src="@drawable/ic_close"
+                android:contentDescription="@string/desc_cancel_selection"
+                app:tint="?attr/colorPrimary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Header Stats Banner -->
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_header_stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="4dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
-        <TextView
-            android:id="@+id/tv_apps_header_summary"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/tracked_applications"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp">
 
-        <TextView
-            android:id="@+id/tv_total_notifications_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 notifications"
-            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-            android:textColor="?attr/colorPrimary"
-            android:background="@drawable/bg_widget_pill"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_nav_apps_selected"
+                app:tint="?attr/colorPrimary"
+                android:layout_marginEnd="8dp"
+                android:importantForAccessibility="no" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_apps_header_summary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tracked_applications"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_total_notifications_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 notifications"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textStyle="bold"
+                android:background="@drawable/bg_widget_pill"
+                android:backgroundTint="?attr/colorSecondaryContainer"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Search bar for apps -->
     <com.google.android.material.textfield.TextInputLayout
@@ -110,6 +146,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:singleLine="true"
             android:maxLines="1"
             android:paddingStart="48dp"
             android:paddingVertical="10dp" />
@@ -137,6 +174,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sort_most_alerts"
                 android:checked="true"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
@@ -144,6 +184,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sort_name_az"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
@@ -151,6 +194,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sort_least_alerts"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Filter" />
 
         </com.google.android.material.chip.ChipGroup>
@@ -177,22 +223,33 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
+            android:paddingHorizontal="32dp"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:src="@drawable/ic_apps"
-                app:tint="?attr/colorOutline"
-                android:layout_marginBottom="16dp"
-                android:importantForAccessibility="no" />
+            <FrameLayout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/bg_button_circle_ripple"
+                android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/sel_nav_apps"
+                    app:tint="?attr/colorPrimary"
+                    android:importantForAccessibility="no" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/empty_apps_title"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -201,8 +258,7 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:gravity="center"
-                android:layout_marginTop="8dp"
-                android:paddingHorizontal="32dp" />
+                android:layout_marginTop="8dp" />
 
         </LinearLayout>
 
