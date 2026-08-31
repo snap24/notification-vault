@@ -677,44 +677,48 @@ public class HistoryFragment extends Fragment {
                 showRecyclerView(false);
             } else {
                 showRecyclerView(true);
-                
-                if (isViewingMessage) {
-                    isViewingMessage = false;
-                    
-                    androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
-                            (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                    int firstVisiblePos = -1;
-                    int topOffset = 0;
-                    if (layoutManager != null) {
-                        firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
-                        android.view.View firstVisibleView = layoutManager.findViewByPosition(firstVisiblePos);
-                        if (firstVisibleView != null) {
-                            topOffset = firstVisibleView.getTop() - binding.recyclerView.getPaddingTop();
-                        }
-                    }
 
-                    final int restorePos = firstVisiblePos;
-                    final int restoreOffset = topOffset;
-                    adapter.submitList(buildListWithHeaders(notifications), () -> {
-                        isLoadingPage = false;
-                        if (binding != null && layoutManager != null && restorePos >= 0) {
-                            layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
-                        }
-                    });
-                } else {
-                    adapter.submitList(buildListWithHeaders(notifications), () -> {
-                        isLoadingPage = false;
-                        if (binding != null) {
-                            if (!userHasScrolled) {
-                                androidx.recyclerview.widget.LinearLayoutManager lm =
-                                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                                if (lm != null) {
-                                    lm.scrollToPositionWithOffset(0, 0);
-                                }
-                            }
-                        }
-                    });
+                final boolean viewingMsg = isViewingMessage;
+                isViewingMessage = false;
+
+                androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
+                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                int firstVisiblePos = -1;
+                int topOffset = 0;
+                if (layoutManager != null) {
+                    firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
+                    android.view.View firstVisibleView = layoutManager.findViewByPosition(firstVisiblePos);
+                    if (firstVisibleView != null) {
+                        topOffset = firstVisibleView.getTop() - binding.recyclerView.getPaddingTop();
+                    }
                 }
+
+                final int restorePos = firstVisiblePos;
+                final int restoreOffset = topOffset;
+                final Context ctx = getContext();
+
+                AppExecutor.execute(() -> {
+                    List<NotificationAdapter.ListItem> items = buildListWithHeaders(ctx, notifications);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (binding == null) return;
+                            adapter.submitList(items, () -> {
+                                isLoadingPage = false;
+                                if (binding != null) {
+                                    if (viewingMsg && layoutManager != null && restorePos >= 0) {
+                                        layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
+                                    } else if (!userHasScrolled) {
+                                        androidx.recyclerview.widget.LinearLayoutManager lm =
+                                                (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                                        if (lm != null) {
+                                            lm.scrollToPositionWithOffset(0, 0);
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    }
+                });
             }
         });
 
@@ -784,7 +788,7 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    private List<NotificationAdapter.ListItem> buildListWithHeaders(List<NotificationEntity> notifications) {
+    private List<NotificationAdapter.ListItem> buildListWithHeaders(Context context, List<NotificationEntity> notifications) {
         List<NotificationAdapter.ListItem> result = new ArrayList<>();
         if (notifications == null || notifications.isEmpty()) return result;
 
@@ -794,7 +798,7 @@ public class HistoryFragment extends Fragment {
         while (i < size) {
             NotificationEntity first = notifications.get(i);
             String currentDateGroup = DateUtils.getDateGroupKey(first.timestamp);
-            result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(getContext(), first.timestamp)));
+            result.add(new NotificationAdapter.ListItem(DateUtils.getRelativeTimeLabel(context, first.timestamp)));
 
             // Process all items in this date group
             while (i < size && DateUtils.getDateGroupKey(notifications.get(i).timestamp).equals(currentDateGroup)) {

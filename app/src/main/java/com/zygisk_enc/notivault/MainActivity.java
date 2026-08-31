@@ -111,8 +111,17 @@ public class MainActivity extends BaseActivity {
             boolean shouldShow = op != null && op.progress >= 0 && (op.progress < 100 || op.type != com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE);
             int newVisibility = shouldShow ? android.view.View.VISIBLE : android.view.View.GONE;
             if (binding.cardToolbarDecryption.getVisibility() != newVisibility) {
-                androidx.transition.TransitionManager.beginDelayedTransition(binding.layoutToolbarPills, new androidx.transition.ChangeBounds().setDuration(200));
-                binding.cardToolbarDecryption.setVisibility(newVisibility);
+                if (shouldShow) {
+                    binding.cardToolbarDecryption.animate().cancel();
+                    binding.cardToolbarDecryption.setAlpha(0f);
+                    binding.cardToolbarDecryption.setVisibility(android.view.View.VISIBLE);
+                    binding.cardToolbarDecryption.animate().alpha(1f).setDuration(150).start();
+                } else {
+                    binding.cardToolbarDecryption.animate().cancel();
+                    binding.cardToolbarDecryption.animate().alpha(0f).setDuration(150).withEndAction(() -> {
+                        binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
+                    }).start();
+                }
             }
             if (shouldShow) {
                 if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_DELETING) {
