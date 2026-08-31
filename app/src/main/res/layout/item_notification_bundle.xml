@@ -79,7 +79,7 @@
                         android:textStyle="bold"
                         android:visibility="gone" />
 
-                    <!-- Bundle Tag Badge beside Time (Material 3 Rounded Box) -->
+                    <!-- Bundle Tag Badge beside Time (Material 3 Rounded Box - Amber Text) -->
                     <TextView
                         android:id="@+id/tv_bundle_tag"
                         android:layout_width="wrap_content"
@@ -89,7 +89,7 @@
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="3dp"
                         android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textColor="@color/bundle_tag_amber"
                         android:textStyle="bold" />
 
                     <TextView

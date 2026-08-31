@@ -242,4 +242,5 @@
     <color name="widget_text_secondary">#B3FFFFFF</color>
     <color name="widget_text_tertiary">#80FFFFFF</color>
     <color name="bundle_tag_green">#22C55E</color>
+    <color name="bundle_tag_amber">#F59E0B</color>
 </resources>
