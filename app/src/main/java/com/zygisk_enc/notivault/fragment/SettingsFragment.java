@@ -532,7 +532,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 );
             }
         } else if ("qs_tile_enabled".equals(key)) {
-            boolean tileEnabled = sharedPreferences.getBoolean("qs_tile_enabled", true);
+            boolean tileEnabled = sharedPreferences.getBoolean("qs_tile_enabled", false);
             PreferenceUtil.setTileServiceEnabled(requireContext(), tileEnabled);
         }
     }

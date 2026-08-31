@@ -30,7 +30,7 @@
             app:key="qs_tile_enabled"
             app:title="@string/pref_qs_tile_title"
             app:summary="@string/pref_qs_tile_summary"
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:widgetLayout="@layout/custom_preference_switch"
             app:iconSpaceReserved="false" />
 
