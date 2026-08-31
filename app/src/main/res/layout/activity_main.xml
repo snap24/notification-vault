@@ -75,19 +75,12 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="8dp">
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:src="@drawable/ic_search"
-                            app:tint="?attr/colorOnSecondaryContainer" />
+                        android:paddingHorizontal="10dp">
 
                         <TextView
                             android:id="@+id/tv_toolbar_search_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
                             android:text="0 found"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSecondaryContainer"
