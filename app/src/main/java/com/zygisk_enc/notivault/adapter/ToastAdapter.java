@@ -112,6 +112,17 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             // Load and cache App Icon asynchronously using memory-safe AppIconLoader
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
                     ivAppIcon, toast.packageName, R.drawable.ic_code);
+
+            itemView.setOnClickListener(v -> {
+                if (toast.decryptedText != null && !toast.decryptedText.isEmpty()) {
+                    android.content.ClipboardManager cm = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (cm != null) {
+                        android.content.ClipData clip = android.content.ClipData.newPlainText("Toast Message", toast.decryptedText);
+                        cm.setPrimaryClip(clip);
+                        android.widget.Toast.makeText(context, R.string.copied_to_clipboard, android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

@@ -293,7 +293,6 @@ public class ToastHistoryActivity extends BaseActivity {
         boolean hasAnyFilter = hasAppFilter || hasDateFilter;
 
         if (!hasAnyFilter) {
-            binding.tvActiveFilters.setText(R.string.showing_all_toasts);
             binding.scrollActiveFilters.setVisibility(View.GONE);
             binding.btnReloadAll.setVisibility(View.GONE);
         } else {
@@ -321,14 +320,6 @@ public class ToastHistoryActivity extends BaseActivity {
                 binding.chipActiveDateFilter.setText(getString(R.string.date_filter_format, formattedDateFilter));
             } else {
                 binding.chipActiveDateFilter.setVisibility(View.GONE);
-            }
-
-            if (hasAppFilter && hasDateFilter) {
-                binding.tvActiveFilters.setText(getString(R.string.app_and_date_filter_format, appLabel, formattedDateFilter));
-            } else if (hasAppFilter) {
-                binding.tvActiveFilters.setText(getString(R.string.app_filter_format, appLabel));
-            } else {
-                binding.tvActiveFilters.setText(getString(R.string.date_filter_format, formattedDateFilter));
             }
         }
     }
