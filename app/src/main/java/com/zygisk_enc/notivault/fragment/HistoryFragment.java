@@ -85,6 +85,7 @@ public class HistoryFragment extends Fragment {
     private Runnable searchDebounceRunnable;
     private int rawNotificationCount = 0;
     private boolean isLoadingPage = false;
+    private boolean isInitialFeedRendered = false;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -692,6 +693,14 @@ public class HistoryFragment extends Fragment {
                     adapter.submitList(buildListWithHeaders(notifications), () -> {
                         isLoadingPage = false;
                         if (binding != null) {
+                            if (!isInitialFeedRendered) {
+                                isInitialFeedRendered = true;
+                                androidx.recyclerview.widget.LinearLayoutManager lm =
+                                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                                if (lm != null) {
+                                    lm.scrollToPositionWithOffset(0, 0);
+                                }
+                            }
                             Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                             if (scroll != null && scroll) {
                                 viewModel.clearScrollToTopEvent();
