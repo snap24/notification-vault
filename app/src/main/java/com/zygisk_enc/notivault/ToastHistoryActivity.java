@@ -34,6 +34,7 @@ public class ToastHistoryActivity extends BaseActivity {
     private Long oldestToastTimestamp = null;
     private String formattedDateFilter = null;
     private boolean isLoadingPage = false;
+    private boolean shouldResetScroll = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +158,8 @@ public class ToastHistoryActivity extends BaseActivity {
             adapter.submitList(toasts, () -> {
                 isLoadingPage = false;
                 Boolean scroll = viewModel.getScrollToTopEvent().getValue();
-                if (scroll != null && scroll) {
+                if ((scroll != null && scroll) || shouldResetScroll) {
+                    shouldResetScroll = false;
                     viewModel.clearScrollToTopEvent();
                     animateScrollToTop();
                 }
@@ -196,22 +198,28 @@ public class ToastHistoryActivity extends BaseActivity {
     private void setupAppPicker() {
         binding.btnFilterApp.setOnClickListener(v -> showAppFilterBottomSheet());
         binding.btnFilterApp.setOnLongClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.setFilterPackage(null);
             updateFilterDisplay();
+            animateScrollToTop();
             Snackbar.make(binding.getRoot(), R.string.app_filter_cleared, Snackbar.LENGTH_SHORT).show();
             return true;
         });
 
         binding.chipActiveAppFilter.setOnCloseIconClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.setFilterPackage(null);
             updateFilterDisplay();
+            animateScrollToTop();
             Snackbar.make(binding.getRoot(), R.string.app_filter_cleared, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.chipActiveDateFilter.setOnCloseIconClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.setDateFilter(null, null);
             formattedDateFilter = null;
             updateFilterDisplay();
+            animateScrollToTop();
             Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT).show();
         });
     }
@@ -233,14 +241,18 @@ public class ToastHistoryActivity extends BaseActivity {
         rvApps.setAdapter(appAdapter);
 
         appAdapter.setOnAppClickListener(summary -> {
+            shouldResetScroll = true;
             viewModel.setFilterPackage(summary.packageName);
             updateFilterDisplay();
+            animateScrollToTop();
             dialog.dismiss();
         });
 
         btnShowAll.setOnClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.setFilterPackage(null);
             updateFilterDisplay();
+            animateScrollToTop();
             dialog.dismiss();
         });
 
@@ -368,25 +380,31 @@ public class ToastHistoryActivity extends BaseActivity {
                 endCal.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
                 endCal.set(Calendar.MILLISECOND, 999);
 
+                shouldResetScroll = true;
                 viewModel.setDateFilter(startCal.getTimeInMillis(), endCal.getTimeInMillis());
                 formattedDateFilter = (utc.get(Calendar.MONTH) + 1) + "/" + utc.get(Calendar.DAY_OF_MONTH) + "/" + utc.get(Calendar.YEAR);
                 updateFilterDisplay();
+                animateScrollToTop();
             });
             picker.show(getSupportFragmentManager(), "DATE_PICKER");
         });
 
         // Setup reload button click to clear all filters
         binding.btnReloadAll.setOnClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.resetAllFilters();
             formattedDateFilter = null;
             updateFilterDisplay();
+            animateScrollToTop();
             Snackbar.make(binding.getRoot(), R.string.filters_reset, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnOpenCalendar.setOnLongClickListener(v -> {
+            shouldResetScroll = true;
             viewModel.setDateFilter(null, null);
             formattedDateFilter = null;
             updateFilterDisplay();
+            animateScrollToTop();
             Snackbar.make(binding.getRoot(), R.string.date_filter_cleared, Snackbar.LENGTH_SHORT).show();
             return true;
         });
