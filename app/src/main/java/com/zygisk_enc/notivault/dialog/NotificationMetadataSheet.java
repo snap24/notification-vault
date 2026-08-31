@@ -3,7 +3,6 @@ package com.zygisk_enc.notivault.dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,23 +37,30 @@ public final class NotificationMetadataSheet {
         TextView tvProfileBadge = view.findViewById(R.id.tv_meta_profile_badge);
         View btnCopyJson = view.findViewById(R.id.btn_copy_json);
 
+        // 2x2 Quick Specs Boxes
+        TextView tvBoxSpace = view.findViewById(R.id.tv_meta_box_space);
+        TextView tvBoxDbId = view.findViewById(R.id.tv_meta_box_db_id);
+        TextView tvBoxPriority = view.findViewById(R.id.tv_meta_box_priority);
+        TextView tvBoxDuplicates = view.findViewById(R.id.tv_meta_box_duplicates);
+
+        // Identity card
         TextView tvRowPkg = view.findViewById(R.id.tv_meta_row_pkg);
         TextView tvRowUserId = view.findViewById(R.id.tv_meta_row_user_id);
-        TextView tvRowDbId = view.findViewById(R.id.tv_meta_row_db_id);
         TextView tvRowBundleId = view.findViewById(R.id.tv_meta_row_bundle_id);
 
+        // Timing card
         TextView tvRowTimeExact = view.findViewById(R.id.tv_meta_row_time_exact);
         TextView tvRowEpochMs = view.findViewById(R.id.tv_meta_row_epoch_ms);
-        TextView tvRowDuplicates = view.findViewById(R.id.tv_meta_row_duplicates);
 
+        // System attributes card
         TextView tvRowChannel = view.findViewById(R.id.tv_meta_row_channel);
         TextView tvRowSystemId = view.findViewById(R.id.tv_meta_row_system_id);
         TextView tvRowCategory = view.findViewById(R.id.tv_meta_row_category);
-        TextView tvRowPriority = view.findViewById(R.id.tv_meta_row_priority);
         TextView tvRowVisibility = view.findViewById(R.id.tv_meta_row_visibility);
         TextView tvRowActions = view.findViewById(R.id.tv_meta_row_actions);
         TextView tvRowFlags = view.findViewById(R.id.tv_meta_row_flags);
 
+        // Security & Content card
         TextView tvRowEncryption = view.findViewById(R.id.tv_meta_row_encryption);
         TextView tvRowChars = view.findViewById(R.id.tv_meta_row_chars);
         TextView tvRowMedia = view.findViewById(R.id.tv_meta_row_media);
@@ -73,18 +79,22 @@ public final class NotificationMetadataSheet {
             tvProfileBadge.setVisibility(View.VISIBLE);
         }
 
+        // Quick Specs Grid
+        String spaceShort = isWork ? ("Work (" + entity.userId + ")") : ("Personal (" + entity.userId + ")");
+        if (tvBoxSpace != null) tvBoxSpace.setText(spaceShort);
+        if (tvBoxDbId != null) tvBoxDbId.setText("#" + entity.id);
+        if (tvBoxDuplicates != null) tvBoxDuplicates.setText(entity.duplicateCount + (entity.duplicateCount == 1 ? " event" : " events"));
+
         // Section 1: Identity
         tvRowPkg.setText(context.getString(R.string.meta_label_package, entity.packageName));
         String spaceLabel = isWork ? context.getString(R.string.meta_space_work, entity.userId) : context.getString(R.string.meta_space_personal, entity.userId);
         tvRowUserId.setText(context.getString(R.string.meta_label_user_id, spaceLabel));
-        tvRowDbId.setText(context.getString(R.string.meta_label_db_id, String.valueOf(entity.id)));
         tvRowBundleId.setText(context.getString(R.string.meta_label_bundle_id, entity.bundleId != null && !entity.bundleId.isEmpty() ? entity.bundleId : context.getString(R.string.meta_none)));
 
         // Section 2: Timing
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z", Locale.getDefault());
         tvRowTimeExact.setText(context.getString(R.string.meta_label_exact_time, sdf.format(new Date(entity.timestamp))));
         tvRowEpochMs.setText(context.getString(R.string.meta_label_epoch_ms, String.valueOf(entity.timestamp)));
-        tvRowDuplicates.setText(context.getString(R.string.meta_label_duplicate_count, entity.duplicateCount));
 
         // Decrypted texts for content length
         String decTitle = EncryptionHelper.decrypt(entity.title);
@@ -99,6 +109,7 @@ public final class NotificationMetadataSheet {
             } catch (Exception ignored) {}
         }
 
+        String priority = "Default (0)";
         if (metaObj != null) {
             String channelId = metaObj.optString("channelId", context.getString(R.string.meta_none));
             tvRowChannel.setText(context.getString(R.string.meta_label_channel_id, channelId));
@@ -111,8 +122,7 @@ public final class NotificationMetadataSheet {
             String category = metaObj.optString("category", context.getString(R.string.meta_none));
             tvRowCategory.setText(context.getString(R.string.meta_label_category, category));
 
-            String priority = metaObj.optString("priority", "Default (0)");
-            tvRowPriority.setText(context.getString(R.string.meta_label_priority, priority));
+            priority = metaObj.optString("priority", "Default (0)");
 
             String visibility = metaObj.optString("visibility", "Default");
             boolean clearable = metaObj.optBoolean("isClearable", true);
@@ -149,11 +159,12 @@ public final class NotificationMetadataSheet {
             tvRowChannel.setText(context.getString(R.string.meta_label_channel_id, context.getString(R.string.meta_not_recorded)));
             tvRowSystemId.setText(context.getString(R.string.meta_label_system_id_simple));
             tvRowCategory.setText(context.getString(R.string.meta_label_category, context.getString(R.string.meta_none)));
-            tvRowPriority.setText(context.getString(R.string.meta_label_priority, "Default (0)"));
             tvRowVisibility.setText(context.getString(R.string.meta_label_visibility_ongoing, "Default", context.getString(R.string.meta_yes), context.getString(R.string.meta_no)));
             tvRowActions.setText(context.getString(R.string.meta_label_actions, "0"));
             tvRowFlags.setText(context.getString(R.string.meta_label_flags, context.getString(R.string.meta_not_recorded)));
         }
+
+        if (tvBoxPriority != null) tvBoxPriority.setText(priority);
 
         // Section 4: Security & Content
         tvRowEncryption.setText(R.string.meta_encryption_value);

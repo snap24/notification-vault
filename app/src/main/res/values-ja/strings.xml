@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">表示状態: %1$s • 削除可能: %2$s • 進行中: %3$s</string>
     <string name="meta_label_actions">アクション: %1$s</string>
     <string name="meta_label_flags">フラグ: %1$s</string>
-    <string name="meta_encryption_value">暗号化: AES-256-GCM (Zygisk暗号化)</string>
+    <string name="meta_encryption_value">暗号化: AES-256-GCM</string>
     <string name="meta_label_content_length">文字数: タイトル (%1$d 文字), 本文 (%2$d 文字)</string>
     <string name="meta_label_media_details">添付メディア: %1$d 件の画像 (%2$d KB)</string>
     <string name="meta_label_media_none">添付メディア: なし</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">いいえ</string>
     <string name="meta_not_recorded">未記録</string>
     <string name="badge_personal">個人</string>
+    <string name="btn_metadata">メタデータ</string>
 </resources>

@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">Visibilidade: %1$s • Dispensável: %2$s • Em andamento: %3$s</string>
     <string name="meta_label_actions">Ações: %1$s</string>
     <string name="meta_label_flags">Sinalizadores: %1$s</string>
-    <string name="meta_encryption_value">Criptografia: AES-256-GCM (Criptografado Zygisk)</string>
+    <string name="meta_encryption_value">Criptografia: AES-256-GCM</string>
     <string name="meta_label_content_length">Tamanho do conteúdo: Título (%1$d car.), Texto (%2$d car.)</string>
     <string name="meta_label_media_details">Anexos de mídia: %1$d imagem(ns) (%2$d KB)</string>
     <string name="meta_label_media_none">Anexos de mídia: Nenhum</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">Não</string>
     <string name="meta_not_recorded">Não registrado</string>
     <string name="badge_personal">Pessoal</string>
+    <string name="btn_metadata">Metadados</string>
 </resources>

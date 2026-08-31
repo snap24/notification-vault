@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">الرؤية: %1$s • قابل للمسح: %2$s • قيد التشغيل: %3$s</string>
     <string name="meta_label_actions">الإجراءات: %1$s</string>
     <string name="meta_label_flags">الأعلام: %1$s</string>
-    <string name="meta_encryption_value">التشفير: AES-256-GCM (مشفر بواسطة Zygisk)</string>
+    <string name="meta_encryption_value">التشفير: AES-256-GCM</string>
     <string name="meta_label_content_length">طول المحتوى: العنوان (%1$d حرف)، النص (%2$d حرف)</string>
     <string name="meta_label_media_details">مرفقات الوسائط: %1$d صورة (%2$d ك.ب)</string>
     <string name="meta_label_media_none">مرفقات الوسائط: لا يوجد</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">لا</string>
     <string name="meta_not_recorded">غير مسجل</string>
     <string name="badge_personal">شخصي</string>
+    <string name="btn_metadata">البيانات الوصفية</string>
 </resources>

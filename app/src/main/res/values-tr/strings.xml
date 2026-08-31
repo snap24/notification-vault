@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">Görünürlük: %1$s • Temizlenebilir: %2$s • Devam Eden: %3$s</string>
     <string name="meta_label_actions">Eylemler: %1$s</string>
     <string name="meta_label_flags">Bayraklar: %1$s</string>
-    <string name="meta_encryption_value">Şifreleme: AES-256-GCM (Zygisk Şifreli)</string>
+    <string name="meta_encryption_value">Şifreleme: AES-256-GCM</string>
     <string name="meta_label_content_length">İçerik Uzunluğu: Başlık (%1$d krk), Metin (%2$d krk)</string>
     <string name="meta_label_media_details">Medya Ekleri: %1$d resim (%2$d KB)</string>
     <string name="meta_label_media_none">Medya Ekleri: Yok</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">Hayır</string>
     <string name="meta_not_recorded">Kaydedilmedi</string>
     <string name="badge_personal">Kişisel</string>
+    <string name="btn_metadata">Meta Veri</string>
 </resources>

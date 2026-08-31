@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">Visibilitas: %1$s • Dapat Dihapus: %2$s • Berlangsung: %3$s</string>
     <string name="meta_label_actions">Tindakan: %1$s</string>
     <string name="meta_label_flags">Flag: %1$s</string>
-    <string name="meta_encryption_value">Enkripsi: AES-256-GCM (Terenkripsi Zygisk)</string>
+    <string name="meta_encryption_value">Enkripsi: AES-256-GCM</string>
     <string name="meta_label_content_length">Panjang Konten: Judul (%1$d kar), Teks (%2$d kar)</string>
     <string name="meta_label_media_details">Lampiran Media: %1$d gambar (%2$d KB)</string>
     <string name="meta_label_media_none">Lampiran Media: Tidak ada</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">Tidak</string>
     <string name="meta_not_recorded">Tidak terekam</string>
     <string name="badge_personal">Pribadi</string>
+    <string name="btn_metadata">Metadata</string>
 </resources>

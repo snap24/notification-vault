@@ -66,16 +66,6 @@
                 </LinearLayout>
 
                 <ImageButton
-                    android:id="@+id/btn_detail_metadata"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="4dp"
-                    android:background="@drawable/bg_button_circle_ripple"
-                    android:src="@drawable/ic_info"
-                    app:tint="?attr/colorOnSurfaceVariant"
-                    android:contentDescription="@string/desc_metadata" />
-
-                <ImageButton
                     android:id="@+id/btn_detail_close"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
@@ -170,6 +160,21 @@
                     style="@style/Widget.Material3.Button.TonalButton" />
 
             </LinearLayout>
+
+            <!-- Metadata Button Row -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_detail_metadata"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="6dp"
+                android:text="@string/btn_metadata"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_info"
+                app:iconSize="16dp"
+                app:iconGravity="textStart"
+                app:cornerRadius="12dp"
+                style="@style/Widget.Material3.Button.OutlinedButton" />
 
             <!-- Message Body Card -->
             <com.google.android.material.card.MaterialCardView

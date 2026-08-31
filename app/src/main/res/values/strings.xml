@@ -511,7 +511,7 @@
     <string name="meta_label_visibility_ongoing">Visibility: %1$s • Clearable: %2$s • Ongoing: %3$s</string>
     <string name="meta_label_actions">Actions: %1$s</string>
     <string name="meta_label_flags">Flags: %1$s</string>
-    <string name="meta_encryption_value">Encryption: AES-256-GCM (Zygisk Encrypted)</string>
+    <string name="meta_encryption_value">Encryption: AES-256-GCM</string>
     <string name="meta_label_content_length">Content Length: Title (%1$d chars), Text (%2$d chars)</string>
     <string name="meta_label_media_details">Media Attachments: %1$d image(s) (%2$d KB)</string>
     <string name="meta_label_media_none">Media Attachments: None</string>
@@ -520,4 +520,5 @@
     <string name="meta_no">No</string>
     <string name="meta_not_recorded">Not recorded</string>
     <string name="badge_personal">Personal</string>
+    <string name="btn_metadata">Metadata</string>
 </resources>

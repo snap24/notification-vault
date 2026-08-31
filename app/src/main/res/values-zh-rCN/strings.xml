@@ -450,7 +450,7 @@
     <string name="meta_label_visibility_ongoing">可见性：%1$s • 可清除：%2$s • 进行中：%3$s</string>
     <string name="meta_label_actions">操作：%1$s</string>
     <string name="meta_label_flags">标志：%1$s</string>
-    <string name="meta_encryption_value">加密方式：AES-256-GCM（Zygisk 加密）</string>
+    <string name="meta_encryption_value">加密方式：AES-256-GCM</string>
     <string name="meta_label_content_length">内容长度：标题（%1$d 字符），正文（%2$d 字符）</string>
     <string name="meta_label_media_details">媒体附件：%1$d 个图片（%2$d KB）</string>
     <string name="meta_label_media_none">媒体附件：无</string>
@@ -459,4 +459,5 @@
     <string name="meta_no">否</string>
     <string name="meta_not_recorded">未记录</string>
     <string name="badge_personal">个人</string>
+    <string name="btn_metadata">元数据</string>
 </resources>
