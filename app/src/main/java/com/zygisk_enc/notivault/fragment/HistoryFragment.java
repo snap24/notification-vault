@@ -737,6 +737,17 @@ public class HistoryFragment extends Fragment {
                                     if (layoutManager != null) {
                                         updateScrollingDateBadge(layoutManager.findFirstVisibleItemPosition());
                                     }
+                                    // Auto-load next page if the list doesn't fill the screen and more data exists
+                                    if (!binding.recyclerView.canScrollVertically(1)
+                                            && !binding.recyclerView.canScrollVertically(-1)) {
+                                        Integer currentLimit = viewModel.getFilterLimit().getValue();
+                                        int rawCount = viewModel.getNotifications().getValue() != null
+                                                ? viewModel.getNotifications().getValue().size() : 0;
+                                        if (!isLoadingPage && currentLimit != null && rawCount >= currentLimit) {
+                                            isLoadingPage = true;
+                                            viewModel.loadNextPage();
+                                        }
+                                    }
                                 }
                             });
                         });

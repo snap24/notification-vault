@@ -168,6 +168,17 @@ public class ToastHistoryActivity extends BaseActivity {
                     viewModel.clearScrollToTopEvent();
                     animateScrollToTop();
                 }
+                // Auto-load next page if the list doesn't fill the screen and more data exists
+                if (!binding.recyclerView.canScrollVertically(1)
+                        && !binding.recyclerView.canScrollVertically(-1)) {
+                    Integer currentLimit = viewModel.getFilterLimit().getValue();
+                    java.util.List<com.zygisk_enc.notivault.database.ToastEntity> currentList = viewModel.getToasts().getValue();
+                    int rawCount = currentList != null ? currentList.size() : 0;
+                    if (!isLoadingPage && currentLimit != null && rawCount >= currentLimit) {
+                        isLoadingPage = true;
+                        viewModel.loadNextPage();
+                    }
+                }
             });
         }
     }
