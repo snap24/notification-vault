@@ -86,6 +86,7 @@ public class HistoryFragment extends Fragment {
     private int rawNotificationCount = 0;
     private boolean isLoadingPage = false;
     private boolean userHasScrolled = false;
+    private String currentScrollingDateLabel = "";
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -180,6 +181,8 @@ public class HistoryFragment extends Fragment {
                     int visibleCount = layout.getChildCount();
                     int totalCount = layout.getItemCount();
                     int firstVisiblePos = layout.findFirstVisibleItemPosition();
+
+                    updateScrollingDateBadge(firstVisiblePos);
 
                     // Prefetch threshold: trigger next page load when 250 items remain
                     int threshold = Math.max(0, totalCount - 250);
@@ -337,6 +340,22 @@ public class HistoryFragment extends Fragment {
                 String query = s != null ? s.toString().trim() : "";
                 if (searchBackPressedCallback != null) {
                     searchBackPressedCallback.setEnabled(!query.isEmpty());
+                }
+
+                if (!query.isEmpty()) {
+                    if (binding.cardSearchScrollDate.getVisibility() != View.GONE) {
+                        binding.cardSearchScrollDate.animate().cancel();
+                        binding.cardSearchScrollDate.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+                            if (binding != null) binding.cardSearchScrollDate.setVisibility(View.GONE);
+                        }).start();
+                    }
+                } else {
+                    if (binding != null && binding.recyclerView != null) {
+                        LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                        if (lm != null) {
+                            updateScrollingDateBadge(lm.findFirstVisibleItemPosition());
+                        }
+                    }
                 }
 
                 if (searchDebounceRunnable != null) {
@@ -714,6 +733,9 @@ public class HistoryFragment extends Fragment {
                                             lm.scrollToPositionWithOffset(0, 0);
                                         }
                                     }
+                                    if (layoutManager != null) {
+                                        updateScrollingDateBadge(layoutManager.findFirstVisibleItemPosition());
+                                    }
                                 }
                             });
                         });
@@ -764,6 +786,47 @@ public class HistoryFragment extends Fragment {
                 .setDuration(220)
                 .setInterpolator(new androidx.interpolator.view.animation.FastOutSlowInInterpolator())
                 .start();
+    }
+
+    private void updateScrollingDateBadge(int firstVisiblePos) {
+        if (binding == null || adapter == null) return;
+        if (binding.etSearch.getText() != null && binding.etSearch.getText().length() > 0) {
+            if (binding.cardSearchScrollDate.getVisibility() != View.GONE) {
+                binding.cardSearchScrollDate.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        List<NotificationAdapter.ListItem> list = adapter.getCurrentList();
+        if (list == null || list.isEmpty() || firstVisiblePos < 0 || firstVisiblePos >= list.size()) {
+            if (binding.cardSearchScrollDate.getVisibility() != View.GONE) {
+                binding.cardSearchScrollDate.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        NotificationAdapter.ListItem item = list.get(firstVisiblePos);
+        String label = "";
+        if (item.type == NotificationAdapter.ListItem.TYPE_HEADER && item.header != null) {
+            label = item.header;
+        } else if (item.type == NotificationAdapter.ListItem.TYPE_NOTIFICATION && item.entity != null) {
+            label = DateUtils.getRelativeTimeLabel(getContext(), item.entity.timestamp);
+        } else if (item.type == NotificationAdapter.ListItem.TYPE_BUNDLE && item.bundle != null) {
+            label = DateUtils.getRelativeTimeLabel(getContext(), item.bundle.latestTimestamp);
+        }
+
+        if (!label.isEmpty()) {
+            if (!label.equals(currentScrollingDateLabel)) {
+                currentScrollingDateLabel = label;
+                binding.tvSearchScrollDate.setText(label);
+            }
+            if (binding.cardSearchScrollDate.getVisibility() != View.VISIBLE) {
+                binding.cardSearchScrollDate.animate().cancel();
+                binding.cardSearchScrollDate.setAlpha(0f);
+                binding.cardSearchScrollDate.setVisibility(View.VISIBLE);
+                binding.cardSearchScrollDate.animate().alpha(1f).setDuration(150).start();
+            }
+        }
     }
 
     private void showRecyclerView(boolean show) {

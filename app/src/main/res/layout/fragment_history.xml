@@ -8,33 +8,67 @@
     android:paddingTop="8dp"
     android:paddingHorizontal="16dp">
 
-    <!-- 1. Search Bar for Notifications -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_search"
+    <!-- 1. Search Bar for Notifications with Live Scrolling Date Pill Badge -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/search_hint"
-        android:layout_marginBottom="8dp"
-        app:startIconDrawable="@drawable/ic_search"
-        app:endIconMode="clear_text"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="24dp"
-        app:boxCornerRadiusTopEnd="24dp"
-        app:boxCornerRadiusBottomStart="24dp"
-        app:boxCornerRadiusBottomEnd="24dp">
+        android:layout_marginBottom="8dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_search"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:singleLine="true"
-            android:maxLines="1"
-            android:paddingStart="48dp"
-            android:paddingVertical="10dp" />
+            android:hint="@string/search_hint"
+            app:startIconDrawable="@drawable/ic_search"
+            app:endIconMode="clear_text"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:paddingStart="48dp"
+                android:paddingEnd="110dp"
+                android:paddingVertical="10dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Live Scrolling Date Pill Badge (e.g. "Today", "Yesterday", "Aug 28") -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_search_scroll_date"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_search_scroll_date"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:text="Today"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textStyle="bold" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
 
     <!-- 2. Quick Action Filter Chips Row -->
     <HorizontalScrollView
