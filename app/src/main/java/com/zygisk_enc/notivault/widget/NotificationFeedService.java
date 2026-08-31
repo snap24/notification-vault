@@ -10,14 +10,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.NotificationEntity;
 import com.zygisk_enc.notivault.util.DateUtils;
 import com.zygisk_enc.notivault.util.EncryptionHelper;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
+import com.zygisk_enc.notivault.util.ProfileUtil;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationFeedService extends RemoteViewsService {
 
@@ -34,7 +39,8 @@ public class NotificationFeedService extends RemoteViewsService {
 
         private final Context context;
         private final int appWidgetId;
-        private List<NotificationEntity> notifications = new ArrayList<>();
+        private final List<FeedItem> feedItems = new ArrayList<>();
+        private final Map<String, Bitmap> iconCache = new HashMap<>();
 
         NotificationFeedViewsFactory(Context context, int appWidgetId) {
             this.context = context;
@@ -47,59 +53,79 @@ public class NotificationFeedService extends RemoteViewsService {
         @Override
         public void onDataSetChanged() {
             try {
-                boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(context);
+                boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
                 int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
                 String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, appWidgetId, profileMode);
+
+                List<NotificationEntity> rawList;
                 if (filterPkg != null && !"ALL".equals(filterPkg)) {
-                    notifications = AppDatabase.getInstance(context)
+                    rawList = AppDatabase.getInstance(context)
                             .notificationDao()
                             .getRecentNotificationsByPackageSync(filterPkg, 200, profileMode);
                 } else {
-                    notifications = AppDatabase.getInstance(context)
+                    rawList = AppDatabase.getInstance(context)
                             .notificationDao()
                             .getRecentNotificationsSync(200, profileMode);
                 }
+
+                feedItems.clear();
+                if (rawList != null) {
+                    for (NotificationEntity entity : rawList) {
+                        String title = EncryptionHelper.decrypt(entity.title);
+                        String text = EncryptionHelper.decrypt(entity.text);
+                        if (title == null || title.trim().isEmpty()) {
+                            title = context.getString(R.string.no_title);
+                        }
+                        String timeStr = DateUtils.getTimeString(context, entity.timestamp);
+                        String appName = ProfileUtil.getAppLabel(context, entity.packageName, entity.userId, entity.appName);
+
+                        feedItems.add(new FeedItem(
+                                entity.id,
+                                entity.packageName,
+                                appName,
+                                timeStr,
+                                title,
+                                text != null ? text : "",
+                                entity.userId
+                        ));
+                    }
+                }
             } catch (Exception e) {
-                notifications = new ArrayList<>();
+                feedItems.clear();
             }
         }
 
         @Override
         public void onDestroy() {
-            notifications.clear();
+            feedItems.clear();
+            iconCache.clear();
         }
 
         @Override
         public int getCount() {
-            return notifications.size();
+            return feedItems.size();
         }
 
         @Override
         public RemoteViews getViewAt(int position) {
             try {
-                if (position < 0 || position >= notifications.size()) {
+                if (position < 0 || position >= feedItems.size()) {
                     return null;
                 }
 
-                NotificationEntity entity = notifications.get(position);
+                FeedItem item = feedItems.get(position);
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.item_widget_notification);
 
                 // App Name & Time
-                views.setTextViewText(R.id.tv_item_app_name, entity.appName != null ? entity.appName : entity.packageName);
-                views.setTextViewText(R.id.tv_item_time, DateUtils.getTimeString(context, entity.timestamp));
+                views.setTextViewText(R.id.tv_item_app_name, item.appName);
+                views.setTextViewText(R.id.tv_item_time, item.timeStr);
 
-                // Decrypt Title & Text
-                String title = EncryptionHelper.decrypt(entity.title);
-                String text = EncryptionHelper.decrypt(entity.text);
-                if (title == null || title.isEmpty()) {
-                    title = context.getString(R.string.no_title);
-                }
+                // Pre-decrypted Title & Text
+                views.setTextViewText(R.id.tv_item_title, item.title);
+                views.setTextViewText(R.id.tv_item_text, item.text);
 
-                views.setTextViewText(R.id.tv_item_title, title);
-                views.setTextViewText(R.id.tv_item_text, text != null ? text : "");
-
-                // App Icon (fixed lightweight thumbnail)
-                Bitmap iconBitmap = getAppIconBitmap(context, entity.packageName);
+                // Fast Cached App Icon
+                Bitmap iconBitmap = getCachedAppIconBitmap(item.packageName, item.userId);
                 if (iconBitmap != null) {
                     views.setImageViewBitmap(R.id.iv_item_app_icon, iconBitmap);
                 } else {
@@ -108,26 +134,47 @@ public class NotificationFeedService extends RemoteViewsService {
 
                 // Fill-in Intent for item click
                 Intent fillInIntent = new Intent();
-                fillInIntent.putExtra("notification_id", entity.id);
-                fillInIntent.putExtra("package_name", entity.packageName);
+                fillInIntent.putExtra("notification_id", item.id);
+                fillInIntent.putExtra("package_name", item.packageName);
                 views.setOnClickFillInIntent(R.id.item_widget_root, fillInIntent);
 
                 return views;
             } catch (Exception e) {
-                e.printStackTrace();
                 return null;
             }
         }
 
-        private Bitmap getAppIconBitmap(Context ctx, String packageName) {
+        private Bitmap getCachedAppIconBitmap(String packageName, int userId) {
+            if (packageName == null) return null;
+            String key = packageName + "_" + userId;
+            if (iconCache.containsKey(key)) {
+                return iconCache.get(key);
+            }
+
             try {
-                PackageManager pm = ctx.getPackageManager();
-                Drawable drawable = pm.getApplicationIcon(packageName);
-                int size = 64; // fixed lightweight 64x64 thumbnail to prevent IPC overflow
-                Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                drawable.setBounds(0, 0, size, size);
-                drawable.draw(canvas);
+                Drawable drawable = ProfileUtil.getBadgedAppIcon(context, packageName, userId);
+                if (drawable == null) {
+                    PackageManager pm = context.getPackageManager();
+                    drawable = pm.getApplicationIcon(packageName);
+                }
+
+                int size = 64;
+                Bitmap bitmap;
+                if (drawable instanceof BitmapDrawable) {
+                    Bitmap raw = ((BitmapDrawable) drawable).getBitmap();
+                    if (raw != null && raw.getWidth() == size && raw.getHeight() == size) {
+                        bitmap = raw;
+                    } else {
+                        bitmap = Bitmap.createScaledBitmap(raw, size, size, true);
+                    }
+                } else {
+                    bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    drawable.setBounds(0, 0, size, size);
+                    drawable.draw(canvas);
+                }
+
+                iconCache.put(key, bitmap);
                 return bitmap;
             } catch (Exception e) {
                 return null;
@@ -146,12 +193,35 @@ public class NotificationFeedService extends RemoteViewsService {
 
         @Override
         public long getItemId(int position) {
+            if (position >= 0 && position < feedItems.size()) {
+                return feedItems.get(position).id;
+            }
             return position;
         }
 
         @Override
         public boolean hasStableIds() {
-            return false;
+            return true;
+        }
+    }
+
+    private static class FeedItem {
+        final long id;
+        final String packageName;
+        final String appName;
+        final String timeStr;
+        final String title;
+        final String text;
+        final int userId;
+
+        FeedItem(long id, String packageName, String appName, String timeStr, String title, String text, int userId) {
+            this.id = id;
+            this.packageName = packageName;
+            this.appName = appName;
+            this.timeStr = timeStr;
+            this.title = title;
+            this.text = text;
+            this.userId = userId;
         }
     }
 }
