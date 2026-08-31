@@ -460,7 +460,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle(R.string.pref_about_title)
-                .setMessage("Notification Vault v" + versionName + "\n\nEncrypted, private local notification log manager.\n\n• Zero Tracking & No Ads\n• Local AES-256 KeyStore Encryption\n• Work & Personal Profile Isolation\n• Instant Fast Search & Smart Bundling\n\nOpen-source project under MIT License.")
+                .setMessage("Notification Vault v" + versionName + "\n\nEncrypted, private local notification log manager.\n\n• Zero Tracking & No Ads\n• Local AES-256 KeyStore Encryption\n• Work & Personal Profile Isolation\n• Instant Fast Search & Smart Bundling\n\nOpen-source project under GNU General Public License v3.0 (GPLv3).")
                 .setPositiveButton("GitHub", (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
