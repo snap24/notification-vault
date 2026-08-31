@@ -420,4 +420,5 @@
     <string name="custom_days_dots">Personalizado...</string>
     <string name="badge_work">Trabajo</string>
     <string name="filter_work_apps">Apps de trabajo</string>
+    <string name="desc_enable_toast_permission">Habilitar grabación de toasts</string>
 </resources>

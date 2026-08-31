@@ -38,6 +38,7 @@
     <string name="desc_search">Search</string>
     <string name="desc_app_icon">App Icon</string>
     <string name="desc_star">Star Notification</string>
+    <string name="desc_enable_toast_permission">Enable Toast Recording</string>
 
     <!-- History Fragment -->
     <string name="search_hint">Search notifications…</string>

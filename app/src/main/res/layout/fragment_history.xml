@@ -138,6 +138,30 @@
                 app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
+            <!-- Small Toast Permission Missing Button (Only Icon, visible when permission missing) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toast_permission"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_toast_permission"
+                app:iconSize="18dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="?attr/colorOnErrorContainer"
+                app:backgroundTint="?attr/colorErrorContainer"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorError"
+                android:contentDescription="@string/desc_enable_toast_permission"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Cloud Backup Shortcut Chip -->
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_cloud_backup"

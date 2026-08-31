@@ -420,4 +420,5 @@
     <string name="custom_days_dots">مخصص...</string>
     <string name="badge_work">عمل</string>
     <string name="filter_work_apps">تطبيقات العمل</string>
+    <string name="desc_enable_toast_permission">تفعيل تسجيل الإشعارات المنبثقة</string>
 </resources>

@@ -420,4 +420,5 @@
     <string name="custom_days_dots">Özel...</string>
     <string name="badge_work">İş</string>
     <string name="filter_work_apps">İş Uygulamaları</string>
+    <string name="desc_enable_toast_permission">Toast Kaydını Etkinleştir</string>
 </resources>

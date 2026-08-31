@@ -56,6 +56,10 @@ public class ToastHistoryActivity extends BaseActivity {
             startActivity(intent);
         });
 
+        binding.btnToolbarAccessibilityAlert.setOnClickListener(v -> {
+            com.zygisk_enc.notivault.util.PreferenceUtil.openAccessibilitySettings(this);
+        });
+
         setupRecyclerView();
         setupAppPicker();
         setupDatePicker();
@@ -134,6 +138,7 @@ public class ToastHistoryActivity extends BaseActivity {
         if (isLoading == null) isLoading = false;
 
         boolean isAccessibilityEnabled = isAccessibilityServiceEnabled();
+        binding.btnToolbarAccessibilityAlert.setVisibility(isAccessibilityEnabled ? View.GONE : View.VISIBLE);
 
         if (toasts == null || toasts.isEmpty()) {
             binding.recyclerView.setVisibility(View.GONE);
@@ -497,8 +502,10 @@ public class ToastHistoryActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        boolean isAccessibilityEnabled = isAccessibilityServiceEnabled();
+        binding.btnToolbarAccessibilityAlert.setVisibility(isAccessibilityEnabled ? View.GONE : View.VISIBLE);
         if (adapter != null && adapter.getItemCount() == 0) {
-            if (isAccessibilityServiceEnabled()) {
+            if (isAccessibilityEnabled) {
                 binding.tvAccessibilityHint.setText(R.string.toasts_active_desc);
                 binding.btnGrantAccessibility.setVisibility(View.GONE);
             } else {

@@ -205,4 +205,41 @@ public class PreferenceUtil {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit().putString("widget_feed_filter_pkg_" + appWidgetId, packageName).apply();
     }
+
+    public static boolean isAccessibilityServiceEnabled(Context context) {
+        if (context == null) return false;
+        String expectedPackage = context.getPackageName();
+        String expectedClass = "com.zygisk_enc.notivault.service.ToastRecorderService";
+
+        String enabledServicesSetting = android.provider.Settings.Secure.getString(
+                context.getContentResolver(), android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (enabledServicesSetting == null) return false;
+
+        android.text.TextUtils.SimpleStringSplitter colonSplitter = new android.text.TextUtils.SimpleStringSplitter(':');
+        colonSplitter.setString(enabledServicesSetting);
+        while (colonSplitter.hasNext()) {
+            String componentNameString = colonSplitter.next();
+            ComponentName cn = ComponentName.unflattenFromString(componentNameString);
+            if (cn != null && cn.getPackageName().equals(expectedPackage)
+                    && cn.getClassName().equals(expectedClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void openAccessibilitySettings(Context context) {
+        if (context == null) return;
+        try {
+            android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            try {
+                android.content.Intent fallback = new android.content.Intent(android.provider.Settings.ACTION_SETTINGS);
+                fallback.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(fallback);
+            } catch (Exception ignored) {}
+        }
+    }
 }
