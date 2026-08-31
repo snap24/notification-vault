@@ -897,7 +897,25 @@ public class HistoryFragment extends Fragment {
                     }
 
                     int streakCount = i - streakStart;
-                    if (streakCount >= 10) {
+                    String currentAppFilter = viewModel != null && viewModel.getFilterPackage() != null ? viewModel.getFilterPackage().getValue() : null;
+                    boolean isAppFilterActive = (currentAppFilter != null && !currentAppFilter.isEmpty());
+
+                    if (isAppFilterActive && streakStart < 30 && streakCount >= 10) {
+                        int unbundledCount = Math.min(30 - streakStart, streakCount);
+                        for (int j = streakStart; j < streakStart + unbundledCount; j++) {
+                            result.add(new NotificationAdapter.ListItem(notifications.get(j)));
+                        }
+                        int remainingCount = streakCount - unbundledCount;
+                        if (remainingCount >= 10) {
+                            List<NotificationEntity> bundleItems = new ArrayList<>(notifications.subList(streakStart + unbundledCount, i));
+                            String appName = bundleItems.get(0).appName;
+                            result.add(new NotificationAdapter.ListItem(new NotificationAdapter.NotificationBundle(pkg, appName, bundleItems)));
+                        } else {
+                            for (int j = streakStart + unbundledCount; j < i; j++) {
+                                result.add(new NotificationAdapter.ListItem(notifications.get(j)));
+                            }
+                        }
+                    } else if (streakCount >= 10) {
                         List<NotificationEntity> bundleItems = new ArrayList<>(notifications.subList(streakStart, i));
                         String appName = bundleItems.get(0).appName;
                         result.add(new NotificationAdapter.ListItem(new NotificationAdapter.NotificationBundle(pkg, appName, bundleItems)));
