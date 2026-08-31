@@ -85,7 +85,7 @@ public class HistoryFragment extends Fragment {
     private Runnable searchDebounceRunnable;
     private int rawNotificationCount = 0;
     private boolean isLoadingPage = false;
-    private boolean isInitialFeedRendered = false;
+    private boolean userHasScrolled = false;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -162,8 +162,19 @@ public class HistoryFragment extends Fragment {
 
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                    userHasScrolled = true;
+                }
+            }
+
+            @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                if (Math.abs(dy) > 2) {
+                    userHasScrolled = true;
+                }
                 LinearLayoutManager layout = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (layout != null) {
                     int visibleCount = layout.getChildCount();
@@ -201,6 +212,7 @@ public class HistoryFragment extends Fragment {
 
     private void setupSwipeToRefresh() {
         binding.swipeRefresh.setOnRefreshListener(() -> {
+            userHasScrolled = false;
             // Reset filters to show all notifications on refresh
             viewModel.resetAllFilters();
             closeSearchBox();
@@ -693,8 +705,7 @@ public class HistoryFragment extends Fragment {
                     adapter.submitList(buildListWithHeaders(notifications), () -> {
                         isLoadingPage = false;
                         if (binding != null) {
-                            if (!isInitialFeedRendered) {
-                                isInitialFeedRendered = true;
+                            if (!userHasScrolled) {
                                 androidx.recyclerview.widget.LinearLayoutManager lm =
                                         (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
                                 if (lm != null) {
@@ -703,6 +714,7 @@ public class HistoryFragment extends Fragment {
                             }
                             Boolean scroll = viewModel.getScrollToTopEvent().getValue();
                             if (scroll != null && scroll) {
+                                userHasScrolled = false;
                                 viewModel.clearScrollToTopEvent();
                                 animateScrollToTop();
                             }
