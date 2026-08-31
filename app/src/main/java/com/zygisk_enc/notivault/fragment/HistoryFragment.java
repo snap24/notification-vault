@@ -712,12 +712,6 @@ public class HistoryFragment extends Fragment {
                                     lm.scrollToPositionWithOffset(0, 0);
                                 }
                             }
-                            Boolean scroll = viewModel.getScrollToTopEvent().getValue();
-                            if (scroll != null && scroll) {
-                                userHasScrolled = false;
-                                viewModel.clearScrollToTopEvent();
-                                animateScrollToTop();
-                            }
                         }
                     });
                 }
@@ -726,6 +720,8 @@ public class HistoryFragment extends Fragment {
 
         viewModel.getScrollToTopEvent().observe(getViewLifecycleOwner(), scroll -> {
             if (scroll != null && scroll) {
+                viewModel.clearScrollToTopEvent();
+                userHasScrolled = false;
                 closeSearchBox();
                 animateScrollToTop();
             }
