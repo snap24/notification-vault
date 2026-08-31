@@ -128,6 +128,11 @@ public interface NotificationDao {
 
     @Query("SELECT COUNT(*) FROM notifications " +
            "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp")
+    int getCountSinceSync(long startTimestamp, int profileMode);
+
+    @Query("SELECT COUNT(*) FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
            "AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
     int getCountBetweenSync(long startTimestamp, long endTimestamp, int profileMode);
 

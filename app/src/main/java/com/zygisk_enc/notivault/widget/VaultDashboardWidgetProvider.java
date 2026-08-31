@@ -19,6 +19,7 @@ import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.service.NotiVaultTileService;
 import com.zygisk_enc.notivault.util.AppExecutor;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
+import com.zygisk_enc.notivault.util.ProfileUtil;
 import com.zygisk_enc.notivault.util.ShortcutHelper;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class VaultDashboardWidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_TOGGLE_CAPTURE_DASHBOARD = "com.zygisk_enc.notivault.widget.ACTION_TOGGLE_CAPTURE_DASHBOARD";
+    public static final String ACTION_SWITCH_PROFILE_DASHBOARD = "com.zygisk_enc.notivault.widget.ACTION_SWITCH_PROFILE_DASHBOARD";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -56,19 +58,29 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
             Toast.makeText(context, next ? R.string.capture_resumed_toast : R.string.capture_paused_toast, Toast.LENGTH_SHORT).show();
             ShortcutHelper.updateDynamicShortcuts(context);
             WidgetHelper.updateAllWidgets(context);
+        } else if (ACTION_SWITCH_PROFILE_DASHBOARD.equals(intent.getAction())) {
+            if (ProfileUtil.hasWorkProfile(context)) {
+                int current = PreferenceUtil.getActiveProfileMode(context);
+                int next = (current == 0) ? 1 : 0;
+                PreferenceUtil.setActiveProfileMode(context, next);
+                Toast.makeText(context, next == 1 ? R.string.badge_work : R.string.badge_personal, Toast.LENGTH_SHORT).show();
+                WidgetHelper.updateAllWidgets(context);
+            }
         }
     }
 
     private static void updateDashboardAsync(Context context, AppWidgetManager manager, int[] ids) {
         AppExecutor.execute(() -> {
             boolean captureEnabled = PreferenceUtil.isCaptureEnabled(context);
+            boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
+            int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
             long startToday = WidgetHelper.getStartOfTodayMillis();
 
             int notifCount = 0;
             int toastCount = 0;
             try {
-                notifCount = AppDatabase.getInstance(context).notificationDao().getCountSinceSync(startToday);
-                toastCount = AppDatabase.getInstance(context).toastDao().getCountSinceSync(startToday);
+                notifCount = AppDatabase.getInstance(context).notificationDao().getCountSinceSync(startToday, profileMode);
+                toastCount = AppDatabase.getInstance(context).toastDao().getCountSinceSync(startToday, profileMode);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -78,16 +90,16 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     Map<SizeF, RemoteViews> viewMapping = new HashMap<>();
-                    viewMapping.put(new SizeF(100f, 40f), build1RowViews(context, captureEnabled, notifCount, toastCount));
-                    viewMapping.put(new SizeF(100f, 100f), build2RowViews(context, captureEnabled, notifCount, toastCount));
+                    viewMapping.put(new SizeF(100f, 40f), build1RowViews(context, captureEnabled, notifCount, toastCount, hasWorkProfile, profileMode));
+                    viewMapping.put(new SizeF(100f, 100f), build2RowViews(context, captureEnabled, notifCount, toastCount, hasWorkProfile, profileMode));
                     viewsToApply = new RemoteViews(viewMapping);
                 } else {
                     Bundle options = manager.getAppWidgetOptions(id);
                     int minHeight = options != null ? options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 40) : 40;
                     if (minHeight < 90) {
-                        viewsToApply = build1RowViews(context, captureEnabled, notifCount, toastCount);
+                        viewsToApply = build1RowViews(context, captureEnabled, notifCount, toastCount, hasWorkProfile, profileMode);
                     } else {
-                        viewsToApply = build2RowViews(context, captureEnabled, notifCount, toastCount);
+                        viewsToApply = build2RowViews(context, captureEnabled, notifCount, toastCount, hasWorkProfile, profileMode);
                     }
                 }
 
@@ -96,19 +108,37 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
         });
     }
 
-    private static RemoteViews build1RowViews(Context context, boolean captureEnabled, int notifCount, int toastCount) {
+    private static RemoteViews build1RowViews(Context context, boolean captureEnabled, int notifCount, int toastCount, boolean hasWorkProfile, int profileMode) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_dashboard_1row);
 
         views.setTextViewText(R.id.tv_dashboard_notif_count, String.valueOf(notifCount));
         views.setTextViewText(R.id.tv_dashboard_toast_count, String.valueOf(toastCount));
 
-        // 1. History Action
-        Intent historyIntent = new Intent(context, MainActivity.class);
-        historyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent historyPending = PendingIntent.getActivity(
-                context, 301, historyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.btn_action_history, historyPending);
-        views.setOnClickPendingIntent(R.id.tile_dashboard_notifications, historyPending);
+        // 1. History or Profile Switch Action
+        if (hasWorkProfile) {
+            views.setImageViewResource(R.id.btn_action_history, profileMode == 1 ? R.drawable.ic_work_bag : R.drawable.ic_profile_switch);
+            views.setContentDescription(R.id.btn_action_history, context.getString(profileMode == 1 ? R.string.desc_switch_to_personal : R.string.desc_switch_to_work));
+            Intent switchIntent = new Intent(context, VaultDashboardWidgetProvider.class);
+            switchIntent.setAction(ACTION_SWITCH_PROFILE_DASHBOARD);
+            PendingIntent switchPending = PendingIntent.getBroadcast(
+                    context, 301, switchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.btn_action_history, switchPending);
+        } else {
+            views.setImageViewResource(R.id.btn_action_history, R.drawable.ic_history);
+            views.setContentDescription(R.id.btn_action_history, context.getString(R.string.nav_history));
+            Intent historyIntent = new Intent(context, MainActivity.class);
+            historyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent historyPending = PendingIntent.getActivity(
+                    context, 301, historyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.btn_action_history, historyPending);
+        }
+
+        // Tapping the notification tile opens MainActivity
+        Intent notifIntent = new Intent(context, MainActivity.class);
+        notifIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent notifPending = PendingIntent.getActivity(
+                context, 310, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        views.setOnClickPendingIntent(R.id.tile_dashboard_notifications, notifPending);
 
         // 2. Favorites Action
         Intent favIntent = new Intent(context, MainActivity.class);
@@ -140,8 +170,15 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
         return views;
     }
 
-    private static RemoteViews build2RowViews(Context context, boolean captureEnabled, int notifCount, int toastCount) {
+    private static RemoteViews build2RowViews(Context context, boolean captureEnabled, int notifCount, int toastCount, boolean hasWorkProfile, int profileMode) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_vault_dashboard);
+
+        // Title with Work profile indicator
+        if (hasWorkProfile && profileMode == 1) {
+            views.setTextViewText(R.id.tv_dashboard_title, context.getString(R.string.widget_vault_title) + " • " + context.getString(R.string.badge_work));
+        } else {
+            views.setTextViewText(R.id.tv_dashboard_title, context.getString(R.string.widget_vault_title));
+        }
 
         // Status Pill
         views.setTextViewText(R.id.tv_dashboard_status_text, context.getString(captureEnabled ? R.string.widget_status_active : R.string.widget_status_paused));
@@ -151,13 +188,31 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.tv_dashboard_notif_count, String.valueOf(notifCount));
         views.setTextViewText(R.id.tv_dashboard_toast_count, String.valueOf(toastCount));
 
-        // 1. History Action
-        Intent historyIntent = new Intent(context, MainActivity.class);
-        historyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent historyPending = PendingIntent.getActivity(
-                context, 305, historyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.btn_action_history, historyPending);
-        views.setOnClickPendingIntent(R.id.tile_dashboard_notifications, historyPending);
+        // 1. History or Profile Switch Action
+        if (hasWorkProfile) {
+            views.setImageViewResource(R.id.btn_action_history, profileMode == 1 ? R.drawable.ic_work_bag : R.drawable.ic_profile_switch);
+            views.setContentDescription(R.id.btn_action_history, context.getString(profileMode == 1 ? R.string.desc_switch_to_personal : R.string.desc_switch_to_work));
+            Intent switchIntent = new Intent(context, VaultDashboardWidgetProvider.class);
+            switchIntent.setAction(ACTION_SWITCH_PROFILE_DASHBOARD);
+            PendingIntent switchPending = PendingIntent.getBroadcast(
+                    context, 305, switchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.btn_action_history, switchPending);
+        } else {
+            views.setImageViewResource(R.id.btn_action_history, R.drawable.ic_history);
+            views.setContentDescription(R.id.btn_action_history, context.getString(R.string.nav_history));
+            Intent historyIntent = new Intent(context, MainActivity.class);
+            historyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent historyPending = PendingIntent.getActivity(
+                    context, 305, historyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.btn_action_history, historyPending);
+        }
+
+        // Tapping the notification tile opens MainActivity
+        Intent notifIntent = new Intent(context, MainActivity.class);
+        notifIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent notifPending = PendingIntent.getActivity(
+                context, 311, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        views.setOnClickPendingIntent(R.id.tile_dashboard_notifications, notifPending);
 
         // 2. Favorites Action
         Intent favIntent = new Intent(context, MainActivity.class);

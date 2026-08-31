@@ -158,6 +158,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.zygisk_enc.notivault.widget.ACTION_TOGGLE_CAPTURE_DASHBOARD" />
+                <action android:name="com.zygisk_enc.notivault.widget.ACTION_SWITCH_PROFILE_DASHBOARD" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
