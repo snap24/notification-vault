@@ -80,7 +80,7 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
             int toastCount = 0;
             try {
                 notifCount = AppDatabase.getInstance(context).notificationDao().getCountSinceSync(startToday, profileMode);
-                toastCount = AppDatabase.getInstance(context).toastDao().getCountSinceSync(startToday, profileMode);
+                toastCount = AppDatabase.getInstance(context).toastDao().getCountSinceSync(startToday, -1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
