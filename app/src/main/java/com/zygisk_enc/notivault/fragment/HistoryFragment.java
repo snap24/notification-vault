@@ -230,7 +230,6 @@ public class HistoryFragment extends Fragment {
         adapter = new NotificationAdapter();
         adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setItemViewCacheSize(25);
         binding.recyclerView.setAdapter(adapter);
 
