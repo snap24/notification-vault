@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">Włącz rejestrowanie toastów</string>
     <string name="desc_switch_to_work">Przełącz na profil roboczy</string>
     <string name="desc_switch_to_personal">Przełącz na profil osobisty</string>
+    <string name="nav_switch">Przełącz</string>
 </resources>

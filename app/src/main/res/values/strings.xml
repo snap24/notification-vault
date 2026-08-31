@@ -484,4 +484,5 @@
     <string name="custom_days_dots">Custom...</string>
     <string name="desc_switch_to_work">Switch to Work Profile</string>
     <string name="desc_switch_to_personal">Switch to Personal Profile</string>
+    <string name="nav_switch">Switch</string>
 </resources>

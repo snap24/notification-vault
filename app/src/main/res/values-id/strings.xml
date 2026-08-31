@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">Aktifkan Perekaman Toast</string>
     <string name="desc_switch_to_work">Beralih ke Profil Kerja</string>
     <string name="desc_switch_to_personal">Beralih ke Profil Pribadi</string>
+    <string name="nav_switch">Beralih</string>
 </resources>

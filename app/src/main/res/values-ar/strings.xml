@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">تفعيل تسجيل الإشعارات المنبثقة</string>
     <string name="desc_switch_to_work">التبديل إلى ملف العمل</string>
     <string name="desc_switch_to_personal">التبديل إلى الملف الشخصي</string>
+    <string name="nav_switch">تبديل</string>
 </resources>

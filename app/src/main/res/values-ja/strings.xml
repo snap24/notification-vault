@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">トースト記録を有効にする</string>
     <string name="desc_switch_to_work">仕事用プロファイルに切り替える</string>
     <string name="desc_switch_to_personal">個人用プロファイルに切り替える</string>
+    <string name="nav_switch">切替</string>
 </resources>

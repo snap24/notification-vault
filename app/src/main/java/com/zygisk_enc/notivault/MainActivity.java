@@ -60,6 +60,14 @@ public class MainActivity extends BaseActivity {
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfig);
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             binding.bottomNavigation.setOnItemSelectedListener(item -> {
+                if (item.getItemId() == R.id.action_switch_profile) {
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                            new androidx.lifecycle.ViewModelProvider(this)
+                            .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                    vm.toggleProfileMode();
+                    binding.bottomNavigation.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+                    return false;
+                }
                 if (item.getItemId() == R.id.navigation_history) {
                     com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
                             new androidx.lifecycle.ViewModelProvider(this)
@@ -71,6 +79,14 @@ public class MainActivity extends BaseActivity {
             });
 
             binding.bottomNavigation.setOnItemReselectedListener(item -> {
+                if (item.getItemId() == R.id.action_switch_profile) {
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                            new androidx.lifecycle.ViewModelProvider(this)
+                            .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                    vm.toggleProfileMode();
+                    binding.bottomNavigation.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+                    return;
+                }
                 if (item.getItemId() == R.id.navigation_history) {
                     com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
                             new androidx.lifecycle.ViewModelProvider(this)
@@ -137,7 +153,6 @@ public class MainActivity extends BaseActivity {
         int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
         int glassBgColor = androidx.core.graphics.ColorUtils.setAlphaComponent(surfaceColor, 216); // 85% opacity
         binding.bottomNavigationCard.setCardBackgroundColor(glassBgColor);
-        binding.cardProfileSwitch.setCardBackgroundColor(glassBgColor);
 
         // Setup Profile Switcher (Personal vs Work Profile)
         setupProfileSwitcher(notifViewModel);
@@ -150,17 +165,17 @@ public class MainActivity extends BaseActivity {
             getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
         }
 
-        // Hide bottom navigation bar when keyboard is open to prevent UI layout constraints overlapping search
+        // Hide bottom navigation card when keyboard is open to prevent UI layout constraints overlapping search
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-            binding.layoutBottomBar.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
+            binding.bottomNavigationCard.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
             
             // Adjust bottom margin dynamically to account for system navigation bar gesture line / curved screen vertices
             int bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
             androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp = 
-                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.layoutBottomBar.getLayoutParams();
+                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.bottomNavigationCard.getLayoutParams();
             lp.bottomMargin = Math.max(bottomInset, (int)(12 * getResources().getDisplayMetrics().density));
-            binding.layoutBottomBar.setLayoutParams(lp);
+            binding.bottomNavigationCard.setLayoutParams(lp);
             
             return insets;
         });
@@ -289,23 +304,35 @@ public class MainActivity extends BaseActivity {
 
     private void setupProfileSwitcher(com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm) {
         boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
-        binding.cardProfileSwitch.setVisibility(hasWorkProfile ? android.view.View.VISIBLE : android.view.View.GONE);
+        androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp =
+                (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.bottomNavigationCard.getLayoutParams();
+        int marginHorizontal = (int) ((hasWorkProfile ? 24 : 52) * getResources().getDisplayMetrics().density);
+        lp.leftMargin = marginHorizontal;
+        lp.rightMargin = marginHorizontal;
+        binding.bottomNavigationCard.setLayoutParams(lp);
 
-        binding.btnProfileSwitch.setOnClickListener(v -> {
-            vm.toggleProfileMode();
-        });
+        android.view.Menu menu = binding.bottomNavigation.getMenu();
+        if (hasWorkProfile) {
+            if (menu.findItem(R.id.action_switch_profile) == null) {
+                android.view.MenuItem switchItem = menu.add(
+                        android.view.Menu.NONE,
+                        R.id.action_switch_profile,
+                        android.view.Menu.NONE,
+                        R.string.nav_switch
+                );
+                switchItem.setIcon(R.drawable.sel_nav_switch);
+            }
+        } else {
+            menu.removeItem(R.id.action_switch_profile);
+        }
 
         vm.getProfileMode().observe(this, mode -> {
             int currentMode = mode != null ? mode : 0;
             if (currentMode == 0) {
                 // Personal Profile Active
-                binding.btnProfileSwitch.setImageResource(R.drawable.ic_work_bag);
-                binding.btnProfileSwitch.setContentDescription(getString(R.string.desc_switch_to_work));
                 binding.cardToolbarWorkTag.setVisibility(android.view.View.GONE);
             } else {
                 // Work Profile Active
-                binding.btnProfileSwitch.setImageResource(R.drawable.ic_person);
-                binding.btnProfileSwitch.setContentDescription(getString(R.string.desc_switch_to_personal));
                 binding.cardToolbarWorkTag.setVisibility(android.view.View.VISIBLE);
             }
         });
@@ -314,8 +341,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
-        binding.cardProfileSwitch.setVisibility(hasWorkProfile ? android.view.View.VISIBLE : android.view.View.GONE);
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
+                new androidx.lifecycle.ViewModelProvider(this)
+                .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+        setupProfileSwitcher(notifViewModel);
         checkPermissionsSequence();
     }
 

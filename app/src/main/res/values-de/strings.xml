@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">Toast-Aufzeichnung aktivieren</string>
     <string name="desc_switch_to_work">Zum Arbeitsprofil wechseln</string>
     <string name="desc_switch_to_personal">Zum persönlichen Profil wechseln</string>
+    <string name="nav_switch">Wechseln</string>
 </resources>

@@ -423,4 +423,5 @@
     <string name="desc_enable_toast_permission">Включить запись тостов</string>
     <string name="desc_switch_to_work">Переключиться на рабочий профиль</string>
     <string name="desc_switch_to_personal">Переключиться на личный профиль</string>
+    <string name="nav_switch">Переключить</string>
 </resources>
