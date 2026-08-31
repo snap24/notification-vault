@@ -65,9 +65,12 @@ public class WidgetFilterActivity extends BaseActivity {
         String currentPkg = PreferenceUtil.getWidgetFeedPackage(this, appWidgetId);
 
         AppExecutor.execute(() -> {
+            boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
+            int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(this) : -1;
+
             List<AppSummary> summaries = AppDatabase.getInstance(this)
                     .notificationDao()
-                    .getAppSummariesSync();
+                    .getAppSummariesSync(profileMode);
 
             PackageManager pm = getPackageManager();
             List<FilterItem> items = new ArrayList<>();
@@ -84,19 +87,14 @@ public class WidgetFilterActivity extends BaseActivity {
             // 2. Individual Apps
             for (AppSummary summary : summaries) {
                 if (summary.packageName == null || summary.packageName.isEmpty()) continue;
-                String appName = summary.appName;
-                Drawable icon = null;
-                try {
-                    ApplicationInfo info = pm.getApplicationInfo(summary.packageName, 0);
-                    if (appName == null || appName.isEmpty()) {
-                        appName = pm.getApplicationLabel(info).toString();
+                String appName = com.zygisk_enc.notivault.util.ProfileUtil.getAppLabel(this, summary.packageName, summary.userId, summary.appName);
+                Drawable icon = com.zygisk_enc.notivault.util.ProfileUtil.getBadgedAppIcon(this, summary.packageName, summary.userId);
+                if (icon == null) {
+                    try {
+                        icon = pm.getApplicationIcon(summary.packageName);
+                    } catch (Exception ignored) {
+                        icon = getDrawable(R.mipmap.ic_launcher);
                     }
-                    icon = pm.getApplicationIcon(info);
-                } catch (Exception ignored) {
-                    if (appName == null || appName.isEmpty()) {
-                        appName = summary.packageName;
-                    }
-                    icon = getDrawable(R.mipmap.ic_launcher);
                 }
 
                 String countStr = summary.count == 1
