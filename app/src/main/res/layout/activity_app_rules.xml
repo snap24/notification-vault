@@ -45,6 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
+                android:singleLine="true"
                 android:maxLines="1"
                 android:paddingVertical="10dp" />
 
@@ -65,7 +66,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/filter_user_apps"
                 android:checked="true"
-                app:checkedIconVisible="false"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
@@ -73,7 +76,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/filter_system_apps"
-                app:checkedIconVisible="false"
+                app:chipCornerRadius="12dp"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="?attr/colorOutlineVariant"
                 style="@style/Widget.Material3.Chip.Filter" />
 
         </com.google.android.material.chip.ChipGroup>
@@ -83,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            app:cardCornerRadius="14dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
@@ -109,7 +114,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/capture_all_user_apps"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
                         android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold" />
 

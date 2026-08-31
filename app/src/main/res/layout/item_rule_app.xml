@@ -2,33 +2,39 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_app_rule"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="2dp"
     android:layout_marginVertical="3dp"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
     app:strokeColor="?attr/colorOutlineVariant"
-    app:cardBackgroundColor="?attr/colorSurface">
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp">
 
-        <ImageView
+        <!-- App Icon with Rounded Squircle Shape -->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_app_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
             android:importantForAccessibility="no"
-            android:src="@android:drawable/sym_def_app_icon" />
+            tools:src="@android:drawable/sym_def_app_icon" />
 
+        <!-- Details -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -40,39 +46,47 @@
                 android:id="@+id/tv_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
                 android:maxLines="1"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="10sp"
-                app:autoSizeMaxTextSize="14sp"
-                app:autoSizeStepGranularity="1sp" />
+                android:ellipsize="end"
+                tools:text="WhatsApp" />
 
             <TextView
                 android:id="@+id/tv_rule_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="2dp"
                 android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                 android:textStyle="bold"
-                android:text="@string/status_recording_active" />
+                tools:text="@string/status_recording_active" />
 
         </LinearLayout>
 
-        <TextView
+        <!-- Tap to edit guide pill badge -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/tv_tap_guide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="3dp"
-            android:background="@drawable/bg_tap_guide"
-            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-            android:textColor="?attr/colorPrimary"
-            android:textStyle="bold"
-            android:text="@string/tap_to_edit_rule"
-            android:visibility="gone" />
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textStyle="bold"
+                android:text="@string/tap_to_edit_rule" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switch_capture"
