@@ -27,13 +27,38 @@
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:navigationIcon="?attr/homeAsUpIndicator">
 
+            <!-- Small Toast Permission Missing Button beside Toast Logs title -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toolbar_accessibility_alert"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="8dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_toast_permission"
+                app:iconSize="18dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="?attr/colorOnErrorContainer"
+                app:backgroundTint="?attr/colorErrorContainer"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorError"
+                android:contentDescription="@string/desc_enable_toast_permission"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Circular Progress Ring (Pure Minimalist Border Progress Indicator) -->
             <FrameLayout
                 android:id="@+id/card_toolbar_decryption"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="8dp"
                 android:visibility="gone">
 
                 <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -51,30 +76,6 @@
                     android:progress="0" />
 
             </FrameLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_toolbar_accessibility_alert"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="8dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:cornerRadius="18dp"
-                app:icon="@drawable/ic_toast_permission"
-                app:iconSize="18dp"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="?attr/colorOnErrorContainer"
-                app:backgroundTint="?attr/colorErrorContainer"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorError"
-                android:contentDescription="@string/desc_enable_toast_permission"
-                android:visibility="gone"
-                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_source"

@@ -138,11 +138,6 @@ public class HistoryFragment extends Fragment {
             startActivity(intent);
         });
 
-        binding.btnToastPermission.setOnClickListener(v -> {
-            com.zygisk_enc.notivault.util.PreferenceUtil.openAccessibilitySettings(requireContext());
-        });
-        updateToastPermissionButton();
-
         binding.chipCloudBackup.setOnClickListener(v -> {
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean("biometric_lock", false);
@@ -1775,14 +1770,6 @@ public class HistoryFragment extends Fragment {
         }
         if (adapter != null && getContext() != null) {
             adapter.setShowReadUnreadStatus(PreferenceUtil.isShowReadUnreadEnabled(requireContext()));
-        }
-        updateToastPermissionButton();
-    }
-
-    private void updateToastPermissionButton() {
-        if (binding != null && getContext() != null) {
-            boolean isEnabled = PreferenceUtil.isAccessibilityServiceEnabled(requireContext());
-            binding.btnToastPermission.setVisibility(isEnabled ? View.GONE : View.VISIBLE);
         }
     }
 
