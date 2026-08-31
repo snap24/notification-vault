@@ -145,8 +145,19 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsSync(int limit);
 
+    @Query("SELECT * FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    List<NotificationEntity> getRecentNotificationsSync(int limit, int profileMode);
+
     @Query("SELECT * FROM notifications WHERE packageName = :packageName ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsByPackageSync(String packageName, int limit);
+
+    @Query("SELECT * FROM notifications " +
+           "WHERE packageName = :packageName " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    List<NotificationEntity> getRecentNotificationsByPackageSync(String packageName, int limit, int profileMode);
 
     @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
            "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +

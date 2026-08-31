@@ -13,10 +13,12 @@ import android.widget.Toast;
 import com.zygisk_enc.notivault.MainActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
+import com.zygisk_enc.notivault.util.ProfileUtil;
 
 public class NotificationFeedWidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_REFRESH_FEED = "com.zygisk_enc.notivault.widget.ACTION_REFRESH_FEED";
+    public static final String ACTION_SWITCH_PROFILE_FEED = "com.zygisk_enc.notivault.widget.ACTION_SWITCH_PROFILE_FEED";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -33,6 +35,27 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
 
     public static void updateWidget(Context context, AppWidgetManager appWidgetManager, int id) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_notification_feed);
+
+        // Profile Switch & Work Badge
+        boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
+        int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
+
+        if (hasWorkProfile) {
+            views.setViewVisibility(R.id.btn_feed_switch_profile, android.view.View.VISIBLE);
+            views.setImageViewResource(R.id.btn_feed_switch_profile, R.drawable.ic_profile_switch);
+            views.setContentDescription(R.id.btn_feed_switch_profile, context.getString(profileMode == 1 ? R.string.desc_switch_to_personal : R.string.desc_switch_to_work));
+
+            Intent switchIntent = new Intent(context, NotificationFeedWidgetProvider.class);
+            switchIntent.setAction(ACTION_SWITCH_PROFILE_FEED);
+            PendingIntent switchPending = PendingIntent.getBroadcast(
+                    context, 203 + id, switchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            views.setOnClickPendingIntent(R.id.btn_feed_switch_profile, switchPending);
+
+            views.setViewVisibility(R.id.tv_feed_work_badge, profileMode == 1 ? android.view.View.VISIBLE : android.view.View.GONE);
+        } else {
+            views.setViewVisibility(R.id.btn_feed_switch_profile, android.view.View.GONE);
+            views.setViewVisibility(R.id.tv_feed_work_badge, android.view.View.GONE);
+        }
 
         // Bind RemoteViewsService adapter
         Intent serviceIntent = new Intent(context, NotificationFeedService.class);
@@ -86,6 +109,14 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
         if (ACTION_REFRESH_FEED.equals(intent.getAction())) {
             WidgetHelper.updateAllWidgets(context);
             Toast.makeText(context, R.string.toast_feed_refreshed, Toast.LENGTH_SHORT).show();
+        } else if (ACTION_SWITCH_PROFILE_FEED.equals(intent.getAction())) {
+            if (ProfileUtil.hasWorkProfile(context)) {
+                int current = PreferenceUtil.getActiveProfileMode(context);
+                int next = (current == 0) ? 1 : 0;
+                PreferenceUtil.setActiveProfileMode(context, next);
+                Toast.makeText(context, next == 1 ? R.string.badge_work : R.string.badge_personal, Toast.LENGTH_SHORT).show();
+                WidgetHelper.updateAllWidgets(context);
+            }
         }
     }
 }

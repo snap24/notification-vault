@@ -47,15 +47,17 @@ public class NotificationFeedService extends RemoteViewsService {
         @Override
         public void onDataSetChanged() {
             try {
+                boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(context);
+                int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
                 String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, appWidgetId);
                 if (filterPkg != null && !"ALL".equals(filterPkg)) {
                     notifications = AppDatabase.getInstance(context)
                             .notificationDao()
-                            .getRecentNotificationsByPackageSync(filterPkg, 200);
+                            .getRecentNotificationsByPackageSync(filterPkg, 200, profileMode);
                 } else {
                     notifications = AppDatabase.getInstance(context)
                             .notificationDao()
-                            .getRecentNotificationsSync(200);
+                            .getRecentNotificationsSync(200, profileMode);
                 }
             } catch (Exception e) {
                 notifications = new ArrayList<>();

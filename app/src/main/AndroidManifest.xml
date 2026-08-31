@@ -139,6 +139,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.zygisk_enc.notivault.widget.ACTION_REFRESH_FEED" />
+                <action android:name="com.zygisk_enc.notivault.widget.ACTION_SWITCH_PROFILE_FEED" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
