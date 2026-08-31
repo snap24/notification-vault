@@ -116,7 +116,7 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
 
         // 1. History or Profile Switch Action
         if (hasWorkProfile) {
-            views.setImageViewResource(R.id.btn_action_history, profileMode == 1 ? R.drawable.ic_work_bag : R.drawable.ic_profile_switch);
+            views.setImageViewResource(R.id.btn_action_history, R.drawable.ic_profile_switch);
             views.setContentDescription(R.id.btn_action_history, context.getString(profileMode == 1 ? R.string.desc_switch_to_personal : R.string.desc_switch_to_work));
             Intent switchIntent = new Intent(context, VaultDashboardWidgetProvider.class);
             switchIntent.setAction(ACTION_SWITCH_PROFILE_DASHBOARD);
@@ -173,12 +173,11 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
     private static RemoteViews build2RowViews(Context context, boolean captureEnabled, int notifCount, int toastCount, boolean hasWorkProfile, int profileMode) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_vault_dashboard);
 
-        // Title with Work profile indicator
-        if (hasWorkProfile && profileMode == 1) {
-            views.setTextViewText(R.id.tv_dashboard_title, context.getString(R.string.widget_vault_title) + " • " + context.getString(R.string.badge_work));
-        } else {
-            views.setTextViewText(R.id.tv_dashboard_title, context.getString(R.string.widget_vault_title));
-        }
+        // Title
+        views.setTextViewText(R.id.tv_dashboard_title, context.getString(R.string.widget_vault_title));
+
+        // Work profile hint badge in top right
+        views.setViewVisibility(R.id.tv_dashboard_work_badge, (hasWorkProfile && profileMode == 1) ? android.view.View.VISIBLE : android.view.View.GONE);
 
         // Status Pill
         views.setTextViewText(R.id.tv_dashboard_status_text, context.getString(captureEnabled ? R.string.widget_status_active : R.string.widget_status_paused));
@@ -190,7 +189,7 @@ public class VaultDashboardWidgetProvider extends AppWidgetProvider {
 
         // 1. History or Profile Switch Action
         if (hasWorkProfile) {
-            views.setImageViewResource(R.id.btn_action_history, profileMode == 1 ? R.drawable.ic_work_bag : R.drawable.ic_profile_switch);
+            views.setImageViewResource(R.id.btn_action_history, R.drawable.ic_profile_switch);
             views.setContentDescription(R.id.btn_action_history, context.getString(profileMode == 1 ? R.string.desc_switch_to_personal : R.string.desc_switch_to_work));
             Intent switchIntent = new Intent(context, VaultDashboardWidgetProvider.class);
             switchIntent.setAction(ACTION_SWITCH_PROFILE_DASHBOARD);

@@ -32,6 +32,21 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
+        <!-- Work Profile Badge Hint -->
+        <TextView
+            android:id="@+id/tv_dashboard_work_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_widget_pill"
+            android:text="@string/badge_work"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:layout_marginEnd="6dp"
+            android:visibility="gone" />
+
         <!-- Status Pill -->
         <LinearLayout
             android:id="@+id/layout_dashboard_status_pill"
