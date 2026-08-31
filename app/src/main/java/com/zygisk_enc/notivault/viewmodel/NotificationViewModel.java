@@ -495,6 +495,7 @@ public class NotificationViewModel extends AndroidViewModel {
         if ((packageName == null && current == null) || (packageName != null && packageName.equals(current))) {
             return;
         }
+        resetLimit();
         filterPackage.setValue(packageName);
     }
 
