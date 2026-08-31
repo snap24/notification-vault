@@ -421,4 +421,6 @@
     <string name="badge_work">İş</string>
     <string name="filter_work_apps">İş Uygulamaları</string>
     <string name="desc_enable_toast_permission">Toast Kaydını Etkinleştir</string>
+    <string name="desc_switch_to_work">İş Profiline Geç</string>
+    <string name="desc_switch_to_personal">Kişisel Profile Geç</string>
 </resources>

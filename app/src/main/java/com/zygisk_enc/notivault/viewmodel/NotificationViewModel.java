@@ -20,6 +20,7 @@ public class NotificationViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> filterFavorites = new MutableLiveData<>(false);
     private final MutableLiveData<Long> filterDateStart = new MutableLiveData<>(null);
     private final MutableLiveData<Long> filterDateEnd = new MutableLiveData<>(null);
+    private final MutableLiveData<Integer> filterProfileMode = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> scrollToTopEvent = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> openSearchEvent = new MutableLiveData<>(false);
     private final MediatorLiveData<List<NotificationEntity>> notifications = new MediatorLiveData<>();
@@ -96,12 +97,15 @@ public class NotificationViewModel extends AndroidViewModel {
 
     private boolean isBatchingUpdates = false;
 
+    private LiveData<List<AppSummary>> currentAppSummariesSource = null;
+
     public NotificationViewModel(Application application) {
         super(application);
         repository = new NotificationRepository(application);
-        appSummaries.addSource(repository.getAppSummaries(), list -> {
-            appSummaries.setValue(list != null ? list : new java.util.ArrayList<>());
-        });
+        int initialProfileMode = com.zygisk_enc.notivault.util.PreferenceUtil.getActiveProfileMode(application);
+        filterProfileMode.setValue(initialProfileMode);
+
+        updateAppSummariesSource();
         unreadCount = repository.getUnreadCount();
 
         notifications.addSource(searchQuery, query -> {
@@ -114,6 +118,13 @@ public class NotificationViewModel extends AndroidViewModel {
         notifications.addSource(filterFavorites, favs -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterDateStart, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
         notifications.addSource(filterDateEnd, date -> { if (!isBatchingUpdates) { resetLimit(); updateSource(); } });
+        notifications.addSource(filterProfileMode, mode -> {
+            if (!isBatchingUpdates) {
+                resetLimit();
+                updateAppSummariesSource();
+                updateSource();
+            }
+        });
         notifications.addSource(filterLimit, limit -> {
             if (!isBatchingUpdates && !isResettingLimit) {
                 updateSource();
@@ -124,6 +135,17 @@ public class NotificationViewModel extends AndroidViewModel {
                 lastRawList = null;
                 updateSource();
             }
+        });
+    }
+
+    private void updateAppSummariesSource() {
+        if (currentAppSummariesSource != null) {
+            appSummaries.removeSource(currentAppSummariesSource);
+        }
+        int mode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
+        currentAppSummariesSource = repository.getAppSummaries(mode);
+        appSummaries.addSource(currentAppSummariesSource, list -> {
+            appSummaries.setValue(list != null ? list : new java.util.ArrayList<>());
         });
     }
 
@@ -170,6 +192,7 @@ public class NotificationViewModel extends AndroidViewModel {
         int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
+        int profileMode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
 
         Boolean favs = filterFavorites.getValue();
         int favsOnly = (favs != null && favs) ? 1 : 0;
@@ -180,23 +203,23 @@ public class NotificationViewModel extends AndroidViewModel {
             java.util.List<Long> searchHashes = com.zygisk_enc.notivault.util.BlindIndexHelper.extractQueryTokenHashes(rawQuery);
             if (searchHashes.isEmpty()) {
                 if (favsOnly == 1) {
-                    currentSource = repository.getFavorites(limit, dateStart, dateEnd);
+                    currentSource = repository.getFavorites(limit, dateStart, dateEnd, profileMode);
                 } else if (pkg != null) {
-                    currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
+                    currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd, profileMode);
                 } else {
-                    currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
+                    currentSource = repository.getAllNotifications(limit, dateStart, dateEnd, profileMode);
                 }
             } else if (searchHashes.size() == 1) {
-                currentSource = repository.searchByTokenHash(searchHashes.get(0), pkg, favsOnly, limit, dateStart, dateEnd);
+                currentSource = repository.searchByTokenHash(searchHashes.get(0), pkg, favsOnly, limit, dateStart, dateEnd, profileMode);
             } else {
-                currentSource = repository.searchByTokenHashes(searchHashes, searchHashes.size(), pkg, favsOnly, limit, dateStart, dateEnd);
+                currentSource = repository.searchByTokenHashes(searchHashes, searchHashes.size(), pkg, favsOnly, limit, dateStart, dateEnd, profileMode);
             }
         } else if (favsOnly == 1) {
-            currentSource = repository.getFavorites(limit, dateStart, dateEnd);
+            currentSource = repository.getFavorites(limit, dateStart, dateEnd, profileMode);
         } else if (pkg != null) {
-            currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd);
+            currentSource = repository.getNotificationsByPackage(pkg, limit, dateStart, dateEnd, profileMode);
         } else {
-            currentSource = repository.getAllNotifications(limit, dateStart, dateEnd);
+            currentSource = repository.getAllNotifications(limit, dateStart, dateEnd, profileMode);
         }
 
         notifications.addSource(currentSource, list -> {
@@ -402,9 +425,28 @@ public class NotificationViewModel extends AndroidViewModel {
         return appSummaries;
     }
 
+    public LiveData<Integer> getProfileMode() {
+        return filterProfileMode;
+    }
+
+    public void setProfileMode(int mode) {
+        Integer current = filterProfileMode.getValue();
+        if (current != null && current == mode) {
+            return;
+        }
+        com.zygisk_enc.notivault.util.PreferenceUtil.setActiveProfileMode(getApplication(), mode);
+        filterProfileMode.setValue(mode);
+    }
+
+    public void toggleProfileMode() {
+        int current = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
+        setProfileMode(current == 0 ? 1 : 0);
+    }
+
     public void refreshAppSummaries() {
         coordinatorExecutor.execute(() -> {
-            List<AppSummary> list = repository.getAppSummariesSync();
+            int mode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
+            List<AppSummary> list = repository.getAppSummariesSync(mode);
             appSummaries.postValue(list != null ? list : new java.util.ArrayList<>());
         });
     }
@@ -703,6 +745,9 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     private boolean matchesQuery(NotificationEntity entity, boolean searchingMode, String lowerQuery) {
+        int mode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
+        if (mode == 0 && entity.userId != 0) return false;
+        if (mode == 1 && entity.userId == 0) return false;
         if (!searchingMode) return true;
         boolean appNameMatches = entity.appName != null && entity.appName.toLowerCase().contains(lowerQuery);
         boolean titleMatches = entity.decryptedTitle != null && entity.decryptedTitle.toLowerCase().contains(lowerQuery);

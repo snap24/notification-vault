@@ -482,4 +482,6 @@
     <string name="stats_distraction_insight">Distraction Insight</string>
     <string name="stats_analyzing_pattern">Analyzing your notification pattern...</string>
     <string name="custom_days_dots">Custom...</string>
+    <string name="desc_switch_to_work">Switch to Work Profile</string>
+    <string name="desc_switch_to_personal">Switch to Personal Profile</string>
 </resources>

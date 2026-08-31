@@ -60,18 +60,20 @@ public interface NotificationDao {
     List<String> getImagePathsForPackages(List<String> packages);
 
     @Query("SELECT * FROM notifications " +
-           "WHERE (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
-    LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd);
+    LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd, int profileMode);
 
     @Query("SELECT * FROM notifications ORDER BY timestamp DESC, id DESC")
     List<NotificationEntity> getAllNotificationsSync();
 
     @Query("SELECT * FROM notifications " +
            "WHERE packageName = :packageName " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
            "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
-    LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd);
+    LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd, int profileMode);
 
     @Query("SELECT * FROM notifications WHERE (title LIKE '%' || :query || '%' OR text LIKE '%' || :query || '%' OR appName LIKE '%' || :query || '%') ORDER BY timestamp DESC, id DESC")
     LiveData<List<NotificationEntity>> searchNotifications(String query);
@@ -80,9 +82,10 @@ public interface NotificationDao {
            "WHERE id IN (SELECT notificationId FROM search_tokens WHERE tokenHash = :tokenHash) " +
            "AND (:packageName IS NULL OR packageName = :packageName) " +
            "AND (:isFavoriteOnly = 0 OR isFavorite = 1) " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
            "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
-    LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd);
+    LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd, int profileMode);
 
     @Query("SELECT * FROM notifications " +
            "WHERE id IN (" +
@@ -93,15 +96,18 @@ public interface NotificationDao {
            ") " +
            "AND (:packageName IS NULL OR packageName = :packageName) " +
            "AND (:isFavoriteOnly = 0 OR isFavorite = 1) " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
            "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
-    LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd);
+    LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd, int profileMode);
 
     @Query("SELECT * FROM notifications WHERE id NOT IN (SELECT DISTINCT notificationId FROM search_tokens) ORDER BY id DESC LIMIT :limit")
     List<NotificationEntity> getUnindexedNotifications(int limit);
 
-    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications GROUP BY packageName, userId ORDER BY count DESC")
-    LiveData<List<AppSummary>> getAppSummaries();
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "GROUP BY packageName, userId ORDER BY count DESC")
+    LiveData<List<AppSummary>> getAppSummaries(int profileMode);
 
     @Query("UPDATE notifications SET isRead = 1 WHERE id = :id")
     void markAsRead(long id);
@@ -109,8 +115,10 @@ public interface NotificationDao {
     @Query("UPDATE notifications SET isFavorite = :isFavorite WHERE id = :id")
     void setFavorite(long id, boolean isFavorite);
 
-    @Query("SELECT COUNT(*) FROM notifications WHERE isRead = 0")
-    LiveData<Integer> getUnreadCount();
+    @Query("SELECT COUNT(*) FROM notifications " +
+           "WHERE isRead = 0 " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0))")
+    LiveData<Integer> getUnreadCount(int profileMode);
 
     @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp")
     LiveData<Integer> getCountSince(long startTimestamp);
@@ -118,11 +126,16 @@ public interface NotificationDao {
     @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp")
     int getCountSinceSync(long startTimestamp);
 
-    @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
-    int getCountBetweenSync(long startTimestamp, long endTimestamp);
+    @Query("SELECT COUNT(*) FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    int getCountBetweenSync(long startTimestamp, long endTimestamp, int profileMode);
 
-    @Query("SELECT COUNT(*) FROM notifications WHERE isFavorite = 1 AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
-    int getFavoritesCountBetweenSync(long startTimestamp, long endTimestamp);
+    @Query("SELECT COUNT(*) FROM notifications " +
+           "WHERE isFavorite = 1 " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    int getFavoritesCountBetweenSync(long startTimestamp, long endTimestamp, int profileMode);
 
     @Query("SELECT * FROM notifications ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsSync(int limit);
@@ -130,23 +143,36 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications WHERE packageName = :packageName ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsByPackageSync(String packageName, int limit);
 
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "GROUP BY packageName, userId ORDER BY count DESC")
+    List<AppSummary> getAppSummariesSync(int profileMode);
+
     @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications GROUP BY packageName, userId ORDER BY count DESC")
     List<AppSummary> getAppSummariesSync();
 
-    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
-    List<AppSummary> getTopAppsBetweenSync(long startTimestamp, long endTimestamp, int limit);
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp " +
+           "GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
+    List<AppSummary> getTopAppsBetweenSync(long startTimestamp, long endTimestamp, int limit, int profileMode);
 
-    @Query("SELECT timestamp FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp ORDER BY timestamp ASC")
-    List<Long> getTimestampsBetweenSync(long startTimestamp, long endTimestamp);
+    @Query("SELECT timestamp FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp AND timestamp <= :endTimestamp ORDER BY timestamp ASC")
+    List<Long> getTimestampsBetweenSync(long startTimestamp, long endTimestamp, int profileMode);
 
-    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications WHERE timestamp >= :startTimestamp GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
-    LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit);
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
+           "WHERE ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
+           "AND timestamp >= :startTimestamp GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
+    LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit, int profileMode);
 
     @Query("SELECT * FROM notifications " +
            "WHERE isFavorite = 1 " +
+           "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0)) " +
            "AND (:dateStart IS NULL OR :dateEnd IS NULL OR (timestamp >= :dateStart AND timestamp <= :dateEnd)) " +
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
-    LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd);
+    LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd, int profileMode);
 
     @Query("SELECT * FROM notifications WHERE timestamp >= :startTimestamp ORDER BY timestamp DESC, id DESC")
     LiveData<List<NotificationEntity>> getNotificationsSince(long startTimestamp);

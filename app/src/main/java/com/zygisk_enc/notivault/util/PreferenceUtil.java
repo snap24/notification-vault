@@ -14,6 +14,19 @@ public class PreferenceUtil {
     private static final String KEY_AUTO_DELETE_APP_RULES = "auto_delete_app_rules";
     private static final String KEY_CAPTURE_ENABLED = "capture_enabled";
     private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
+    public static final String KEY_ACTIVE_PROFILE_MODE = "active_profile_mode"; // 0 = Personal, 1 = Work
+
+    public static int getActiveProfileMode(Context context) {
+        if (context == null) return 0;
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(KEY_ACTIVE_PROFILE_MODE, 0);
+    }
+
+    public static void setActiveProfileMode(Context context, int mode) {
+        if (context == null) return;
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putInt(KEY_ACTIVE_PROFILE_MODE, mode).apply();
+    }
 
     public static int getGlobalAutoDeleteDays(Context context) {
         return getAutoDeleteDays(context);

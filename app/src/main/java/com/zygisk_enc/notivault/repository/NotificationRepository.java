@@ -211,48 +211,84 @@ public class NotificationRepository {
         executor.execute(() -> dao.setFavorite(id, isFavorite));
     }
 
+    public LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd, int profileMode) {
+        return dao.getAllNotifications(limit, dateStart, dateEnd, profileMode);
+    }
+
     public LiveData<List<NotificationEntity>> getAllNotifications(int limit, Long dateStart, Long dateEnd) {
-        return dao.getAllNotifications(limit, dateStart, dateEnd);
+        return dao.getAllNotifications(limit, dateStart, dateEnd, -1);
+    }
+
+    public LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd, int profileMode) {
+        return dao.getNotificationsByPackage(packageName, limit, dateStart, dateEnd, profileMode);
     }
 
     public LiveData<List<NotificationEntity>> getNotificationsByPackage(String packageName, int limit, Long dateStart, Long dateEnd) {
-        return dao.getNotificationsByPackage(packageName, limit, dateStart, dateEnd);
+        return dao.getNotificationsByPackage(packageName, limit, dateStart, dateEnd, -1);
     }
 
     public LiveData<List<NotificationEntity>> searchNotifications(String query) {
         return dao.searchNotifications(query);
     }
 
+    public LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd, int profileMode) {
+        return dao.searchByTokenHash(tokenHash, packageName, isFavoriteOnly, limit, dateStart, dateEnd, profileMode);
+    }
+
     public LiveData<List<NotificationEntity>> searchByTokenHash(long tokenHash, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd) {
-        return dao.searchByTokenHash(tokenHash, packageName, isFavoriteOnly, limit, dateStart, dateEnd);
+        return dao.searchByTokenHash(tokenHash, packageName, isFavoriteOnly, limit, dateStart, dateEnd, -1);
+    }
+
+    public LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd, int profileMode) {
+        return dao.searchByTokenHashes(tokenHashes, tokenCount, packageName, isFavoriteOnly, limit, dateStart, dateEnd, profileMode);
     }
 
     public LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd) {
-        return dao.searchByTokenHashes(tokenHashes, tokenCount, packageName, isFavoriteOnly, limit, dateStart, dateEnd);
+        return dao.searchByTokenHashes(tokenHashes, tokenCount, packageName, isFavoriteOnly, limit, dateStart, dateEnd, -1);
+    }
+
+    public LiveData<List<AppSummary>> getAppSummaries(int profileMode) {
+        return dao.getAppSummaries(profileMode);
     }
 
     public LiveData<List<AppSummary>> getAppSummaries() {
-        return dao.getAppSummaries();
+        return dao.getAppSummaries(-1);
+    }
+
+    public List<AppSummary> getAppSummariesSync(int profileMode) {
+        return dao.getAppSummariesSync(profileMode);
     }
 
     public List<AppSummary> getAppSummariesSync() {
-        return dao.getAppSummariesSync();
+        return dao.getAppSummariesSync(-1);
+    }
+
+    public LiveData<Integer> getUnreadCount(int profileMode) {
+        return dao.getUnreadCount(profileMode);
     }
 
     public LiveData<Integer> getUnreadCount() {
-        return dao.getUnreadCount();
+        return dao.getUnreadCount(-1);
     }
 
     public LiveData<Integer> getCountSince(long startTimestamp) {
         return dao.getCountSince(startTimestamp);
     }
 
+    public LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit, int profileMode) {
+        return dao.getTopAppsSince(startTimestamp, limit, profileMode);
+    }
+
     public LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit) {
-        return dao.getTopAppsSince(startTimestamp, limit);
+        return dao.getTopAppsSince(startTimestamp, limit, -1);
+    }
+
+    public LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd, int profileMode) {
+        return dao.getFavorites(limit, dateStart, dateEnd, profileMode);
     }
 
     public LiveData<List<NotificationEntity>> getFavorites(int limit, Long dateStart, Long dateEnd) {
-        return dao.getFavorites(limit, dateStart, dateEnd);
+        return dao.getFavorites(limit, dateStart, dateEnd, -1);
     }
 
     public LiveData<List<NotificationEntity>> getNotificationsSince(long startTimestamp) {

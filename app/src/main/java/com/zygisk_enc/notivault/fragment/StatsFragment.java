@@ -19,6 +19,7 @@ import com.zygisk_enc.notivault.database.AppDatabase;
 import com.zygisk_enc.notivault.database.AppSummary;
 import com.zygisk_enc.notivault.databinding.FragmentStatsBinding;
 import com.zygisk_enc.notivault.util.AppExecutor;
+import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.view.AnalyticsDistributionChartView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -247,12 +248,13 @@ public class StatsFragment extends Fragment {
                     break;
             }
 
+            int profileMode = PreferenceUtil.getActiveProfileMode(context);
             AppDatabase db = AppDatabase.getInstance(context);
-            int total = db.notificationDao().getCountBetweenSync(startTime, endTime);
-            int favorites = db.notificationDao().getFavoritesCountBetweenSync(startTime, endTime);
+            int total = db.notificationDao().getCountBetweenSync(startTime, endTime, profileMode);
+            int favorites = db.notificationDao().getFavoritesCountBetweenSync(startTime, endTime, profileMode);
             int toasts = db.toastDao().getToastCountBetweenSync(startTime, endTime);
-            List<AppSummary> topApps = db.notificationDao().getTopAppsBetweenSync(startTime, endTime, 100);
-            List<Long> timestamps = db.notificationDao().getTimestampsBetweenSync(startTime, endTime);
+            List<AppSummary> topApps = db.notificationDao().getTopAppsBetweenSync(startTime, endTime, 100, profileMode);
+            List<Long> timestamps = db.notificationDao().getTimestampsBetweenSync(startTime, endTime, profileMode);
 
             AnalyticsData data = computeAnalytics(context, currentPeriod, startTime, endTime, total, favorites, toasts, topApps, timestamps);
 

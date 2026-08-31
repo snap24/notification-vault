@@ -421,4 +421,6 @@
     <string name="badge_work">Работа</string>
     <string name="filter_work_apps">Рабочие приложения</string>
     <string name="desc_enable_toast_permission">Включить запись тостов</string>
+    <string name="desc_switch_to_work">Переключиться на рабочий профиль</string>
+    <string name="desc_switch_to_personal">Переключиться на личный профиль</string>
 </resources>

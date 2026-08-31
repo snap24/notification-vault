@@ -421,4 +421,6 @@
     <string name="badge_work">Kerja</string>
     <string name="filter_work_apps">Aplikasi Kerja</string>
     <string name="desc_enable_toast_permission">Aktifkan Perekaman Toast</string>
+    <string name="desc_switch_to_work">Beralih ke Profil Kerja</string>
+    <string name="desc_switch_to_personal">Beralih ke Profil Pribadi</string>
 </resources>

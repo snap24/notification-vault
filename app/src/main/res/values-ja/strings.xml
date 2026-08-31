@@ -421,4 +421,6 @@
     <string name="badge_work">仕事</string>
     <string name="filter_work_apps">仕事用アプリ</string>
     <string name="desc_enable_toast_permission">トースト記録を有効にする</string>
+    <string name="desc_switch_to_work">仕事用プロファイルに切り替える</string>
+    <string name="desc_switch_to_personal">個人用プロファイルに切り替える</string>
 </resources>

@@ -421,4 +421,6 @@
     <string name="badge_work">工作</string>
     <string name="filter_work_apps">工作应用</string>
     <string name="desc_enable_toast_permission">启用 Toast 记录</string>
+    <string name="desc_switch_to_work">切换到工作资料</string>
+    <string name="desc_switch_to_personal">切换到个人资料</string>
 </resources>

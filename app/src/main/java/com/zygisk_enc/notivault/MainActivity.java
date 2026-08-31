@@ -137,6 +137,10 @@ public class MainActivity extends BaseActivity {
         int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
         int glassBgColor = androidx.core.graphics.ColorUtils.setAlphaComponent(surfaceColor, 216); // 85% opacity
         binding.bottomNavigationCard.setCardBackgroundColor(glassBgColor);
+        binding.cardProfileSwitch.setCardBackgroundColor(glassBgColor);
+
+        // Setup Profile Switcher (Personal vs Work Profile)
+        setupProfileSwitcher(notifViewModel);
 
         int outlineColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorOutline, android.graphics.Color.GRAY);
         int glassBorderColor = androidx.core.graphics.ColorUtils.setAlphaComponent(outlineColor, 64); // 25% opacity
@@ -146,17 +150,17 @@ public class MainActivity extends BaseActivity {
             getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
         }
 
-        // Hide bottom navigation card when keyboard is open to prevent UI layout constraints overlapping search
+        // Hide bottom navigation bar when keyboard is open to prevent UI layout constraints overlapping search
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-            binding.bottomNavigationCard.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
+            binding.layoutBottomBar.setVisibility(keyboardVisible ? android.view.View.GONE : android.view.View.VISIBLE);
             
             // Adjust bottom margin dynamically to account for system navigation bar gesture line / curved screen vertices
             int bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
             androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams lp = 
-                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.bottomNavigationCard.getLayoutParams();
+                    (androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) binding.layoutBottomBar.getLayoutParams();
             lp.bottomMargin = Math.max(bottomInset, (int)(12 * getResources().getDisplayMetrics().density));
-            binding.bottomNavigationCard.setLayoutParams(lp);
+            binding.layoutBottomBar.setLayoutParams(lp);
             
             return insets;
         });
@@ -283,9 +287,35 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void setupProfileSwitcher(com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm) {
+        boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
+        binding.cardProfileSwitch.setVisibility(hasWorkProfile ? android.view.View.VISIBLE : android.view.View.GONE);
+
+        binding.btnProfileSwitch.setOnClickListener(v -> {
+            vm.toggleProfileMode();
+        });
+
+        vm.getProfileMode().observe(this, mode -> {
+            int currentMode = mode != null ? mode : 0;
+            if (currentMode == 0) {
+                // Personal Profile Active
+                binding.btnProfileSwitch.setImageResource(R.drawable.ic_work_bag);
+                binding.btnProfileSwitch.setContentDescription(getString(R.string.desc_switch_to_work));
+                binding.cardToolbarWorkTag.setVisibility(android.view.View.GONE);
+            } else {
+                // Work Profile Active
+                binding.btnProfileSwitch.setImageResource(R.drawable.ic_person);
+                binding.btnProfileSwitch.setContentDescription(getString(R.string.desc_switch_to_personal));
+                binding.cardToolbarWorkTag.setVisibility(android.view.View.VISIBLE);
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        boolean hasWorkProfile = com.zygisk_enc.notivault.util.ProfileUtil.hasWorkProfile(this);
+        binding.cardProfileSwitch.setVisibility(hasWorkProfile ? android.view.View.VISIBLE : android.view.View.GONE);
         checkPermissionsSequence();
     }
 

@@ -112,6 +112,46 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:visibility="gone" />
 
+            <!-- Work Profile Active Tag (Visible ONLY in Work Profile mode, to the left of Source button) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_toolbar_work_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorTertiary"
+                app:cardBackgroundColor="?attr/colorTertiaryContainer"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="10dp">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_work_bag"
+                        app:tint="?attr/colorOnTertiaryContainer" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/badge_work"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnTertiaryContainer"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_source"
                 android:layout_width="wrap_content"
@@ -150,39 +190,73 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/bottom_navigation_card"
+    <LinearLayout
+        android:id="@+id/layout_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="52dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="100dp"
-        app:cardElevation="10dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="?attr/colorOutlineVariant"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginBottom="12dp">
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:minHeight="58dp"
-            android:background="@android:color/transparent"
-            android:paddingVertical="2dp"
-            android:paddingHorizontal="4dp"
-            app:elevation="0dp"
-            app:itemPaddingTop="4dp"
-            app:itemPaddingBottom="4dp"
-            app:paddingBottomSystemWindowInsets="false"
-            app:paddingTopSystemWindowInsets="false"
-            app:paddingLeftSystemWindowInsets="false"
-            app:paddingRightSystemWindowInsets="false"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/bottom_nav_menu"
-            style="@style/Widget.Material3.BottomNavigationView" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bottom_navigation_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardCornerRadius="100dp"
+            app:cardElevation="10dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
 
-    </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:minHeight="58dp"
+                android:background="@android:color/transparent"
+                android:paddingVertical="2dp"
+                android:paddingHorizontal="4dp"
+                app:elevation="0dp"
+                app:itemPaddingTop="4dp"
+                app:itemPaddingBottom="4dp"
+                app:paddingBottomSystemWindowInsets="false"
+                app:paddingTopSystemWindowInsets="false"
+                app:paddingLeftSystemWindowInsets="false"
+                app:paddingRightSystemWindowInsets="false"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/bottom_nav_menu"
+                style="@style/Widget.Material3.BottomNavigationView" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Profile Switch Button (Visible ONLY when Work Profile is detected) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_profile_switch"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="10dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/btn_profile_switch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_work_bag"
+                android:contentDescription="@string/desc_switch_to_work"
+                app:tint="?attr/colorPrimary" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
 
     <!-- Full-screen lock overlay -->
     <LinearLayout

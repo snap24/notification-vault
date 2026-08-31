@@ -421,4 +421,6 @@
     <string name="badge_work">업무</string>
     <string name="filter_work_apps">업무용 앱</string>
     <string name="desc_enable_toast_permission">토스트 기록 활성화</string>
+    <string name="desc_switch_to_work">업무 프로필로 전환</string>
+    <string name="desc_switch_to_personal">개인 프로필로 전환</string>
 </resources>

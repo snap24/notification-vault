@@ -421,4 +421,6 @@
     <string name="badge_work">Trabajo</string>
     <string name="filter_work_apps">Apps de trabajo</string>
     <string name="desc_enable_toast_permission">Habilitar grabación de toasts</string>
+    <string name="desc_switch_to_work">Cambiar al perfil de trabajo</string>
+    <string name="desc_switch_to_personal">Cambiar al perfil personal</string>
 </resources>
