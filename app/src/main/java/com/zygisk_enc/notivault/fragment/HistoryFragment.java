@@ -981,6 +981,7 @@ public class HistoryFragment extends Fragment {
 
         List<NotificationAdapter.ListItem> listItems = new ArrayList<>();
         for (NotificationEntity entity : bundle.notifications) {
+            viewModel.ensureEntityDecrypted(entity);
             listItems.add(new NotificationAdapter.ListItem(entity));
         }
         bundleAdapter.submitList(listItems);

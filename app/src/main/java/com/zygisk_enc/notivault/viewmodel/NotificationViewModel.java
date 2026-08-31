@@ -233,13 +233,28 @@ public class NotificationViewModel extends AndroidViewModel {
                     String query = searchQuery.getValue();
                     final String lowerQuery = query != null ? query.toLowerCase().trim() : "";
                     final boolean searchingMode = !lowerQuery.isEmpty();
+                    final String currentPkgFilter = filterPackage.getValue();
+                    final boolean isMainFeedMode = (!searchingMode && (currentPkgFilter == null || currentPkgFilter.isEmpty()));
 
                     // Pre-mark exact items that actually need decryption (not in cache)
                     int itemsToDecrypt = 0;
                     final boolean[] needsDecryption = new boolean[total];
+                    final boolean[] isSubsequentBundleItem = new boolean[total];
+
                     for (int i = 0; i < total; i++) {
                         if (runToken != currentRunToken) return;
-                        if (decryptedCache.get(list.get(i).id) == null) {
+                        NotificationEntity currentEntity = list.get(i);
+
+                        // In Main Feed mode, skip full decryption for subsequent items of a bundle streak
+                        if (isMainFeedMode && currentEntity.bundleId != null && !currentEntity.bundleId.isEmpty()) {
+                            if (i > 0 && currentEntity.bundleId.equals(list.get(i - 1).bundleId)) {
+                                isSubsequentBundleItem[i] = true;
+                                needsDecryption[i] = false;
+                                continue;
+                            }
+                        }
+
+                        if (decryptedCache.get(currentEntity.id) == null) {
                             needsDecryption[i] = true;
                             itemsToDecrypt++;
                         }
@@ -280,7 +295,9 @@ public class NotificationViewModel extends AndroidViewModel {
                                     if (runToken != currentRunToken) return;
 
                                     NotificationEntity entity = list.get(i);
-                                    decryptEntity(entity);
+                                    if (!isSubsequentBundleItem[i]) {
+                                        decryptEntity(entity);
+                                    }
 
                                     int processed = processedCount.incrementAndGet();
 
@@ -656,6 +673,12 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public LiveData<List<AppRuleEntity>> getAllRules() {
         return repository.getAllRules();
+    }
+
+    public void ensureEntityDecrypted(NotificationEntity entity) {
+        if (entity != null) {
+            decryptEntity(entity);
+        }
     }
 
     private void decryptEntity(NotificationEntity entity) {
