@@ -101,11 +101,6 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
 
         appWidgetManager.updateAppWidget(id, views);
         appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.lv_widget_notifications);
-
-        // Reset scroll position to top (index 0)
-        RemoteViews resetScrollViews = new RemoteViews(context.getPackageName(), R.layout.widget_notification_feed);
-        resetScrollViews.setScrollPosition(R.id.lv_widget_notifications, 0);
-        appWidgetManager.partiallyUpdateAppWidget(id, resetScrollViews);
     }
 
     @Override
@@ -113,6 +108,7 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
         if (ACTION_REFRESH_FEED.equals(intent.getAction())) {
             WidgetHelper.updateAllWidgets(context);
+            resetScrollToTop(context);
             Toast.makeText(context, R.string.toast_feed_refreshed, Toast.LENGTH_SHORT).show();
         } else if (ACTION_SWITCH_PROFILE_FEED.equals(intent.getAction())) {
             if (ProfileUtil.hasWorkProfile(context)) {
@@ -121,7 +117,23 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
                 PreferenceUtil.setActiveProfileMode(context, next);
                 Toast.makeText(context, next == 1 ? R.string.badge_work : R.string.badge_personal, Toast.LENGTH_SHORT).show();
                 WidgetHelper.updateAllWidgets(context);
+                resetScrollToTop(context);
             }
         }
+    }
+
+    private static void resetScrollToTop(Context context) {
+        try {
+            AppWidgetManager manager = AppWidgetManager.getInstance(context);
+            android.content.ComponentName feedWidget = new android.content.ComponentName(context, NotificationFeedWidgetProvider.class);
+            int[] ids = manager.getAppWidgetIds(feedWidget);
+            if (ids != null && ids.length > 0) {
+                for (int id : ids) {
+                    RemoteViews resetViews = new RemoteViews(context.getPackageName(), R.layout.widget_notification_feed);
+                    resetViews.setScrollPosition(R.id.lv_widget_notifications, 0);
+                    manager.partiallyUpdateAppWidget(id, resetViews);
+                }
+            }
+        } catch (Exception ignored) {}
     }
 }

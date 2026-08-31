@@ -38,7 +38,7 @@ public class PreferenceUtil {
     public static void setActiveProfileMode(Context context, int mode) {
         if (context == null) return;
         PreferenceManager.getDefaultSharedPreferences(context)
-                .edit().putInt(KEY_ACTIVE_PROFILE_MODE, mode).apply();
+                .edit().putInt(KEY_ACTIVE_PROFILE_MODE, mode).commit();
     }
 
     public static int getGlobalAutoDeleteDays(Context context) {
