@@ -101,6 +101,11 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
 
         appWidgetManager.updateAppWidget(id, views);
         appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.lv_widget_notifications);
+
+        // Reset scroll position to top (index 0)
+        RemoteViews resetScrollViews = new RemoteViews(context.getPackageName(), R.layout.widget_notification_feed);
+        resetScrollViews.setScrollPosition(R.id.lv_widget_notifications, 0);
+        appWidgetManager.partiallyUpdateAppWidget(id, resetScrollViews);
     }
 
     @Override
