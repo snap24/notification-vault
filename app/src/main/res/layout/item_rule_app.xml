@@ -65,28 +65,20 @@
         </LinearLayout>
 
         <!-- Tap to edit guide pill badge -->
-        <com.google.android.material.card.MaterialCardView
+        <TextView
             android:id="@+id/tv_tap_guide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorSecondaryContainer"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                android:textColor="?attr/colorOnSecondaryContainer"
-                android:textStyle="bold"
-                android:text="@string/tap_to_edit_rule" />
-
-        </com.google.android.material.card.MaterialCardView>
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:background="@drawable/bg_widget_pill"
+            android:backgroundTint="?attr/colorSecondaryContainer"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textColor="?attr/colorOnSecondaryContainer"
+            android:textStyle="bold"
+            android:text="@string/tap_to_edit_rule"
+            android:visibility="gone" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switch_capture"

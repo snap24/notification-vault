@@ -380,7 +380,7 @@ public class AppRulesActivity extends BaseActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView ivIcon;
             TextView tvName;
-            TextView tvTapGuide;
+            View tvTapGuide;
             MaterialSwitch switchCapture;
             com.google.android.material.card.MaterialCardView card;
             TextView tvStatus;
