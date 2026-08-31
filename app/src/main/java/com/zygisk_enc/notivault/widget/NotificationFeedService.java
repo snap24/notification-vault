@@ -41,6 +41,8 @@ public class NotificationFeedService extends RemoteViewsService {
         private final int appWidgetId;
         private final List<FeedItem> feedItems = new ArrayList<>();
         private final Map<String, Bitmap> iconCache = new HashMap<>();
+        private final Map<Long, String[]> decryptedCache = new HashMap<>();
+        private volatile int loadVersion = 0;
 
         NotificationFeedViewsFactory(Context context, int appWidgetId) {
             this.context = context;
@@ -52,6 +54,7 @@ public class NotificationFeedService extends RemoteViewsService {
 
         @Override
         public void onDataSetChanged() {
+            final int currentVersion = ++loadVersion;
             try {
                 boolean hasWorkProfile = ProfileUtil.hasWorkProfile(context);
                 int profileMode = hasWorkProfile ? PreferenceUtil.getActiveProfileMode(context) : -1;
@@ -61,37 +64,63 @@ public class NotificationFeedService extends RemoteViewsService {
                 if (filterPkg != null && !"ALL".equals(filterPkg)) {
                     rawList = AppDatabase.getInstance(context)
                             .notificationDao()
-                            .getRecentNotificationsByPackageSync(filterPkg, 200, profileMode);
+                            .getRecentNotificationsByPackageSync(filterPkg, 100, profileMode);
                 } else {
                     rawList = AppDatabase.getInstance(context)
                             .notificationDao()
-                            .getRecentNotificationsSync(200, profileMode);
+                            .getRecentNotificationsSync(100, profileMode);
                 }
 
-                feedItems.clear();
+                if (currentVersion != loadVersion) {
+                    return; // Abort immediately if a newer profile switch request arrived
+                }
+
+                List<FeedItem> newItems = new ArrayList<>();
                 if (rawList != null) {
                     for (NotificationEntity entity : rawList) {
-                        String title = EncryptionHelper.decrypt(entity.title);
-                        String text = EncryptionHelper.decrypt(entity.text);
-                        if (title == null || title.trim().isEmpty()) {
-                            title = context.getString(R.string.no_title);
+                        if (currentVersion != loadVersion) {
+                            return; // Fast cancellation abort loop
                         }
+
+                        String title;
+                        String text;
+                        String[] cached = decryptedCache.get(entity.id);
+                        if (cached != null) {
+                            title = cached[0];
+                            text = cached[1];
+                        } else {
+                            title = EncryptionHelper.decrypt(entity.title);
+                            text = EncryptionHelper.decrypt(entity.text);
+                            if (title == null || title.trim().isEmpty()) {
+                                title = context.getString(R.string.no_title);
+                            }
+                            if (text == null) text = "";
+                            decryptedCache.put(entity.id, new String[]{title, text});
+                        }
+
                         String timeStr = DateUtils.getTimeString(context, entity.timestamp);
                         String appName = ProfileUtil.getAppLabel(context, entity.packageName, entity.userId, entity.appName);
 
-                        feedItems.add(new FeedItem(
+                        newItems.add(new FeedItem(
                                 entity.id,
                                 entity.packageName,
                                 appName,
                                 timeStr,
                                 title,
-                                text != null ? text : "",
+                                text,
                                 entity.userId
                         ));
                     }
                 }
+
+                if (currentVersion == loadVersion) {
+                    feedItems.clear();
+                    feedItems.addAll(newItems);
+                }
             } catch (Exception e) {
-                feedItems.clear();
+                if (currentVersion == loadVersion) {
+                    feedItems.clear();
+                }
             }
         }
 
@@ -99,6 +128,7 @@ public class NotificationFeedService extends RemoteViewsService {
         public void onDestroy() {
             feedItems.clear();
             iconCache.clear();
+            decryptedCache.clear();
         }
 
         @Override

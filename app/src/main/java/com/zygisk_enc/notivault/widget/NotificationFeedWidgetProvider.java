@@ -129,7 +129,6 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
                 PreferenceUtil.setActiveProfileMode(context, next);
                 Toast.makeText(context, next == 1 ? R.string.badge_work : R.string.badge_personal, Toast.LENGTH_SHORT).show();
                 WidgetHelper.updateAllWidgets(context);
-                resetScrollToTop(context);
             }
         }
     }
