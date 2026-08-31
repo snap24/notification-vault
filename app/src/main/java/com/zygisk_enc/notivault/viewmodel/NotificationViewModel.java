@@ -287,6 +287,8 @@ public class NotificationViewModel extends AndroidViewModel {
                     final int totalToDecrypt = Math.max(1, itemsToDecrypt);
                     final java.util.concurrent.atomic.AtomicInteger newlyDecryptedCount = new java.util.concurrent.atomic.AtomicInteger(0);
 
+                    android.util.Log.d("NotiVault_Decryption", "Starting processDecryption for pkg: " + filterPackage.getValue() + ", limit: " + limit + ", total items: " + total + ", itemsToDecrypt: " + itemsToDecrypt + " at " + System.currentTimeMillis());
+
                     if (showProgress && runToken == currentRunToken) {
                         postDecryptionProgress(runToken, 0);
                     }
@@ -349,6 +351,7 @@ public class NotificationViewModel extends AndroidViewModel {
                                                 }
                                             }
                                             if (!snapshot.isEmpty() && runToken == currentRunToken) {
+                                                android.util.Log.d("NotiVault_Decryption", "Milestone trigger " + milestone + " (" + streamProgress + "%), posting snapshot size: " + snapshot.size() + " at " + System.currentTimeMillis());
                                                 notifications.postValue(snapshot);
                                             }
                                         }
@@ -376,6 +379,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
 
                     if (runToken == currentRunToken) {
+                        android.util.Log.d("NotiVault_Decryption", "Latch complete! Posting finalMerged size: " + finalMerged.size() + " at " + System.currentTimeMillis());
                         notifications.postValue(finalMerged);
                     }
 

@@ -694,6 +694,7 @@ public class HistoryFragment extends Fragment {
             if (notifications == null || notifications.isEmpty()) {
                 showRecyclerView(false);
             } else {
+                android.util.Log.d("NotiVault_Decryption", "HistoryFragment observer received notifications list size: " + (notifications != null ? notifications.size() : 0) + " at " + System.currentTimeMillis());
                 showRecyclerView(true);
 
                 final boolean viewingMsg = isViewingMessage;
@@ -720,6 +721,7 @@ public class HistoryFragment extends Fragment {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             if (binding == null) return;
+                            android.util.Log.d("NotiVault_Decryption", "HistoryFragment submitting list to adapter size: " + items.size() + " at " + System.currentTimeMillis());
                             adapter.submitList(items, () -> {
                                 isLoadingPage = false;
                                 if (binding != null) {
