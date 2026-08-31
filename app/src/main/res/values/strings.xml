@@ -546,4 +546,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Zero disturbance during sleep hours (12:00 AM–6:00 AM). Excellent digital hygiene!</string>
     <string name="stats_insight_peak_spike">Your peak notification spike happens around %1$s.</string>
     <string name="stats_insight_balanced">Balanced notification flow throughout your active day.</string>
+    <string name="filter_all">All</string>
 </resources>

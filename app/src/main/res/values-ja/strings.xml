@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">睡眠時間帯（12:00 AM–6:00 AM）の通知はありません。素晴らしいデジタル習慣です！</string>
     <string name="stats_insight_peak_spike">通知のピークは %1$s 頃に発生しています。</string>
     <string name="stats_insight_balanced">アクティブな時間帯を通じてバランスの取れた通知フローです。</string>
+    <string name="filter_all">すべて</string>
 </resources>

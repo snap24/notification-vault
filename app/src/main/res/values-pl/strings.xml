@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Zero zakłóceń w godzinach snu (12:00 AM–6:00 AM). Doskonała higiena cyfrowa!</string>
     <string name="stats_insight_peak_spike">Szczyt powiadomień przypada około %1$s.</string>
     <string name="stats_insight_balanced">Zrównoważony przepływ powiadomień w ciągu aktywnego dnia.</string>
+    <string name="filter_all">Wszystkie</string>
 </resources>

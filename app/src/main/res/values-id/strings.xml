@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Nol gangguan selama jam tidur (12:00 AM–6:00 AM). Higiene digital yang sangat baik!</string>
     <string name="stats_insight_peak_spike">Lonjakan notifikasi puncak terjadi sekitar pukul %1$s.</string>
     <string name="stats_insight_balanced">Aliran notifikasi seimbang sepanjang hari aktif Anda.</string>
+    <string name="filter_all">Semua</string>
 </resources>

@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">수면 시간(12:00 AM–6:00 AM) 동안 방해가 없습니다. 훌륭한 디지털 습관입니다!</string>
     <string name="stats_insight_peak_spike">알림이 가장 많이 집중되는 시간은 %1$s 경입니다.</string>
     <string name="stats_insight_balanced">활동 시간 동안 균형 잡힌 알림 흐름을 보입니다.</string>
+    <string name="filter_all">전체</string>
 </resources>

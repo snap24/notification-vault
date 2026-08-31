@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Cero interrupciones durante las horas de sueño (12:00 AM–6:00 AM). ¡Excelente higiene digital!</string>
     <string name="stats_insight_peak_spike">Tu pico de notificaciones ocurre alrededor de las %1$s.</string>
     <string name="stats_insight_balanced">Flujo de notificaciones equilibrado durante tu día activo.</string>
+    <string name="filter_all">Todos</string>
 </resources>

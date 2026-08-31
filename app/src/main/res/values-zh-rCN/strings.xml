@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">睡眠时间（12:00 AM–6:00 AM）零打扰。出色的数字健康习惯！</string>
     <string name="stats_insight_peak_spike">您的通知高峰发生在 %1$s 左右。</string>
     <string name="stats_insight_balanced">您在活跃时间段内的通知分布非常均衡。</string>
+    <string name="filter_all">全部</string>
 </resources>

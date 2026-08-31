@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">صفر إزعاج أثناء ساعات النوم (12:00 AM–6:00 AM). نظافة رقمية ممتازة!</string>
     <string name="stats_insight_peak_spike">تحدث ذروة الإشعارات حول %1$s.</string>
     <string name="stats_insight_balanced">تدفق متوازن للإشعارات طوال يومك النشط.</string>
+    <string name="filter_all">الكل</string>
 </resources>

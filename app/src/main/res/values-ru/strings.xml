@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Ноль беспокойств во время сна (12:00 AM–6:00 AM). Отличная цифровая гигиена!</string>
     <string name="stats_insight_peak_spike">Пик уведомлений приходится примерно на %1$s.</string>
     <string name="stats_insight_balanced">Сбалансированный поток уведомлений в течение дня.</string>
+    <string name="filter_all">Все</string>
 </resources>

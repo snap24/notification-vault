@@ -503,4 +503,5 @@
     <string name="stats_insight_zero_sleep_disturbance_12h">Uyku saatlerinde sıfır rahatsızlık (12:00 AM–6:00 AM). Mükemmel dijital hijyen!</string>
     <string name="stats_insight_peak_spike">Bildirim yoğunluğunun en yüksek olduğu saat: %1$s civarı.</string>
     <string name="stats_insight_balanced">Aktif gününüz boyunca dengeli bildirim akışı.</string>
+    <string name="filter_all">Tümü</string>
 </resources>
