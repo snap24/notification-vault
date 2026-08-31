@@ -317,7 +317,7 @@ public class MainActivity extends BaseActivity {
                 android.view.MenuItem switchItem = menu.add(
                         android.view.Menu.NONE,
                         R.id.action_switch_profile,
-                        android.view.Menu.NONE,
+                        4,
                         R.string.nav_switch
                 );
                 switchItem.setIcon(R.drawable.sel_nav_switch);

@@ -3,21 +3,25 @@
 
     <item
         android:id="@+id/navigation_history"
+        android:orderInCategory="1"
         android:icon="@drawable/sel_nav_history"
         android:title="@string/nav_history" />
 
     <item
         android:id="@+id/navigation_apps"
+        android:orderInCategory="2"
         android:icon="@drawable/sel_nav_apps"
         android:title="@string/nav_apps" />
 
     <item
         android:id="@+id/navigation_stats"
+        android:orderInCategory="3"
         android:icon="@drawable/sel_nav_stats"
         android:title="@string/nav_stats" />
 
     <item
         android:id="@+id/navigation_settings"
+        android:orderInCategory="5"
         android:icon="@drawable/sel_nav_settings"
         android:title="@string/nav_settings" />
 
