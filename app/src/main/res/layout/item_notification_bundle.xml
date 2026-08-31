@@ -79,17 +79,17 @@
                         android:textStyle="bold"
                         android:visibility="gone" />
 
-                    <!-- Bundle Tag Badge beside Time (Enlarged, Green Text) -->
+                    <!-- Bundle Tag Badge beside Time (Material 3 Rounded Box) -->
                     <TextView
                         android:id="@+id/tv_bundle_tag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_widget_pill"
-                        android:paddingHorizontal="9dp"
-                        android:paddingVertical="2.5dp"
-                        android:textSize="12sp"
-                        android:textColor="@color/bundle_tag_green"
+                        android:background="@drawable/bg_bundle_tag_box"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnSecondaryContainer"
                         android:textStyle="bold" />
 
                     <TextView
