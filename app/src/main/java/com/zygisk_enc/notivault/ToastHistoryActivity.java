@@ -395,15 +395,23 @@ public class ToastHistoryActivity extends BaseActivity {
     private void setupClearAll() {
         binding.btnClearAll.setOnClickListener(v -> {
             Runnable proceedToClear = () -> {
-                new MaterialAlertDialogBuilder(ToastHistoryActivity.this)
-                        .setTitle(R.string.clear_toast_history_title)
-                        .setMessage(R.string.clear_toast_history_desc)
-                        .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.clear, (dialog, which) -> {
-                            viewModel.clearAllToasts();
-                            Toast.makeText(ToastHistoryActivity.this, R.string.toast_history_cleared, Toast.LENGTH_SHORT).show();
-                        })
-                        .show();
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_clear_toasts, null);
+                androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ToastHistoryActivity.this)
+                        .setView(dialogView)
+                        .create();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                }
+
+                dialogView.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v1 -> dialog.dismiss());
+                dialogView.findViewById(R.id.btn_dialog_confirm_clear).setOnClickListener(v1 -> {
+                    dialog.dismiss();
+                    viewModel.clearAllToasts();
+                    Toast.makeText(ToastHistoryActivity.this, R.string.toast_history_cleared, Toast.LENGTH_SHORT).show();
+                });
+
+                dialog.show();
             };
 
             boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)

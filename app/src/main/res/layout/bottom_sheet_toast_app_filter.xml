@@ -30,13 +30,17 @@
             android:textColor="?attr/colorOnSurface"
             android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.material.chip.Chip
             android:id="@+id/btn_show_all_apps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/show_all"
-            style="@style/Widget.Material3.Button.TextButton"
-            app:icon="@drawable/ic_close" />
+            app:chipIcon="@drawable/ic_close"
+            app:chipIconSize="16dp"
+            app:chipCornerRadius="12dp"
+            app:chipStrokeWidth="1dp"
+            app:chipStrokeColor="?attr/colorOutlineVariant"
+            style="@style/Widget.Material3.Chip.Assist.Elevated" />
 
     </LinearLayout>
 
@@ -46,21 +50,23 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="12dp"
-        app:hintEnabled="false"
+        android:hint="@string/search_apps_hint"
         app:startIconDrawable="@drawable/ic_search"
-        app:boxCornerRadiusTopStart="20dp"
-        app:boxCornerRadiusTopEnd="20dp"
-        app:boxCornerRadiusBottomStart="20dp"
-        app:boxCornerRadiusBottomEnd="20dp"
+        app:endIconMode="clear_text"
+        app:boxCornerRadiusTopStart="24dp"
+        app:boxCornerRadiusTopEnd="24dp"
+        app:boxCornerRadiusBottomStart="24dp"
+        app:boxCornerRadiusBottomEnd="24dp"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search_apps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/search_apps_hint"
             android:inputType="text"
+            android:singleLine="true"
             android:maxLines="1"
+            android:paddingStart="48dp"
             android:paddingVertical="10dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
