@@ -130,8 +130,12 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
             if (ids != null && ids.length > 0) {
                 for (int id : ids) {
                     RemoteViews resetViews = new RemoteViews(context.getPackageName(), R.layout.widget_notification_feed);
-                    resetViews.setScrollPosition(R.id.lv_widget_notifications, 0);
+                    Intent serviceIntent = new Intent(context, NotificationFeedService.class);
+                    serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+                    serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME) + "?reset=" + System.currentTimeMillis()));
+                    resetViews.setRemoteAdapter(R.id.lv_widget_notifications, serviceIntent);
                     manager.partiallyUpdateAppWidget(id, resetViews);
+                    manager.notifyAppWidgetViewDataChanged(id, R.id.lv_widget_notifications);
                 }
             }
         } catch (Exception ignored) {}
