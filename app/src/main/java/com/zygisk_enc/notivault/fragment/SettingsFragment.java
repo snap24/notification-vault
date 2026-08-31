@@ -441,19 +441,32 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
-        // About preference click listener to open GitHub repository link
+        // About preference click listener to open About Notification Vault dialog
         Preference aboutPref = findPreference("about");
         if (aboutPref != null) {
             aboutPref.setOnPreferenceClickListener(pref -> {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    Toast.makeText(requireContext(), R.string.toast_failed_to_open_link, Toast.LENGTH_SHORT).show();
-                }
+                showAboutDialog();
                 return true;
             });
         }
+    }
+
+    private void showAboutDialog() {
+        if (getContext() == null) return;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
+                .setIcon(R.mipmap.ic_launcher)
+                .setTitle(R.string.pref_about_title)
+                .setMessage("Notification Vault v2.0.1\n\nEncrypted, private local notification log manager.\n\n• Zero Tracking & No Ads\n• Local AES-256 KeyStore Encryption\n• Work & Personal Profile Isolation\n• Instant Fast Search & Smart Bundling\n\nOpen-source project under MIT License.")
+                .setPositiveButton("GitHub", (dialog, which) -> {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Toast.makeText(requireContext(), R.string.toast_failed_to_open_link, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(R.string.close, null);
+        BaseActivity.showDialog(requireContext(), builder);
     }
 
     private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
