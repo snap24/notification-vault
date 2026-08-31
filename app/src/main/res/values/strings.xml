@@ -536,4 +536,14 @@
     <string name="percent_of_total_format">%d%% of total</string>
     <string name="bundled_logs_deleted">%1$d logs deleted</string>
     <string name="stats_show_top_5_only">Show Top 5 Only</string>
+    <string name="stats_chart_subtitle_24h">24-Hour Distribution (Tap bar to inspect)</string>
+    <string name="stats_chart_subtitle_7d">Daily Volume (Last 7 Days)</string>
+    <string name="stats_chart_subtitle_aggregate">Hourly Aggregate Profile</string>
+    <string name="stats_insight_no_notifications">No notifications captured during this time frame.</string>
+    <string name="stats_insight_loudest_app">%1$s is your loudest app, generating %2$d%% of all distraction alerts.</string>
+    <string name="stats_insight_high_night_disturbance">High nighttime disturbance (%1$d alerts during sleep hours). Consider Quiet Hours or Notification Rules.</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Zero disturbance during sleep hours (00:00–06:00). Excellent digital hygiene!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Zero disturbance during sleep hours (12:00 AM–6:00 AM). Excellent digital hygiene!</string>
+    <string name="stats_insight_peak_spike">Your peak notification spike happens around %1$s.</string>
+    <string name="stats_insight_balanced">Balanced notification flow throughout your active day.</string>
 </resources>

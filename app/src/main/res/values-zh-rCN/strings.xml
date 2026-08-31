@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">已在后台开始折叠处理...</string>
     <string name="copy_all">全部复制</string>
     <string name="view_all_bundled_logs">查看全部 %1$d 条日志</string>
+    <string name="stats_chart_subtitle_24h">24小时分布（点击柱形查看详情）</string>
+    <string name="stats_chart_subtitle_7d">每日通知量（最近7天）</string>
+    <string name="stats_chart_subtitle_aggregate">每小时汇总概况</string>
+    <string name="stats_insight_no_notifications">在此时间段内未捕获任何通知。</string>
+    <string name="stats_insight_loudest_app">%1$s 是产生通知最多的应用，占所有提醒的 %2$d%%。</string>
+    <string name="stats_insight_high_night_disturbance">夜间打扰较高（睡眠时间有 %1$d 条提醒）。</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">睡眠时间（00:00–06:00）零打扰。出色的数字健康习惯！</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">睡眠时间（12:00 AM–6:00 AM）零打扰。出色的数字健康习惯！</string>
+    <string name="stats_insight_peak_spike">您的通知高峰发生在 %1$s 左右。</string>
+    <string name="stats_insight_balanced">您在活跃时间段内的通知分布非常均衡。</string>
 </resources>

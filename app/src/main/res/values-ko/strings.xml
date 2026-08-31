@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">백그라운드에서 로그 묶기 시작됨...</string>
     <string name="copy_all">모두 복사</string>
     <string name="view_all_bundled_logs">모든 %1$d개 로그 보기</string>
+    <string name="stats_chart_subtitle_24h">24시간 분포 (막대를 탭하여 상세 확인)</string>
+    <string name="stats_chart_subtitle_7d">일별 알림량 (최근 7일)</string>
+    <string name="stats_chart_subtitle_aggregate">시간대별 종합 프로필</string>
+    <string name="stats_insight_no_notifications">이 기간 동안 캡처된 알림이 없습니다.</string>
+    <string name="stats_insight_loudest_app">%1$s 앱이 가장 많은 알림을 보내며, 전체의 %2$d%%를 차지합니다.</string>
+    <string name="stats_insight_high_night_disturbance">야간 방해도가 높습니다(수면 시간 중 %1$d개 알림).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">수면 시간(00:00–06:00) 동안 방해가 없습니다. 훌륭한 디지털 습관입니다!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">수면 시간(12:00 AM–6:00 AM) 동안 방해가 없습니다. 훌륭한 디지털 습관입니다!</string>
+    <string name="stats_insight_peak_spike">알림이 가장 많이 집중되는 시간은 %1$s 경입니다.</string>
+    <string name="stats_insight_balanced">활동 시간 동안 균형 잡힌 알림 흐름을 보입니다.</string>
 </resources>

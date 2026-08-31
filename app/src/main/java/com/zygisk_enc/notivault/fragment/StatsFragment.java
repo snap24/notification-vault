@@ -88,7 +88,13 @@ public class StatsFragment extends Fragment {
             }
         });
 
-        loadAnalytics();
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
+                new androidx.lifecycle.ViewModelProvider(requireActivity())
+                .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+
+        notifViewModel.getProfileMode().observe(getViewLifecycleOwner(), mode -> {
+            loadAnalytics();
+        });
     }
 
     @Override
@@ -175,7 +181,8 @@ public class StatsFragment extends Fragment {
     private void setupChartInspector() {
         binding.chartDistribution.setOnBarSelectedListener((index, item) -> {
             if (item != null && binding != null) {
-                binding.tvChartInspector.setText(getString(R.string.chart_inspector_format, item.label, item.count));
+                String labelText = item.inspectorLabel != null ? item.inspectorLabel : item.label;
+                binding.tvChartInspector.setText(getString(R.string.chart_inspector_format, labelText, item.count));
             }
         });
     }
@@ -317,6 +324,8 @@ public class StatsFragment extends Fragment {
         data.evening = evening;
         data.night = night;
 
+        boolean is24Hour = android.text.format.DateFormat.is24HourFormat(context);
+
         // 3. Peak Hour calculation
         int maxHourCount = 0;
         int peakHour = -1;
@@ -328,29 +337,41 @@ public class StatsFragment extends Fragment {
         }
 
         if (peakHour >= 0 && maxHourCount > 0) {
-            int displayHour = peakHour % 12 == 0 ? 12 : peakHour % 12;
-            String ampm = peakHour < 12 ? "AM" : "PM";
-            data.peakHourString = displayHour + ":00 " + ampm;
+            if (is24Hour) {
+                data.peakHourString = String.format(Locale.getDefault(), "%02d:00", peakHour);
+            } else {
+                int displayHour = peakHour % 12 == 0 ? 12 : peakHour % 12;
+                String ampm = peakHour < 12 ? "AM" : "PM";
+                data.peakHourString = displayHour + ":00 " + ampm;
+            }
         } else {
-            data.peakHourString = "None";
+            data.peakHourString = context.getString(R.string.meta_none);
         }
 
         // 4. Chart Bar Items
         List<AnalyticsDistributionChartView.BarItem> barItems = new ArrayList<>();
         if (period == Period.TODAY || period == Period.YESTERDAY) {
-            data.chartSubtitle = "24-Hour Distribution (Tap bar to inspect)";
+            data.chartSubtitle = context.getString(R.string.stats_chart_subtitle_24h);
             for (int h = 0; h < 24; h++) {
-                int displayH = h % 12 == 0 ? 12 : h % 12;
-                String ampm = h < 12 ? "a" : "p";
-                String label = displayH + ampm;
+                String axisLabel;
+                String inspectorLabel;
+                if (is24Hour) {
+                    axisLabel = String.format(Locale.getDefault(), "%02d", h);
+                    inspectorLabel = String.format(Locale.getDefault(), "%02d:00", h);
+                } else {
+                    int displayH = h % 12 == 0 ? 12 : h % 12;
+                    String ampmShort = h < 12 ? "a" : "p";
+                    String ampmFull = h < 12 ? "AM" : "PM";
+                    axisLabel = displayH + ampmShort;
+                    inspectorLabel = displayH + ":00 " + ampmFull;
+                }
                 boolean isPeak = (h == peakHour) && (maxHourCount > 0);
-                barItems.add(new AnalyticsDistributionChartView.BarItem(label, hourBuckets[h], isPeak));
+                barItems.add(new AnalyticsDistributionChartView.BarItem(axisLabel, inspectorLabel, hourBuckets[h], isPeak));
             }
         } else if (period == Period.DAYS_7) {
-            data.chartSubtitle = "Daily Volume (Last 7 Days)";
+            data.chartSubtitle = context.getString(R.string.stats_chart_subtitle_7d);
             int[] dayCounts = new int[7];
             String[] dayLabels = new String[7];
-            Calendar dayCal = Calendar.getInstance();
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
 
             for (int d = 6; d >= 0; d--) {
@@ -377,36 +398,47 @@ public class StatsFragment extends Fragment {
             }
 
             for (int i = 0; i < 7; i++) {
-                barItems.add(new AnalyticsDistributionChartView.BarItem(dayLabels[i], dayCounts[i], i == peakDayIdx));
+                barItems.add(new AnalyticsDistributionChartView.BarItem(dayLabels[i], dayLabels[i], dayCounts[i], i == peakDayIdx));
             }
         } else {
-            data.chartSubtitle = "Hourly Aggregate Profile";
+            data.chartSubtitle = context.getString(R.string.stats_chart_subtitle_aggregate);
             for (int h = 0; h < 24; h++) {
-                int displayH = h % 12 == 0 ? 12 : h % 12;
-                String ampm = h < 12 ? "a" : "p";
-                String label = displayH + ampm;
+                String axisLabel;
+                String inspectorLabel;
+                if (is24Hour) {
+                    axisLabel = String.format(Locale.getDefault(), "%02d", h);
+                    inspectorLabel = String.format(Locale.getDefault(), "%02d:00", h);
+                } else {
+                    int displayH = h % 12 == 0 ? 12 : h % 12;
+                    String ampmShort = h < 12 ? "a" : "p";
+                    String ampmFull = h < 12 ? "AM" : "PM";
+                    axisLabel = displayH + ampmShort;
+                    inspectorLabel = displayH + ":00 " + ampmFull;
+                }
                 boolean isPeak = (h == peakHour) && (maxHourCount > 0);
-                barItems.add(new AnalyticsDistributionChartView.BarItem(label, hourBuckets[h], isPeak));
+                barItems.add(new AnalyticsDistributionChartView.BarItem(axisLabel, inspectorLabel, hourBuckets[h], isPeak));
             }
         }
         data.chartBars = barItems;
 
         // 5. Smart Insight Generator
         if (total == 0) {
-            data.insight = "No notifications captured during this time frame.";
+            data.insight = context.getString(R.string.stats_insight_no_notifications);
         } else if (!data.topApps.isEmpty() && data.topApps.get(0).count > (total * 0.40)) {
             AppSummary loudest = data.topApps.get(0);
             String name = loudest.appName != null ? loudest.appName : loudest.packageName;
             int percent = (int) (((float) loudest.count / total) * 100);
-            data.insight = name + " is your loudest app, generating " + percent + "% of all distraction alerts.";
+            data.insight = context.getString(R.string.stats_insight_loudest_app, name, percent);
         } else if (night > 0 && night > (total * 0.35)) {
-            data.insight = "High nighttime disturbance (" + night + " alerts during sleep hours). Consider Quiet Hours or Notification Rules.";
+            data.insight = context.getString(R.string.stats_insight_high_night_disturbance, night);
         } else if (night == 0) {
-            data.insight = "Zero disturbance during sleep hours (00:00–06:00). Excellent digital hygiene!";
-        } else if (data.peakHourString != null && !data.peakHourString.equals("None")) {
-            data.insight = "Your peak notification spike happens around " + data.peakHourString + ".";
+            data.insight = is24Hour
+                    ? context.getString(R.string.stats_insight_zero_sleep_disturbance_24h)
+                    : context.getString(R.string.stats_insight_zero_sleep_disturbance_12h);
+        } else if (data.peakHourString != null && !data.peakHourString.equals(context.getString(R.string.meta_none))) {
+            data.insight = context.getString(R.string.stats_insight_peak_spike, data.peakHourString);
         } else {
-            data.insight = "Balanced notification flow throughout your active day.";
+            data.insight = context.getString(R.string.stats_insight_balanced);
         }
 
         return data;

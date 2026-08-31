@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Bündelung im Hintergrund gestartet...</string>
     <string name="copy_all">Alle kopieren</string>
     <string name="view_all_bundled_logs">Alle %1$d Protokolle anzeigen</string>
+    <string name="stats_chart_subtitle_24h">24-Stunden-Verteilung (Balken zum Prüfen antippen)</string>
+    <string name="stats_chart_subtitle_7d">Tägliches Volumen (Letzte 7 Tage)</string>
+    <string name="stats_chart_subtitle_aggregate">Stündliches Gesamtprofil</string>
+    <string name="stats_insight_no_notifications">In diesem Zeitraum wurden keine Benachrichtigungen erfasst.</string>
+    <string name="stats_insight_loudest_app">%1$s ist Ihre lauteste App und erzeugt %2$d%% aller Benachrichtigungen.</string>
+    <string name="stats_insight_high_night_disturbance">Hohe nächtliche Störung (%1$d Benachrichtigungen während der Schlafenszeit).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Keine Störungen während der Schlafenszeit (00:00–06:00). Ausgezeichnete digitale Hygiene!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Keine Störungen während der Schlafenszeit (12:00 AM–6:00 AM). Ausgezeichnete digitale Hygiene!</string>
+    <string name="stats_insight_peak_spike">Ihr Spitzenwert bei den Benachrichtigungen liegt um %1$s.</string>
+    <string name="stats_insight_balanced">Ausgewogener Benachrichtigungsfluss während Ihres aktiven Tages.</string>
 </resources>

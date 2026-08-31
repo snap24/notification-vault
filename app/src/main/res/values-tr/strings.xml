@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Gruplama arka planda başlatıldı...</string>
     <string name="copy_all">Tümünü Kopyala</string>
     <string name="view_all_bundled_logs">Tüm %1$d günlüğü görüntüle</string>
+    <string name="stats_chart_subtitle_24h">24 Saatlik Dağılım (İncelemek için çubuğa dokunun)</string>
+    <string name="stats_chart_subtitle_7d">Günlük Hacim (Son 7 Gün)</string>
+    <string name="stats_chart_subtitle_aggregate">Saatlik Toplu Profil</string>
+    <string name="stats_insight_no_notifications">Bu zaman diliminde yakalanan bildirim yok.</string>
+    <string name="stats_insight_loudest_app">%1$s en çok bildirim gönderen uygulama, tüm uyarıların %%%2$d\'sini oluşturuyor.</string>
+    <string name="stats_insight_high_night_disturbance">Yüksek gece rahatsızlığı (uyku saatlerinde %1$d uyarı).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Uyku saatlerinde sıfır rahatsızlık (00:00–06:00). Mükemmel dijital hijyen!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Uyku saatlerinde sıfır rahatsızlık (12:00 AM–6:00 AM). Mükemmel dijital hijyen!</string>
+    <string name="stats_insight_peak_spike">Bildirim yoğunluğunun en yüksek olduğu saat: %1$s civarı.</string>
+    <string name="stats_insight_balanced">Aktif gününüz boyunca dengeli bildirim akışı.</string>
 </resources>

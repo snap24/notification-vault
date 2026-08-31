@@ -20,11 +20,17 @@ public class AnalyticsDistributionChartView extends View {
 
     public static class BarItem {
         public String label;
+        public String inspectorLabel;
         public int count;
         public boolean isPeak;
 
         public BarItem(String label, int count, boolean isPeak) {
+            this(label, label, count, isPeak);
+        }
+
+        public BarItem(String label, String inspectorLabel, int count, boolean isPeak) {
             this.label = label;
+            this.inspectorLabel = inspectorLabel;
             this.count = count;
             this.isPeak = isPeak;
         }

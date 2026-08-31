@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Raggruppamento avviato in background...</string>
     <string name="copy_all">Copia tutto</string>
     <string name="view_all_bundled_logs">Visualizza tutti i %1$d registri</string>
+    <string name="stats_chart_subtitle_24h">Distribuzione 24 ore (Tocca una barra per ispezionare)</string>
+    <string name="stats_chart_subtitle_7d">Volume giornaliero (Ultimi 7 giorni)</string>
+    <string name="stats_chart_subtitle_aggregate">Profilo orario aggregato</string>
+    <string name="stats_insight_no_notifications">Nessuna notifica acquisita durante questo periodo.</string>
+    <string name="stats_insight_loudest_app">%1$s è l\'app più rumorosa, generando il %2$d%% di tutti gli avvisi.</string>
+    <string name="stats_insight_high_night_disturbance">Elevato disturbo notturno (%1$d avvisi durante le ore di sonno).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Zero disturbi durante le ore di sonno (00:00–06:00). Eccellente igiene digitale!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Zero disturbi durante le ore di sonno (12:00 AM–6:00 AM). Eccellente igiene digitale!</string>
+    <string name="stats_insight_peak_spike">Il tuo picco di notifiche si verifica intorno alle %1$s.</string>
+    <string name="stats_insight_balanced">Flusso di notifiche bilanciato durante la tua giornata attiva.</string>
 </resources>

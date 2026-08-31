@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Pembundelan dimulai di latar belakang...</string>
     <string name="copy_all">Salin Semua</string>
     <string name="view_all_bundled_logs">Lihat semua %1$d log</string>
+    <string name="stats_chart_subtitle_24h">Distribusi 24 Jam (Ketuk bilah untuk memeriksa)</string>
+    <string name="stats_chart_subtitle_7d">Volume Harian (7 Hari Terakhir)</string>
+    <string name="stats_chart_subtitle_aggregate">Profil Agregat Per Jam</string>
+    <string name="stats_insight_no_notifications">Tidak ada notifikasi yang ditangkap selama jangka waktu ini.</string>
+    <string name="stats_insight_loudest_app">%1$s adalah aplikasi paling ramai, menghasilkan %2$d%% dari semua peringatan.</string>
+    <string name="stats_insight_high_night_disturbance">Gangguan malam hari tinggi (%1$d peringatan saat jam tidur).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Nol gangguan selama jam tidur (00:00–06:00). Higiene digital yang sangat baik!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Nol gangguan selama jam tidur (12:00 AM–6:00 AM). Higiene digital yang sangat baik!</string>
+    <string name="stats_insight_peak_spike">Lonjakan notifikasi puncak terjadi sekitar pukul %1$s.</string>
+    <string name="stats_insight_balanced">Aliran notifikasi seimbang sepanjang hari aktif Anda.</string>
 </resources>

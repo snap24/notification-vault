@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">بدأ التجميع في الخلفية...</string>
     <string name="copy_all">نسخ الكل</string>
     <string name="view_all_bundled_logs">عرض جميع السجلات الـ %1$d</string>
+    <string name="stats_chart_subtitle_24h">توزيع على مدار 24 ساعة (انقر فوق الشريط للفحص)</string>
+    <string name="stats_chart_subtitle_7d">الحجم اليومي (آخر 7 أيام)</string>
+    <string name="stats_chart_subtitle_aggregate">الملف التراكمي بالساعة</string>
+    <string name="stats_insight_no_notifications">لم يتم التقاط أي إشعارات خلال هذا الإطار الزمني.</string>
+    <string name="stats_insight_loudest_app">%1$s هو التطبيق الأكثر إزعاجًا، حيث يولد %2$d%% من جميع التنبيهات.</string>
+    <string name="stats_insight_high_night_disturbance">إزعاج ليلي مرتفع (%1$d تنبيهات خلال ساعات النوم).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">صفر إزعاج أثناء ساعات النوم (00:00–06:00). نظافة رقمية ممتازة!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">صفر إزعاج أثناء ساعات النوم (12:00 AM–6:00 AM). نظافة رقمية ممتازة!</string>
+    <string name="stats_insight_peak_spike">تحدث ذروة الإشعارات حول %1$s.</string>
+    <string name="stats_insight_balanced">تدفق متوازن للإشعارات طوال يومك النشط.</string>
 </resources>

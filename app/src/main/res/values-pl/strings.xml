@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Rozpoczęto grupowanie w tle...</string>
     <string name="copy_all">Kopiuj wszystko</string>
     <string name="view_all_bundled_logs">Pokaż wszystkie %1$d powiadomienia</string>
+    <string name="stats_chart_subtitle_24h">Rozkład 24-godzinny (Dotknij słupka, aby sprawdzić)</string>
+    <string name="stats_chart_subtitle_7d">Dzienny wolumen (Ostatnie 7 dni)</string>
+    <string name="stats_chart_subtitle_aggregate">Zagregowany profil godzinowy</string>
+    <string name="stats_insight_no_notifications">Brak zarejestrowanych powiadomień w tym przedziale czasu.</string>
+    <string name="stats_insight_loudest_app">%1$s generuje najwięcej powiadomień (%2$d%% wszystkich alertów).</string>
+    <string name="stats_insight_high_night_disturbance">Wysokie zakłócenia w nocy (%1$d alertów w godzinach snu).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Zero zakłóceń w godzinach snu (00:00–06:00). Doskonała higiena cyfrowa!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Zero zakłóceń w godzinach snu (12:00 AM–6:00 AM). Doskonała higiena cyfrowa!</string>
+    <string name="stats_insight_peak_spike">Szczyt powiadomień przypada około %1$s.</string>
+    <string name="stats_insight_balanced">Zrównoważony przepływ powiadomień w ciągu aktywnego dnia.</string>
 </resources>

@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">バックグラウンドでまとめ処理を開始しました...</string>
     <string name="copy_all">すべてコピー</string>
     <string name="view_all_bundled_logs">%1$d 件のすべてのログを表示</string>
+    <string name="stats_chart_subtitle_24h">24時間分布（バーをタップして詳細表示）</string>
+    <string name="stats_chart_subtitle_7d">日別通知量（過去7日間）</string>
+    <string name="stats_chart_subtitle_aggregate">時間帯別集計プロファイル</string>
+    <string name="stats_insight_no_notifications">この期間中に記録された通知はありません。</string>
+    <string name="stats_insight_loudest_app">%1$s が最も通知の多いアプリで、全体の %2$d%% を占めています。</string>
+    <string name="stats_insight_high_night_disturbance">夜間の通知が高頻度です（睡眠時間帯に %1$d 件のアラート）。</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">睡眠時間帯（00:00–06:00）の通知はありません。素晴らしいデジタル習慣です！</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">睡眠時間帯（12:00 AM–6:00 AM）の通知はありません。素晴らしいデジタル習慣です！</string>
+    <string name="stats_insight_peak_spike">通知のピークは %1$s 頃に発生しています。</string>
+    <string name="stats_insight_balanced">アクティブな時間帯を通じてバランスの取れた通知フローです。</string>
 </resources>

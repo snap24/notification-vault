@@ -493,4 +493,14 @@
     <string name="toast_bundling_started">Группировка запущена в фоновом режиме...</string>
     <string name="copy_all">Копировать все</string>
     <string name="view_all_bundled_logs">Посмотреть все %1$d записей</string>
+    <string name="stats_chart_subtitle_24h">Распределение по 24 часам (Нажмите на столбец для просмотра)</string>
+    <string name="stats_chart_subtitle_7d">Ежедневный объем (За последние 7 дней)</string>
+    <string name="stats_chart_subtitle_aggregate">Сводный почасовой профиль</string>
+    <string name="stats_insight_no_notifications">За этот период уведомлений не зафиксировано.</string>
+    <string name="stats_insight_loudest_app">%1$s — самое громкое приложение, создающее %2$d%% всех уведомлений.</string>
+    <string name="stats_insight_high_night_disturbance">Высокое число ночных уведомлений (%1$d во время сна).</string>
+    <string name="stats_insight_zero_sleep_disturbance_24h">Ноль беспокойств во время сна (00:00–06:00). Отличная цифровая гигиена!</string>
+    <string name="stats_insight_zero_sleep_disturbance_12h">Ноль беспокойств во время сна (12:00 AM–6:00 AM). Отличная цифровая гигиена!</string>
+    <string name="stats_insight_peak_spike">Пик уведомлений приходится примерно на %1$s.</string>
+    <string name="stats_insight_balanced">Сбалансированный поток уведомлений в течение дня.</string>
 </resources>
