@@ -175,7 +175,7 @@ public class StatsFragment extends Fragment {
     private void setupChartInspector() {
         binding.chartDistribution.setOnBarSelectedListener((index, item) -> {
             if (item != null && binding != null) {
-                binding.tvChartInspector.setText(item.label + " • " + item.count + " notifications");
+                binding.tvChartInspector.setText(getString(R.string.chart_inspector_format, item.label, item.count));
             }
         });
     }
@@ -185,7 +185,7 @@ public class StatsFragment extends Fragment {
             isShowAllApps = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
                     .getBoolean(PREF_STATS_SHOW_ALL, false);
         }
-        binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All Apps");
+        binding.btnToggleMoreApps.setText(isShowAllApps ? R.string.stats_show_top_5_only : R.string.stats_show_all_apps);
 
         binding.btnToggleMoreApps.setOnClickListener(v -> {
             isShowAllApps = !isShowAllApps;
@@ -195,7 +195,7 @@ public class StatsFragment extends Fragment {
                         .putBoolean(PREF_STATS_SHOW_ALL, isShowAllApps)
                         .apply();
             }
-            binding.btnToggleMoreApps.setText(isShowAllApps ? "Show Top 5 Only" : "Show All Apps");
+            binding.btnToggleMoreApps.setText(isShowAllApps ? R.string.stats_show_top_5_only : R.string.stats_show_all_apps);
             if (lastCalculatedData != null) {
                 renderTopApps(lastCalculatedData.topApps, lastCalculatedData.totalCount);
             }
@@ -494,7 +494,7 @@ public class StatsFragment extends Fragment {
             tvCount.setText(String.valueOf(app.count));
 
             int percentOfTotal = totalCount > 0 ? (int) Math.round(((double) app.count / totalCount) * 100.0) : 0;
-            tvPercentage.setText(percentOfTotal + "% of total");
+            tvPercentage.setText(getString(R.string.percent_of_total_format, percentOfTotal));
 
             int progressPercent = maxAppCount > 0 ? (int) (((float) app.count / maxAppCount) * 100) : 0;
             progress.setProgress(progressPercent);

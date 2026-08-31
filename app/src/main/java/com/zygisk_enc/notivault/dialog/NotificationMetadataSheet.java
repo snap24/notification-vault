@@ -80,10 +80,15 @@ public final class NotificationMetadataSheet {
         }
 
         // Quick Specs Grid
-        String spaceShort = isWork ? ("Work (" + entity.userId + ")") : ("Personal (" + entity.userId + ")");
+        String spaceShort = isWork ? context.getString(R.string.meta_space_box_work, entity.userId) : context.getString(R.string.meta_space_box_personal, entity.userId);
         if (tvBoxSpace != null) tvBoxSpace.setText(spaceShort);
         if (tvBoxDbId != null) tvBoxDbId.setText("#" + entity.id);
-        if (tvBoxDuplicates != null) tvBoxDuplicates.setText(entity.duplicateCount + (entity.duplicateCount == 1 ? " event" : " events"));
+        if (tvBoxDuplicates != null) {
+            String dupStr = entity.duplicateCount == 1
+                    ? context.getString(R.string.meta_duplicate_event_singular, entity.duplicateCount)
+                    : context.getString(R.string.meta_duplicate_event_plural, entity.duplicateCount);
+            tvBoxDuplicates.setText(dupStr);
+        }
 
         // Section 1: Identity
         tvRowPkg.setText(context.getString(R.string.meta_label_package, entity.packageName));
@@ -109,7 +114,7 @@ public final class NotificationMetadataSheet {
             } catch (Exception ignored) {}
         }
 
-        String priority = "Default (0)";
+        String priority = context.getString(R.string.meta_priority_default);
         if (metaObj != null) {
             String channelId = metaObj.optString("channelId", context.getString(R.string.meta_none));
             tvRowChannel.setText(context.getString(R.string.meta_label_channel_id, channelId));
@@ -122,9 +127,9 @@ public final class NotificationMetadataSheet {
             String category = metaObj.optString("category", context.getString(R.string.meta_none));
             tvRowCategory.setText(context.getString(R.string.meta_label_category, category));
 
-            priority = metaObj.optString("priority", "Default (0)");
+            priority = metaObj.optString("priority", context.getString(R.string.meta_priority_default));
 
-            String visibility = metaObj.optString("visibility", "Default");
+            String visibility = metaObj.optString("visibility", context.getString(R.string.meta_visibility_default));
             boolean clearable = metaObj.optBoolean("isClearable", true);
             boolean ongoing = metaObj.optBoolean("isOngoing", false);
             String clearableStr = clearable ? context.getString(R.string.meta_yes) : context.getString(R.string.meta_no);
@@ -159,7 +164,7 @@ public final class NotificationMetadataSheet {
             tvRowChannel.setText(context.getString(R.string.meta_label_channel_id, context.getString(R.string.meta_not_recorded)));
             tvRowSystemId.setText(context.getString(R.string.meta_label_system_id_simple));
             tvRowCategory.setText(context.getString(R.string.meta_label_category, context.getString(R.string.meta_none)));
-            tvRowVisibility.setText(context.getString(R.string.meta_label_visibility_ongoing, "Default", context.getString(R.string.meta_yes), context.getString(R.string.meta_no)));
+            tvRowVisibility.setText(context.getString(R.string.meta_label_visibility_ongoing, context.getString(R.string.meta_visibility_default), context.getString(R.string.meta_yes), context.getString(R.string.meta_no)));
             tvRowActions.setText(context.getString(R.string.meta_label_actions, "0"));
             tvRowFlags.setText(context.getString(R.string.meta_label_flags, context.getString(R.string.meta_not_recorded)));
         }

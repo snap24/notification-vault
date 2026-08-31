@@ -657,7 +657,7 @@ public class HistoryFragment extends Fragment {
                     for (NotificationEntity entity : list) {
                         viewModel.deleteById(entity.id);
                     }
-                    String msg = getString(R.string.bundled_logs_count, list.size()) + " deleted";
+                    String msg = getString(R.string.bundled_logs_deleted, list.size());
                     Snackbar snackbar = Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_LONG)
                             .setAction(R.string.undo, v -> {
                                 for (NotificationEntity entity : list) {
@@ -1007,7 +1007,7 @@ public class HistoryFragment extends Fragment {
                 viewModel.deleteById(entity.id);
             }
             dialog.dismiss();
-            String msg = getString(R.string.bundled_logs_count, list.size()) + " deleted";
+            String msg = getString(R.string.bundled_logs_deleted, list.size());
             Snackbar snackbar = Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_LONG)
                     .setAction(R.string.undo, u -> {
                         for (NotificationEntity entity : list) {

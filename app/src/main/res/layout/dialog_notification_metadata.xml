@@ -141,7 +141,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="SPACE"
+                            android:text="@string/meta_box_space"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textStyle="bold" />
@@ -181,7 +181,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="RECORD ID"
+                            android:text="@string/meta_box_db_id"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textStyle="bold" />
@@ -229,7 +229,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="PRIORITY"
+                            android:text="@string/meta_box_priority"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textStyle="bold" />
@@ -269,7 +269,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="DUPLICATES"
+                            android:text="@string/meta_box_duplicates"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textStyle="bold" />

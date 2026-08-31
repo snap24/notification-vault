@@ -522,4 +522,18 @@
     <string name="badge_personal">Personal</string>
     <string name="btn_metadata">Metadata</string>
     <string name="auth_toggle_metadata_capture">Authenticate to toggle metadata capture</string>
+    <string name="meta_box_space">SPACE</string>
+    <string name="meta_box_db_id">RECORD ID</string>
+    <string name="meta_box_priority">PRIORITY</string>
+    <string name="meta_box_duplicates">DUPLICATES</string>
+    <string name="meta_space_box_personal">Personal (%1$d)</string>
+    <string name="meta_space_box_work">Work (%1$d)</string>
+    <string name="meta_duplicate_event_singular">%1$d event</string>
+    <string name="meta_duplicate_event_plural">%1$d events</string>
+    <string name="meta_priority_default">Default (0)</string>
+    <string name="meta_visibility_default">Default</string>
+    <string name="chart_inspector_format">%1$s • %2$d notifications</string>
+    <string name="percent_of_total_format">%d%% of total</string>
+    <string name="bundled_logs_deleted">%1$d logs deleted</string>
+    <string name="stats_show_top_5_only">Show Top 5 Only</string>
 </resources>
