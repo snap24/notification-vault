@@ -44,7 +44,7 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
     private final List<AppSummary> filteredList = new ArrayList<>();
     private final Set<String> selectedPackages = new HashSet<>();
     private boolean isSelectionMode = false;
-    private int currentSortMode = SORT_VOLUME_DESC;
+    private int currentSortMode = SORT_NAME_ASC;
     private String currentQuery = "";
 
     private OnAppClickListener clickListener;
