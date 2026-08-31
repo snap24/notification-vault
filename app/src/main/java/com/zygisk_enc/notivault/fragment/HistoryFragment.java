@@ -1002,7 +1002,7 @@ public class HistoryFragment extends Fragment {
         });
 
         View skeletonContainer = dialogView.findViewById(R.id.layout_bundle_skeleton);
-        com.google.android.material.progressindicator.LinearProgressIndicator progressIndicator =
+        com.google.android.material.progressindicator.CircularProgressIndicator progressIndicator =
                 dialogView.findViewById(R.id.progress_bundle_decrypt);
 
         rv.setAdapter(bundleAdapter);
@@ -1028,6 +1028,7 @@ public class HistoryFragment extends Fragment {
 
         if (allDecrypted) {
             if (skeletonContainer != null) skeletonContainer.setVisibility(View.GONE);
+            if (progressIndicator != null) progressIndicator.setVisibility(View.GONE);
             rv.setVisibility(View.VISIBLE);
             List<NotificationAdapter.ListItem> listItems = new ArrayList<>(bundle.notifications.size());
             for (NotificationEntity entity : bundle.notifications) {
@@ -1037,8 +1038,11 @@ public class HistoryFragment extends Fragment {
         } else {
             if (skeletonContainer != null) skeletonContainer.setVisibility(View.VISIBLE);
             rv.setVisibility(View.GONE);
-            if (progressIndicator != null) progressIndicator.setProgressCompat(0, false);
-            tvSubInfo.setText(getString(R.string.decrypting_progress, 0));
+            if (progressIndicator != null) {
+                progressIndicator.setAlpha(1f);
+                progressIndicator.setProgressCompat(0, false);
+                progressIndicator.setVisibility(View.VISIBLE);
+            }
 
             AppExecutor.execute(() -> {
                 final int total = bundle.notifications.size();
@@ -1051,7 +1055,6 @@ public class HistoryFragment extends Fragment {
                             getActivity().runOnUiThread(() -> {
                                 if (dialog.isShowing()) {
                                     if (progressIndicator != null) progressIndicator.setProgressCompat(progress, true);
-                                    tvSubInfo.setText(getString(R.string.decrypting_progress, progress));
                                 }
                             });
                         }
@@ -1067,8 +1070,12 @@ public class HistoryFragment extends Fragment {
                             }
                             bundleAdapter.submitList(listItems, () -> {
                                 if (skeletonContainer != null) skeletonContainer.setVisibility(View.GONE);
+                                if (progressIndicator != null) {
+                                    progressIndicator.animate().alpha(0f).setDuration(150).withEndAction(() -> {
+                                        progressIndicator.setVisibility(View.GONE);
+                                    }).start();
+                                }
                                 rv.setVisibility(View.VISIBLE);
-                                tvSubInfo.setText(getString(R.string.bundled_logs_count, bundle.getCount()) + " • " + relativeTime);
                             });
                         }
                     });

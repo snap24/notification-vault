@@ -61,6 +61,21 @@
 
             </LinearLayout>
 
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_bundle_decrypt"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="10dp"
+                app:indicatorSize="20dp"
+                app:trackThickness="3.5dp"
+                app:trackCornerRadius="2dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="?attr/colorSurfaceContainerHighest"
+                android:indeterminate="false"
+                android:max="100"
+                android:progress="0"
+                android:visibility="gone" />
+
             <ImageButton
                 android:id="@+id/btn_bundle_close"
                 android:layout_width="36dp"
@@ -173,18 +188,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone">
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progress_bundle_decrypt"
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="8dp"
-                app:indicatorColor="?attr/colorPrimary"
-                app:trackColor="?attr/colorSurfaceContainerHighest"
-                app:trackCornerRadius="2dp"
-                android:indeterminate="false"
-                android:max="100" />
 
             <include layout="@layout/item_notification_skeleton" />
             <include layout="@layout/item_notification_skeleton" />

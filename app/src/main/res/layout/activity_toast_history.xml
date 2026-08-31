@@ -27,48 +27,30 @@
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:navigationIcon="?attr/homeAsUpIndicator">
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Circular Progress Ring (Pure Minimalist Border Progress Indicator) -->
+            <FrameLayout
                 android:id="@+id/card_toolbar_decryption"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="20dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:cardBackgroundColor="?attr/colorPrimaryContainer"
                 android:visibility="gone">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="8dp">
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_toolbar_decryption"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    app:indicatorSize="20dp"
+                    app:trackThickness="3.5dp"
+                    app:trackCornerRadius="2dp"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0" />
 
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:indicatorSize="12dp"
-                        app:trackThickness="2dp"
-                        app:indicatorColor="?attr/colorOnPrimaryContainer"
-                        app:trackColor="?attr/colorPrimaryContainer"
-                        android:indeterminate="true" />
-
-                    <TextView
-                        android:id="@+id/tv_toolbar_decryption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="Decrypting... 45%"
-                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            </FrameLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_view_source"
