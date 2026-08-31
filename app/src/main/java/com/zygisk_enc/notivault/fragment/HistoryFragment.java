@@ -1167,6 +1167,7 @@ public class HistoryFragment extends Fragment {
         TextView tvAppName = dialogView.findViewById(R.id.tv_detail_app_name);
         TextView tvSubInfo = dialogView.findViewById(R.id.tv_detail_sub_info);
         ImageButton btnClose = dialogView.findViewById(R.id.btn_detail_close);
+        ImageButton btnMetadata = dialogView.findViewById(R.id.btn_detail_metadata);
 
         com.google.android.material.button.MaterialButton chipCopy = dialogView.findViewById(R.id.chip_detail_copy);
         com.google.android.material.button.MaterialButton chipStar = dialogView.findViewById(R.id.chip_detail_star);
@@ -1192,6 +1193,11 @@ public class HistoryFragment extends Fragment {
         }
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
+        if (btnMetadata != null) {
+            btnMetadata.setOnClickListener(v -> {
+                com.zygisk_enc.notivault.dialog.NotificationMetadataSheet.show(requireContext(), entity);
+            });
+        }
 
         // Populate Content
         tvTitle.setText(displayTitle);

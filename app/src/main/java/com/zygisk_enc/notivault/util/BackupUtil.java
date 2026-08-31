@@ -63,6 +63,7 @@ public class BackupUtil {
         boolean isFavorite = false;
         String imagePath = null;
         int userId = 0;
+        String metadata = null;
     }
 
     private static class RawToastItem {
@@ -178,6 +179,7 @@ public class BackupUtil {
                                 obj.put("isRead", notif.isRead ? 1 : 0);
                                 obj.put("isFavorite", notif.isFavorite ? 1 : 0);
                                 obj.put("userId", notif.userId);
+                                obj.put("metadata", notif.metadata != null ? notif.metadata : JSONObject.NULL);
 
                                 if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
                                     String[] paths = notif.imagePath.split("\\|");
@@ -420,6 +422,7 @@ public class BackupUtil {
                             notif.isRead = raw.isRead;
                             notif.isFavorite = raw.isFavorite;
                             notif.userId = raw.userId;
+                            notif.metadata = raw.metadata;
 
                             if (raw.imagePath != null) {
                                 String[] parts = raw.imagePath.split("\\|");
@@ -571,6 +574,7 @@ public class BackupUtil {
                 case "isFavorite": item.isFavorite = reader.nextInt() == 1; break;
                 case "imagePath": item.imagePath = reader.nextString(); break;
                 case "userId": item.userId = reader.nextInt(); break;
+                case "metadata": item.metadata = reader.nextString(); break;
                 default: reader.skipValue(); break;
             }
         }

@@ -15,6 +15,19 @@ public class PreferenceUtil {
     private static final String KEY_CAPTURE_ENABLED = "capture_enabled";
     private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
     public static final String KEY_ACTIVE_PROFILE_MODE = "active_profile_mode"; // 0 = Personal, 1 = Work
+    public static final String KEY_CAPTURE_EXTENDED_METADATA = "capture_extended_metadata";
+
+    public static boolean isExtendedMetadataEnabled(Context context) {
+        if (context == null) return false;
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(KEY_CAPTURE_EXTENDED_METADATA, false);
+    }
+
+    public static void setExtendedMetadataEnabled(Context context, boolean enabled) {
+        if (context == null) return;
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean(KEY_CAPTURE_EXTENDED_METADATA, enabled).apply();
+    }
 
     public static int getActiveProfileMode(Context context) {
         if (context == null) return 0;

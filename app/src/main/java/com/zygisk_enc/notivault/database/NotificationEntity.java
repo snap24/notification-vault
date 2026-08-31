@@ -27,6 +27,7 @@ public class NotificationEntity {
     public String imagePath;
     public String bundleId;
     public int userId = 0;
+    public String metadata = null;
 
     @androidx.room.Ignore
     public String decryptedTitle = null;

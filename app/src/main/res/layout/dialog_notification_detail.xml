@@ -66,6 +66,16 @@
                 </LinearLayout>
 
                 <ImageButton
+                    android:id="@+id/btn_detail_metadata"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_button_circle_ripple"
+                    android:src="@drawable/ic_info"
+                    app:tint="?attr/colorOnSurfaceVariant"
+                    android:contentDescription="@string/desc_metadata" />
+
+                <ImageButton
                     android:id="@+id/btn_detail_close"
                     android:layout_width="36dp"
                     android:layout_height="36dp"

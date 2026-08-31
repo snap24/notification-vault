@@ -19,6 +19,14 @@
             app:iconSpaceReserved="false" />
 
         <SwitchPreferenceCompat
+            app:key="capture_extended_metadata"
+            app:title="@string/pref_extended_metadata_title"
+            app:summary="@string/pref_extended_metadata_summary"
+            app:defaultValue="false"
+            app:widgetLayout="@layout/custom_preference_switch"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
             app:key="qs_tile_enabled"
             app:title="@string/pref_qs_tile_title"
             app:summary="@string/pref_qs_tile_summary"

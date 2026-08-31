@@ -14,6 +14,7 @@ import com.zygisk_enc.notivault.database.AppRuleEntity;
 import com.zygisk_enc.notivault.util.AppLockManager;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.util.EncryptionHelper;
+import com.zygisk_enc.notivault.util.MetadataHelper;
 import java.io.ByteArrayOutputStream;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -203,6 +204,10 @@ public class NotiVaultService extends NotificationListenerService {
         NotificationEntity entity = new NotificationEntity(
                 packageName, appName, encTitle, encText, encBigText, timestamp);
         entity.userId = userId;
+
+        if (PreferenceUtil.isExtendedMetadataEnabled(this)) {
+            entity.metadata = MetadataHelper.extractJson(sbn, notification, this);
+        }
 
         final String finalTitle = title;
         final String finalText = text;
