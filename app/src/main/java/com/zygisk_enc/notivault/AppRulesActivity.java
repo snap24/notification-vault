@@ -370,10 +370,6 @@ public class AppRulesActivity extends BaseActivity {
             AppInfoItem item = filteredList.get(position);
             holder.tvName.setText(item.appName);
 
-            if (holder.tvWorkBadge != null) {
-                holder.tvWorkBadge.setVisibility(item.isWorkProfile ? View.VISIBLE : View.GONE);
-            }
-
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(activity).loadInto(
                     holder.ivIcon, item.packageName, item.userId, R.drawable.ic_code);
 
@@ -455,7 +451,6 @@ public class AppRulesActivity extends BaseActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView ivIcon;
             TextView tvName;
-            TextView tvWorkBadge;
             View tvTapGuide;
             MaterialSwitch switchCapture;
             com.google.android.material.card.MaterialCardView card;
@@ -465,7 +460,6 @@ public class AppRulesActivity extends BaseActivity {
                 super(itemView);
                 ivIcon = itemView.findViewById(R.id.iv_app_icon);
                 tvName = itemView.findViewById(R.id.tv_app_name);
-                tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
                 tvTapGuide = itemView.findViewById(R.id.tv_tap_guide);
                 switchCapture = itemView.findViewById(R.id.switch_capture);
                 card = itemView.findViewById(R.id.card_app_rule);
