@@ -293,7 +293,14 @@ public class NotificationViewModel extends AndroidViewModel {
                         postDecryptionProgress(runToken, 0);
                     }
 
-                    // Slicing current page across parallel threads
+                    final boolean isInitialLoad = (limit <= 500);
+
+                    // Phase 1: Pre-decrypt top 30 items sequentially for instant screen rendering
+                    // Only active when viewing a specific app filter on initial load
+                    final int preDecryptCount = (isInitialLoad && currentPkgFilter != null && !currentPkgFilter.isEmpty())
+                            ? Math.min(30, total) : 0;
+
+                    // Slicing current page across parallel threads (covers full range; Phase 2 skips pre-decrypted items)
                     int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 99) / 100));
                     int chunkSize = (total + numChunks - 1) / numChunks;
 
@@ -304,14 +311,49 @@ public class NotificationViewModel extends AndroidViewModel {
                     for (int c = 0; c < numChunks; c++) {
                         chunkResults[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
                     }
-
-                    final boolean isInitialLoad = (limit <= 500);
                     final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
 
+                    // ── Phase 1: Sequential decrypt of top 30 items ──
+                    if (preDecryptCount > 0 && runToken == currentRunToken) {
+                        for (int i = 0; i < preDecryptCount; i++) {
+                            if (runToken != currentRunToken) break;
+                            NotificationEntity entity = list.get(i);
+                            if (!isSubsequentBundleItem[i]) {
+                                decryptEntity(entity);
+                            }
+                            if (needsDecryption[i]) {
+                                newlyDecryptedCount.incrementAndGet();
+                            }
+                            if (matchesQuery(entity, searchingMode, lowerQuery)) {
+                                int chunkIdx = i / chunkSize;
+                                chunkResults[chunkIdx].add(entity);
+                            }
+                        }
+                        // Post Phase 1 snapshot immediately for instant screen display
+                        if (runToken == currentRunToken) {
+                            java.util.List<NotificationEntity> phase1Snapshot = new java.util.ArrayList<>();
+                            for (int k = 0; k < numChunks; k++) {
+                                synchronized (chunkResults[k]) {
+                                    phase1Snapshot.addAll(chunkResults[k]);
+                                }
+                            }
+                            if (!phase1Snapshot.isEmpty()) {
+                                android.util.Log.d("NotiVault_Decryption", "Phase 1: posted " + phase1Snapshot.size() + " items instantly at " + System.currentTimeMillis());
+                                notifications.postValue(phase1Snapshot);
+                                // Give the main thread 80ms to render Phase 1 cards before Phase 2 parallel starts
+                                try { Thread.sleep(80); } catch (InterruptedException ignored) {}
+                            }
+                        }
+                    }
+
+                    // ── Phase 2: Parallel 8-core decryption for remaining items ──
                     for (int c = 0; c < numChunks; c++) {
                         final int chunkIndex = c;
-                        final int startIdx = c * chunkSize;
-                        final int endIdx = Math.min(total, startIdx + chunkSize);
+                        final int rawStartIdx = c * chunkSize;
+                        final int rawEndIdx = Math.min(total, rawStartIdx + chunkSize);
+                        // Skip items already decrypted in Phase 1
+                        final int startIdx = Math.max(rawStartIdx, preDecryptCount);
+                        final int endIdx = rawEndIdx;
 
                         parallelDecryptionPool.execute(() -> {
                             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
