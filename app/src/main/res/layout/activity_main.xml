@@ -112,6 +112,19 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:visibility="gone" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_view_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:text="@string/source"
+                style="@style/Widget.Material3.Button.TextButton"
+                app:icon="@drawable/ic_code"
+                app:iconPadding="4dp"
+                app:iconTint="?attr/colorPrimary"
+                android:textColor="?attr/colorPrimary" />
+
             <!-- Work Profile Active Tag (Visible ONLY in Work Profile mode, to the left of Source button) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_toolbar_work_tag"
@@ -151,19 +164,6 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_view_source"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:text="@string/source"
-                style="@style/Widget.Material3.Button.TextButton"
-                app:icon="@drawable/ic_code"
-                app:iconPadding="4dp"
-                app:iconTint="?attr/colorPrimary"
-                android:textColor="?attr/colorPrimary" />
 
             <ImageButton
                 android:id="@+id/btn_delete_apps"
