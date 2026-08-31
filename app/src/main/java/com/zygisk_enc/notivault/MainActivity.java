@@ -126,16 +126,6 @@ public class MainActivity extends BaseActivity {
             if (shouldShow) {
                 int progress = Math.min(100, Math.max(0, op.progress));
                 binding.progressToolbarDecryption.setProgressCompat(progress, true);
-
-                if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_DELETING) {
-                    binding.ivToolbarDecryptionIcon.setImageResource(R.drawable.ic_delete_sweep);
-                } else if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_IMPORTING) {
-                    binding.ivToolbarDecryptionIcon.setImageResource(R.drawable.ic_cloud_upload);
-                } else if (op.type == com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_BUNDLING) {
-                    binding.ivToolbarDecryptionIcon.setImageResource(R.drawable.ic_apps);
-                } else {
-                    binding.ivToolbarDecryptionIcon.setImageResource(R.drawable.ic_lock);
-                }
             }
         });
 
