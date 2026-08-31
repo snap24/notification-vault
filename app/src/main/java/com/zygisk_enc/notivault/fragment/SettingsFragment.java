@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.zygisk_enc.notivault.BaseActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.util.AppLockManager;
 import com.zygisk_enc.notivault.util.BackupUtil;
@@ -466,7 +467,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     }
                 })
                 .setNegativeButton(R.string.close, null);
-        BaseActivity.showDialog(requireContext(), builder);
+        androidx.appcompat.app.AlertDialog dialog = builder.show();
+        BaseActivity act = BaseActivity.findBaseActivity(getContext());
+        if (act != null) {
+            act.registerActiveDialog(dialog);
+        }
     }
 
     private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
