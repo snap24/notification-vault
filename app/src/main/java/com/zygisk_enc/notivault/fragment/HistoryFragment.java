@@ -745,6 +745,8 @@ public class HistoryFragment extends Fragment {
 
     private void animateScrollToTop() {
         if (binding == null) return;
+        binding.recyclerView.stopScroll();
+        userHasScrolled = false;
         androidx.recyclerview.widget.LinearLayoutManager lm = 
                 (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
         if (lm != null) {

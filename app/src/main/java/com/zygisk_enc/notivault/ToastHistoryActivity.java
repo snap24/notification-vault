@@ -107,6 +107,8 @@ public class ToastHistoryActivity extends BaseActivity {
     }
 
     private void animateScrollToTop() {
+        if (binding == null) return;
+        binding.recyclerView.stopScroll();
         LinearLayoutManager lm = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
         if (lm != null) {
             lm.scrollToPositionWithOffset(0, 0);
