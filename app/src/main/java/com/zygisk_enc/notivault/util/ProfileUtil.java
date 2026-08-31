@@ -65,6 +65,19 @@ public final class ProfileUtil {
     }
 
     /**
+     * Returns the integer userId of the first active Work Profile found, or 10 as default.
+     */
+    public static int getWorkProfileUserId(@NonNull Context context) {
+        refreshCacheIfNeeded(context);
+        for (Map.Entry<Integer, Boolean> entry : WORK_PROFILE_CACHE.entrySet()) {
+            if (Boolean.TRUE.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return 10;
+    }
+
+    /**
      * Returns all user profiles on the device (Personal + Work Profile + Clone/Secondary).
      */
     @NonNull

@@ -22,13 +22,23 @@
             android:src="@mipmap/ic_launcher"
             android:contentDescription="@string/app_name" />
 
+        <!-- Selected App Icon (Shown when an app filter is selected) -->
+        <ImageView
+            android:id="@+id/iv_feed_app_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="6dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
         <TextView
             android:id="@+id/tv_feed_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="@string/widget_recent_notifications_title"
+            android:text="@string/filter_all"
             android:textColor="@color/widget_text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />

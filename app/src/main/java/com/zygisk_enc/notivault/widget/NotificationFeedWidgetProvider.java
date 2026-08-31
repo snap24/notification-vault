@@ -64,17 +64,29 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.lv_widget_notifications, serviceIntent);
         views.setEmptyView(R.id.lv_widget_notifications, R.id.tv_widget_feed_empty);
 
-        // Check dynamic title based on selected app filter
+        // Check dynamic title and app icon based on selected app filter
         String filterPkg = PreferenceUtil.getWidgetFeedPackage(context, id, profileMode);
         if (filterPkg != null && !"ALL".equals(filterPkg)) {
-            String appTitle = filterPkg;
+            views.setTextViewText(R.id.tv_feed_title, "");
+            views.setViewVisibility(R.id.iv_feed_app_icon, android.view.View.VISIBLE);
             try {
-                PackageManager pm = context.getPackageManager();
-                appTitle = pm.getApplicationLabel(pm.getApplicationInfo(filterPkg, 0)).toString();
-            } catch (Exception ignored) {}
-            views.setTextViewText(R.id.tv_feed_title, appTitle);
+                int targetUserId = (profileMode == 1) ? ProfileUtil.getWorkProfileUserId(context) : 0;
+                android.graphics.drawable.Drawable iconDrawable = ProfileUtil.getBadgedAppIcon(context, filterPkg, targetUserId);
+                if (iconDrawable == null) {
+                    iconDrawable = context.getPackageManager().getApplicationIcon(filterPkg);
+                }
+                android.graphics.Bitmap bitmap = drawableToBitmap(iconDrawable);
+                if (bitmap != null) {
+                    views.setImageViewBitmap(R.id.iv_feed_app_icon, bitmap);
+                } else {
+                    views.setImageViewResource(R.id.iv_feed_app_icon, R.mipmap.ic_launcher);
+                }
+            } catch (Exception e) {
+                views.setImageViewResource(R.id.iv_feed_app_icon, R.mipmap.ic_launcher);
+            }
         } else {
-            views.setTextViewText(R.id.tv_feed_title, context.getString(R.string.widget_recent_notifications_title));
+            views.setViewVisibility(R.id.iv_feed_app_icon, android.view.View.GONE);
+            views.setTextViewText(R.id.tv_feed_title, context.getString(R.string.filter_all));
         }
 
         // Item click pending intent template
@@ -139,5 +151,18 @@ public class NotificationFeedWidgetProvider extends AppWidgetProvider {
                 }
             }
         } catch (Exception ignored) {}
+    }
+
+    private static android.graphics.Bitmap drawableToBitmap(android.graphics.drawable.Drawable drawable) {
+        if (drawable == null) return null;
+        if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+            return ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
+        }
+        int size = 64;
+        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+        drawable.setBounds(0, 0, size, size);
+        drawable.draw(canvas);
+        return bitmap;
     }
 }
