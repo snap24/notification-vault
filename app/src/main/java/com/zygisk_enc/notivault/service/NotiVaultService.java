@@ -254,8 +254,8 @@ public class NotiVaultService extends NotificationListenerService {
                 }
             }
 
-            // Check for duplicate consecutive notifications against the global latest notification card
-            NotificationEntity lastNotif = db.notificationDao().getLatestNotificationSync();
+            // Check for duplicate consecutive notifications against the last notification for this package
+            NotificationEntity lastNotif = db.notificationDao().getLastNotificationForPackage(entity.packageName);
             boolean pkgMatches = lastNotif != null && entity.packageName != null && entity.packageName.equals(lastNotif.packageName);
             
             // Background thread image extraction
