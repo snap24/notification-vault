@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">Reglas de captura de apps</string>
     <string name="pref_app_rules_summary">Bloquear aplicaciones o filtrar por palabras clave</string>
     <string name="pref_about_title">Acerca de Notification Vault</string>
-    <string name="pref_about_summary">Versión 2.0.1 · Código abierto · Sin anuncios · Sin rastreo</string>
+    <string name="pref_about_summary">Versión 3.0.0 · Código abierto · Sin anuncios · Sin rastreo</string>
     <string name="dialog_per_app_auto_delete_title">Eliminación automática por app</string>
     <string name="dialog_custom_days_title">Eliminación automática personalizada</string>
     <string name="dialog_custom_days_desc">Establece el número de días para conservar las notificaciones antes de la limpieza automática.</string>

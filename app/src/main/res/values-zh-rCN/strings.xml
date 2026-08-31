@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">应用捕获规则</string>
     <string name="pref_app_rules_summary">屏蔽应用或按关键词进行过滤</string>
     <string name="pref_about_title">关于 Notification Vault</string>
-    <string name="pref_about_summary">版本 2.0.1 · 开源 · 无广告 · 无追踪</string>
+    <string name="pref_about_summary">版本 3.0.0 · 开源 · 无广告 · 无追踪</string>
     <string name="dialog_per_app_auto_delete_title">按应用自动删除</string>
     <string name="dialog_custom_days_title">自定义自动删除保留天数</string>
     <string name="dialog_custom_days_desc">设置通知在自动清理前保留的天数。</string>

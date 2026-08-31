@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">Reguły rejestrowania aplikacji</string>
     <string name="pref_app_rules_summary">Blokuj aplikacje lub filtruj według słów kluczowych</string>
     <string name="pref_about_title">O programie Notification Vault</string>
-    <string name="pref_about_summary">Wersja 2.0.1 · Open Source · Bez reklam · Bez śledzenia</string>
+    <string name="pref_about_summary">Wersja 3.0.0 · Open Source · Bez reklam · Bez śledzenia</string>
     <string name="dialog_per_app_auto_delete_title">Automatyczne usuwanie wg aplikacji</string>
     <string name="dialog_custom_days_title">Własny okres automatycznego usuwania</string>
     <string name="dialog_custom_days_desc">Ustaw liczbę dni przechowywania powiadomień przed automatycznym wyczyszczeniem.</string>

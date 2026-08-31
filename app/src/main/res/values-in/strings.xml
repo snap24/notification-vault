@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">Aturan Perekaman Aplikasi</string>
     <string name="pref_app_rules_summary">Blokir aplikasi atau filter berdasarkan kata kunci</string>
     <string name="pref_about_title">Tentang Notification Vault</string>
-    <string name="pref_about_summary">Versi 2.0.1 · Sumber Terbuka · Tanpa iklan · Tanpa pelacak</string>
+    <string name="pref_about_summary">Versi 3.0.0 · Sumber Terbuka · Tanpa iklan · Tanpa pelacak</string>
     <string name="dialog_per_app_auto_delete_title">Hapus Otomatis per Aplikasi</string>
     <string name="dialog_custom_days_title">Jumlah Hari Hapus Otomatis Khusus</string>
     <string name="dialog_custom_days_desc">Atur jumlah hari penyimpanan notifikasi sebelum pembersihan otomatis.</string>

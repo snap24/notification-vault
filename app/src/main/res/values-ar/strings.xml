@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">قواعد تسجيل التطبيقات</string>
     <string name="pref_app_rules_summary">حظر تطبيقات معينة أو الفلترة بالكلمات المفتاحية</string>
     <string name="pref_about_title">حول Notification Vault</string>
-    <string name="pref_about_summary">الإصدار 2.0.1 · مفتوح المصدر · بدون إعلانات · بدون تتبع</string>
+    <string name="pref_about_summary">الإصدار 3.0.0 · مفتوح المصدر · بدون إعلانات · بدون تتبع</string>
     <string name="dialog_per_app_auto_delete_title">حذف تلقائي لكل تطبيق</string>
     <string name="dialog_custom_days_title">أيام الحذف التلقائي المخصصة</string>
     <string name="dialog_custom_days_desc">حدد عدد أيام الاحتفاظ بالإشعارات قبل التنظيف التلقائي.</string>

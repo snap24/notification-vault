@@ -119,7 +119,7 @@
     <string name="pref_app_rules_title">앱별 수집 규칙</string>
     <string name="pref_app_rules_summary">앱 차단 또는 키워드 필터링 설정</string>
     <string name="pref_about_title">Notification Vault 정보</string>
-    <string name="pref_about_summary">버전 2.0.1 · 오픈 소스 · 광고 없음 · 추적 없음</string>
+    <string name="pref_about_summary">버전 3.0.0 · 오픈 소스 · 광고 없음 · 추적 없음</string>
     <string name="dialog_per_app_auto_delete_title">앱별 자동 삭제</string>
     <string name="dialog_custom_days_title">사용자 지정 자동 삭제 일수</string>
     <string name="dialog_custom_days_desc">자동 정리 전 알림을 보관할 일수를 설정하세요.</string>

@@ -164,7 +164,7 @@
     <string name="pref_app_rules_title">App Capture Rules</string>
     <string name="pref_app_rules_summary">Block apps or filter by keywords</string>
     <string name="pref_about_title">About Notification Vault</string>
-    <string name="pref_about_summary">Version 2.0.1 · Open Source · No ads · No tracking</string>
+    <string name="pref_about_summary">Version 3.0.0 · Open Source · No ads · No tracking</string>
 
     <!-- Auto-Delete Dialogs -->
     <string name="dialog_unified_auto_delete_title">Auto-Delete Rules</string>

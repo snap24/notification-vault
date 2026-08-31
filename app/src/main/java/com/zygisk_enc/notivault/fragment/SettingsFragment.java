@@ -1,6 +1,5 @@
 package com.zygisk_enc.notivault.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -29,7 +28,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.zygisk_enc.notivault.BaseActivity;
 import com.zygisk_enc.notivault.R;
 import com.zygisk_enc.notivault.util.AppLockManager;
-import com.zygisk_enc.notivault.util.BackupUtil;
 import com.zygisk_enc.notivault.util.PreferenceUtil;
 import com.zygisk_enc.notivault.viewmodel.NotificationViewModel;
 import java.util.concurrent.Executor;
@@ -103,7 +101,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
         });
 
-        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), dialog);
+        BaseActivity.showDialog(requireContext(), dialog);
     }
 
     private void showImportPasswordDialog(Uri uri) {
@@ -137,7 +135,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         });
 
-        com.zygisk_enc.notivault.BaseActivity.showDialog(requireContext(), dialog);
+        BaseActivity.showDialog(requireContext(), dialog);
     }
 
     @Override
@@ -454,10 +452,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private void showAboutDialog() {
         if (getContext() == null) return;
+        String versionName = "3.0.0";
+        try {
+            versionName = requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0).versionName;
+        } catch (Exception ignored) {}
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle(R.string.pref_about_title)
-                .setMessage("Notification Vault v2.0.1\n\nEncrypted, private local notification log manager.\n\n• Zero Tracking & No Ads\n• Local AES-256 KeyStore Encryption\n• Work & Personal Profile Isolation\n• Instant Fast Search & Smart Bundling\n\nOpen-source project under MIT License.")
+                .setMessage("Notification Vault v" + versionName + "\n\nEncrypted, private local notification log manager.\n\n• Zero Tracking & No Ads\n• Local AES-256 KeyStore Encryption\n• Work & Personal Profile Isolation\n• Instant Fast Search & Smart Bundling\n\nOpen-source project under MIT License.")
                 .setPositiveButton("GitHub", (dialog, which) -> {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/snap24/notification-vault"));
@@ -467,11 +470,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     }
                 })
                 .setNegativeButton(R.string.close, null);
-        androidx.appcompat.app.AlertDialog dialog = builder.show();
-        BaseActivity act = BaseActivity.findBaseActivity(getContext());
-        if (act != null) {
-            act.registerActiveDialog(dialog);
-        }
+        BaseActivity.showDialog(requireContext(), builder);
     }
 
     private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
