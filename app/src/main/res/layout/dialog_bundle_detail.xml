@@ -166,6 +166,32 @@
             android:background="?attr/colorOutlineVariant"
             android:alpha="0.4" />
 
+        <!-- Skeleton Loading Container -->
+        <LinearLayout
+            android:id="@+id/layout_bundle_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_bundle_decrypt"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="8dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="?attr/colorSurfaceContainerHighest"
+                app:trackCornerRadius="2dp"
+                android:indeterminate="false"
+                android:max="100" />
+
+            <include layout="@layout/item_notification_skeleton" />
+            <include layout="@layout/item_notification_skeleton" />
+            <include layout="@layout/item_notification_skeleton" />
+
+        </LinearLayout>
+
         <!-- Scrollable Bundle Items List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_bundle_items"

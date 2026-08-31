@@ -36,6 +36,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.zygisk_enc.notivault.util.AppExecutor;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -979,14 +980,11 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        List<NotificationAdapter.ListItem> listItems = new ArrayList<>();
-        for (NotificationEntity entity : bundle.notifications) {
-            viewModel.ensureEntityDecrypted(entity);
-            listItems.add(new NotificationAdapter.ListItem(entity));
-        }
-        bundleAdapter.submitList(listItems);
-        rv.setAdapter(bundleAdapter);
+        View skeletonContainer = dialogView.findViewById(R.id.layout_bundle_skeleton);
+        com.google.android.material.progressindicator.LinearProgressIndicator progressIndicator =
+                dialogView.findViewById(R.id.progress_bundle_decrypt);
 
+        rv.setAdapter(bundleAdapter);
         int maxRvHeight = (int) (380 * getResources().getDisplayMetrics().density);
         ViewGroup.LayoutParams rvLp = rv.getLayoutParams();
         if (rvLp != null) {
@@ -997,6 +995,65 @@ public class HistoryFragment extends Fragment {
         dialog.setContentView(dialogView);
         setupDialogWindowAndBlur(dialog);
         BaseActivity.showDialog(requireContext(), dialog);
+
+        // Check if items in bundle are already decrypted
+        boolean allDecrypted = true;
+        for (NotificationEntity entity : bundle.notifications) {
+            if (entity.decryptedTitle == null && entity.decryptedText == null) {
+                allDecrypted = false;
+                break;
+            }
+        }
+
+        if (allDecrypted) {
+            if (skeletonContainer != null) skeletonContainer.setVisibility(View.GONE);
+            rv.setVisibility(View.VISIBLE);
+            List<NotificationAdapter.ListItem> listItems = new ArrayList<>(bundle.notifications.size());
+            for (NotificationEntity entity : bundle.notifications) {
+                listItems.add(new NotificationAdapter.ListItem(entity));
+            }
+            bundleAdapter.submitList(listItems);
+        } else {
+            if (skeletonContainer != null) skeletonContainer.setVisibility(View.VISIBLE);
+            rv.setVisibility(View.GONE);
+            if (progressIndicator != null) progressIndicator.setProgressCompat(0, false);
+            tvSubInfo.setText(getString(R.string.decrypting_progress, 0));
+
+            AppExecutor.execute(() -> {
+                final int total = bundle.notifications.size();
+                for (int i = 0; i < total; i++) {
+                    NotificationEntity entity = bundle.notifications.get(i);
+                    viewModel.ensureEntityDecrypted(entity);
+                    final int progress = Math.min(100, ((i + 1) * 100) / total);
+                    if (i % 5 == 0 || i == total - 1) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (dialog.isShowing()) {
+                                    if (progressIndicator != null) progressIndicator.setProgressCompat(progress, true);
+                                    tvSubInfo.setText(getString(R.string.decrypting_progress, progress));
+                                }
+                            });
+                        }
+                    }
+                }
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (dialog.isShowing()) {
+                            List<NotificationAdapter.ListItem> listItems = new ArrayList<>(total);
+                            for (NotificationEntity entity : bundle.notifications) {
+                                listItems.add(new NotificationAdapter.ListItem(entity));
+                            }
+                            bundleAdapter.submitList(listItems, () -> {
+                                if (skeletonContainer != null) skeletonContainer.setVisibility(View.GONE);
+                                rv.setVisibility(View.VISIBLE);
+                                tvSubInfo.setText(getString(R.string.bundled_logs_count, bundle.getCount()) + " • " + relativeTime);
+                            });
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private void showDetailDialog(NotificationEntity entity) {
