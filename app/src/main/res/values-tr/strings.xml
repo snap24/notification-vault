@@ -418,4 +418,6 @@
     <string name="stats_distraction_insight">Dikkat Dağınıklığı Analizi</string>
     <string name="stats_analyzing_pattern">Bildirim alışkanlıklarınız analiz ediliyor...</string>
     <string name="custom_days_dots">Özel...</string>
+    <string name="badge_work">İş</string>
+    <string name="filter_work_apps">İş Uygulamaları</string>
 </resources>

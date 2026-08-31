@@ -100,7 +100,7 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications WHERE id NOT IN (SELECT DISTINCT notificationId FROM search_tokens) ORDER BY id DESC LIMIT :limit")
     List<NotificationEntity> getUnindexedNotifications(int limit);
 
-    @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications GROUP BY packageName ORDER BY count DESC")
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications GROUP BY packageName, userId ORDER BY count DESC")
     LiveData<List<AppSummary>> getAppSummaries();
 
     @Query("UPDATE notifications SET isRead = 1 WHERE id = :id")
@@ -130,16 +130,16 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications WHERE packageName = :packageName ORDER BY timestamp DESC, id DESC LIMIT :limit")
     List<NotificationEntity> getRecentNotificationsByPackageSync(String packageName, int limit);
 
-    @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications GROUP BY packageName ORDER BY count DESC")
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications GROUP BY packageName, userId ORDER BY count DESC")
     List<AppSummary> getAppSummariesSync();
 
-    @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp GROUP BY packageName ORDER BY count DESC LIMIT :limit")
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
     List<AppSummary> getTopAppsBetweenSync(long startTimestamp, long endTimestamp, int limit);
 
     @Query("SELECT timestamp FROM notifications WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp ORDER BY timestamp ASC")
     List<Long> getTimestampsBetweenSync(long startTimestamp, long endTimestamp);
 
-    @Query("SELECT packageName, appName, COUNT(*) as count FROM notifications WHERE timestamp >= :startTimestamp GROUP BY packageName ORDER BY count DESC LIMIT :limit")
+    @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications WHERE timestamp >= :startTimestamp GROUP BY packageName, userId ORDER BY count DESC LIMIT :limit")
     LiveData<List<AppSummary>> getTopAppsSince(long startTimestamp, int limit);
 
     @Query("SELECT * FROM notifications " +

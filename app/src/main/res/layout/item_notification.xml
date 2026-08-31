@@ -64,6 +64,22 @@
                         android:ellipsize="end" />
 
                     <TextView
+                        android:id="@+id/tv_work_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_widget_pill"
+                        android:backgroundTint="?attr/colorTertiaryContainer"
+                        android:paddingHorizontal="5dp"
+                        android:paddingVertical="1dp"
+                        android:text="@string/badge_work"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnTertiaryContainer"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:id="@+id/tv_duplicate_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

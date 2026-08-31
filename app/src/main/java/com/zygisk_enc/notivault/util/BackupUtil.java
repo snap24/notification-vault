@@ -62,6 +62,7 @@ public class BackupUtil {
         boolean isRead = false;
         boolean isFavorite = false;
         String imagePath = null;
+        int userId = 0;
     }
 
     private static class RawToastItem {
@@ -69,6 +70,7 @@ public class BackupUtil {
         String appName = "Unknown App";
         String text = "";
         long timestamp = System.currentTimeMillis();
+        int userId = 0;
     }
 
     private static SecretKey deriveKey(String password, byte[] salt) throws Exception {
@@ -175,6 +177,7 @@ public class BackupUtil {
                                 obj.put("timestamp", notif.timestamp);
                                 obj.put("isRead", notif.isRead ? 1 : 0);
                                 obj.put("isFavorite", notif.isFavorite ? 1 : 0);
+                                obj.put("userId", notif.userId);
 
                                 if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
                                     String[] paths = notif.imagePath.split("\\|");
@@ -229,6 +232,7 @@ public class BackupUtil {
                                 obj.put("appName", toast.appName);
                                 obj.put("text", EncryptionHelper.decrypt(toast.text));
                                 obj.put("timestamp", toast.timestamp);
+                                obj.put("userId", toast.userId);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -415,6 +419,7 @@ public class BackupUtil {
                                     raw.packageName, raw.appName, encTitle, encText, encBigText, raw.timestamp);
                             notif.isRead = raw.isRead;
                             notif.isFavorite = raw.isFavorite;
+                            notif.userId = raw.userId;
 
                             if (raw.imagePath != null) {
                                 String[] parts = raw.imagePath.split("\\|");
@@ -450,6 +455,7 @@ public class BackupUtil {
                             String encText = EncryptionHelper.encrypt(raw.text);
                             ToastEntity toast = new ToastEntity(
                                     raw.packageName, raw.appName, encText, raw.timestamp);
+                            toast.userId = raw.userId;
                             encryptedToasts[j] = toast;
                             int count = processedCounter.incrementAndGet();
                             if (callback instanceof BackupProgressListener && totalItems > 0) {
@@ -564,6 +570,7 @@ public class BackupUtil {
                 case "isRead": item.isRead = reader.nextInt() == 1; break;
                 case "isFavorite": item.isFavorite = reader.nextInt() == 1; break;
                 case "imagePath": item.imagePath = reader.nextString(); break;
+                case "userId": item.userId = reader.nextInt(); break;
                 default: reader.skipValue(); break;
             }
         }
@@ -585,6 +592,7 @@ public class BackupUtil {
                 case "appName": item.appName = reader.nextString(); break;
                 case "text": item.text = reader.nextString(); break;
                 case "timestamp": item.timestamp = reader.nextLong(); break;
+                case "userId": item.userId = reader.nextInt(); break;
                 default: reader.skipValue(); break;
             }
         }

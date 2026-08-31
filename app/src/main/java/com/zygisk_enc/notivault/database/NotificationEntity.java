@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey;
     indices = {
         @androidx.room.Index("packageName"),
         @androidx.room.Index("timestamp"),
-        @androidx.room.Index("bundleId")
+        @androidx.room.Index("bundleId"),
+        @androidx.room.Index("userId")
     }
 )
 public class NotificationEntity {
@@ -25,6 +26,7 @@ public class NotificationEntity {
     public int duplicateCount;
     public String imagePath;
     public String bundleId;
+    public int userId = 0;
 
     @androidx.room.Ignore
     public String decryptedTitle = null;
@@ -46,5 +48,6 @@ public class NotificationEntity {
         this.duplicateCount = 1;
         this.imagePath = null;
         this.bundleId = null;
+        this.userId = 0;
     }
 }

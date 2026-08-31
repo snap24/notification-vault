@@ -183,6 +183,7 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
         private final MaterialCheckBox cbSelect;
         private final ImageView ivIcon;
         private final TextView tvName;
+        private final TextView tvWorkBadge;
         private final TextView tvPackage;
         private final TextView tvCount;
 
@@ -191,6 +192,7 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
             cbSelect = itemView.findViewById(R.id.cb_select_app);
             ivIcon = itemView.findViewById(R.id.iv_app_icon);
             tvName = itemView.findViewById(R.id.tv_app_name);
+            tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
             tvPackage = itemView.findViewById(R.id.tv_app_package);
             tvCount = itemView.findViewById(R.id.tv_notification_count);
         }
@@ -205,8 +207,13 @@ public class AppFilterAdapter extends RecyclerView.Adapter<AppFilterAdapter.AppV
             tvPackage.setText(summary.packageName);
             tvCount.setText(String.valueOf(summary.count));
 
+            boolean isWork = com.zygisk_enc.notivault.util.ProfileUtil.isWorkProfile(context, summary.userId);
+            if (tvWorkBadge != null) {
+                tvWorkBadge.setVisibility(isWork ? View.VISIBLE : View.GONE);
+            }
+
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
-                    ivIcon, summary.packageName, android.R.drawable.sym_def_app_icon);
+                    ivIcon, summary.packageName, summary.userId, android.R.drawable.sym_def_app_icon);
 
             if (selectionMode) {
                 cbSelect.setVisibility(View.VISIBLE);

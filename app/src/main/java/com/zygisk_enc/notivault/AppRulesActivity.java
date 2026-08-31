@@ -1,5 +1,6 @@
 package com.zygisk_enc.notivault;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -30,8 +31,10 @@ import com.zygisk_enc.notivault.database.AppRuleEntity;
 import com.zygisk_enc.notivault.util.AppExecutor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,9 +49,11 @@ public class AppRulesActivity extends BaseActivity {
     private ChipGroup chipGroup;
     private Chip chipUser;
     private Chip chipSystem;
+    private Chip chipWork;
 
     private List<AppInfoItem> userAppItems = new ArrayList<>();
     private List<AppInfoItem> systemAppItems = new ArrayList<>();
+    private List<AppInfoItem> workAppItems = new ArrayList<>();
     private List<AppInfoItem> currentList = new ArrayList<>();
     private RulesAdapter adapter;
 
@@ -79,6 +84,7 @@ public class AppRulesActivity extends BaseActivity {
         chipGroup = findViewById(R.id.chip_group_filters);
         chipUser = findViewById(R.id.chip_user);
         chipSystem = findViewById(R.id.chip_system);
+        chipWork = findViewById(R.id.chip_work);
 
         adapter = new RulesAdapter(this, currentList, item -> {
             Intent intent = new Intent(this, AppRuleEditActivity.class);
@@ -105,6 +111,10 @@ public class AppRulesActivity extends BaseActivity {
                 currentList = systemAppItems;
                 tvToggleAllTitle.setText(R.string.capture_all_system_apps);
                 tvToggleAllDesc.setText(R.string.capture_all_system_desc);
+            } else if (checkedIds.contains(R.id.chip_work)) {
+                currentList = workAppItems;
+                tvToggleAllTitle.setText(R.string.filter_work_apps);
+                tvToggleAllDesc.setText(R.string.filter_work_apps);
             } else {
                 currentList = userAppItems;
                 tvToggleAllTitle.setText(R.string.capture_all_user_apps);
@@ -129,6 +139,8 @@ public class AppRulesActivity extends BaseActivity {
             List<ApplicationInfo> packages = pm.getInstalledApplications(0);
             List<AppInfoItem> userItems = new ArrayList<>();
             List<AppInfoItem> systemItems = new ArrayList<>();
+            List<AppInfoItem> workItems = new ArrayList<>();
+            Set<String> seenWorkPackages = new HashSet<>();
 
             for (ApplicationInfo info : packages) {
                 if (info.packageName.equals(getPackageName())) continue;
@@ -141,12 +153,47 @@ public class AppRulesActivity extends BaseActivity {
                 item.appName = pm.getApplicationLabel(info).toString();
                 item.isCaptureEnabled = true;
                 item.isSystemApp = isSystem;
+                item.isWorkProfile = false;
+                item.userId = 0;
 
                 if (isSystem) {
                     systemItems.add(item);
                 } else {
                     userItems.add(item);
                 }
+            }
+
+            // Discover apps from Android Work Profiles
+            try {
+                android.content.pm.LauncherApps launcherApps = (android.content.pm.LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                if (launcherApps != null) {
+                    List<android.os.UserHandle> profiles = com.zygisk_enc.notivault.util.ProfileUtil.getAllProfiles(this);
+                    for (android.os.UserHandle profile : profiles) {
+                        int uid = profile.hashCode();
+                        if (com.zygisk_enc.notivault.util.ProfileUtil.isWorkProfile(this, uid)) {
+                            List<android.content.pm.LauncherActivityInfo> actList = launcherApps.getActivityList(null, profile);
+                            if (actList != null) {
+                                for (android.content.pm.LauncherActivityInfo act : actList) {
+                                    String pkg = act.getApplicationInfo().packageName;
+                                    if (pkg.equals(getPackageName()) || seenWorkPackages.contains(pkg)) continue;
+                                    seenWorkPackages.add(pkg);
+
+                                    AppInfoItem workItem = new AppInfoItem();
+                                    workItem.packageName = pkg;
+                                    CharSequence label = act.getLabel();
+                                    workItem.appName = label != null ? label.toString() : pkg;
+                                    workItem.isCaptureEnabled = true;
+                                    workItem.isSystemApp = false;
+                                    workItem.isWorkProfile = true;
+                                    workItem.userId = uid;
+                                    workItems.add(workItem);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             AppDatabase db = AppDatabase.getInstance(this);
@@ -171,13 +218,35 @@ public class AppRulesActivity extends BaseActivity {
                 item.isCaptureEnabled = (rule == null) || !rule.blockAll;
             }
 
+            for (AppInfoItem item : workItems) {
+                AppRuleEntity rule = ruleMap.get(item.packageName);
+                item.rule = rule;
+                item.isCaptureEnabled = (rule == null) || !rule.blockAll;
+            }
+
             userItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
             systemItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
+            workItems.sort((a, b) -> a.appName.compareToIgnoreCase(b.appName));
 
             runOnUiThread(() -> {
                 userAppItems = userItems;
                 systemAppItems = systemItems;
-                currentList = chipSystem.isChecked() ? systemAppItems : userAppItems;
+                workAppItems = workItems;
+
+                if (!workAppItems.isEmpty()) {
+                    chipWork.setVisibility(View.VISIBLE);
+                } else {
+                    chipWork.setVisibility(View.GONE);
+                }
+
+                if (chipWork.isChecked()) {
+                    currentList = workAppItems;
+                } else if (chipSystem.isChecked()) {
+                    currentList = systemAppItems;
+                } else {
+                    currentList = userAppItems;
+                }
+
                 adapter.setList(currentList);
                 adapter.filter(etSearch.getText() != null ? etSearch.getText().toString() : "");
                 updateMasterToggleState();
@@ -243,6 +312,8 @@ public class AppRulesActivity extends BaseActivity {
         String appName;
         boolean isCaptureEnabled;
         boolean isSystemApp;
+        boolean isWorkProfile;
+        int userId = 0;
         AppRuleEntity rule;
     }
 
@@ -299,8 +370,12 @@ public class AppRulesActivity extends BaseActivity {
             AppInfoItem item = filteredList.get(position);
             holder.tvName.setText(item.appName);
 
+            if (holder.tvWorkBadge != null) {
+                holder.tvWorkBadge.setVisibility(item.isWorkProfile ? View.VISIBLE : View.GONE);
+            }
+
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(activity).loadInto(
-                    holder.ivIcon, item.packageName, R.drawable.ic_code);
+                    holder.ivIcon, item.packageName, item.userId, R.drawable.ic_code);
 
             int statusColorAttr;
             int cardColorAttr;
@@ -380,6 +455,7 @@ public class AppRulesActivity extends BaseActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView ivIcon;
             TextView tvName;
+            TextView tvWorkBadge;
             View tvTapGuide;
             MaterialSwitch switchCapture;
             com.google.android.material.card.MaterialCardView card;
@@ -389,6 +465,7 @@ public class AppRulesActivity extends BaseActivity {
                 super(itemView);
                 ivIcon = itemView.findViewById(R.id.iv_app_icon);
                 tvName = itemView.findViewById(R.id.tv_app_name);
+                tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
                 tvTapGuide = itemView.findViewById(R.id.tv_tap_guide);
                 switchCapture = itemView.findViewById(R.id.switch_capture);
                 card = itemView.findViewById(R.id.card_app_rule);

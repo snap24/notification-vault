@@ -418,4 +418,6 @@
     <string name="stats_distraction_insight">방해 요소 분석</string>
     <string name="stats_analyzing_pattern">알림 패턴을 분석하는 중...</string>
     <string name="custom_days_dots">사용자 지정...</string>
+    <string name="badge_work">업무</string>
+    <string name="filter_work_apps">업무용 앱</string>
 </resources>

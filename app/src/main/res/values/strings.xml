@@ -26,6 +26,8 @@
     <string name="enable_in_settings">Enable in Settings</string>
     <string name="toasts">Toasts</string>
     <string name="cloud_backup">Cloud Backup</string>
+    <string name="badge_work">Work</string>
+    <string name="filter_work_apps">Work Apps</string>
 
     <!-- Content Descriptions -->
     <string name="desc_close_search">Close Search</string>

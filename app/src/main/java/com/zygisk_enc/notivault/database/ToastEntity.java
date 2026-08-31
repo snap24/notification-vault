@@ -8,7 +8,8 @@ import androidx.room.Ignore;
     tableName = "toasts",
     indices = {
         @androidx.room.Index("packageName"),
-        @androidx.room.Index("timestamp")
+        @androidx.room.Index("timestamp"),
+        @androidx.room.Index("userId")
     }
 )
 public class ToastEntity {
@@ -19,6 +20,7 @@ public class ToastEntity {
     public String text; // encrypted
     public long timestamp;
     public int duplicateCount;
+    public int userId = 0;
 
     @Ignore
     public String decryptedText;
@@ -29,5 +31,6 @@ public class ToastEntity {
         this.text = text;
         this.timestamp = timestamp;
         this.duplicateCount = 1;
+        this.userId = 0;
     }
 }

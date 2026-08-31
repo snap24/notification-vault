@@ -418,4 +418,6 @@
     <string name="stats_distraction_insight">干扰洞察</string>
     <string name="stats_analyzing_pattern">正在分析您的通知模式...</string>
     <string name="custom_days_dots">自定义...</string>
+    <string name="badge_work">工作</string>
+    <string name="filter_work_apps">工作应用</string>
 </resources>

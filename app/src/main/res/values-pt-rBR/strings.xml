@@ -418,4 +418,6 @@
     <string name="stats_distraction_insight">Insights de distração</string>
     <string name="stats_analyzing_pattern">Analisando seu padrão de notificações...</string>
     <string name="custom_days_dots">Personalizado...</string>
+    <string name="badge_work">Trabalho</string>
+    <string name="filter_work_apps">Apps de trabalho</string>
 </resources>

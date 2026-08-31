@@ -53,19 +53,30 @@ public class AppIconLoader {
 
     @Nullable
     public Bitmap getCachedBitmap(String packageName) {
+        return getCachedBitmap(packageName, 0);
+    }
+
+    @Nullable
+    public Bitmap getCachedBitmap(String packageName, int userId) {
         if (packageName == null) return null;
-        return iconCache.get(packageName);
+        String cacheKey = (userId != 0) ? (packageName + "#" + userId) : packageName;
+        return iconCache.get(cacheKey);
     }
 
     public void loadInto(@NonNull ImageView imageView, @Nullable String packageName, int placeholderResId) {
+        loadInto(imageView, packageName, 0, placeholderResId);
+    }
+
+    public void loadInto(@NonNull ImageView imageView, @Nullable String packageName, int userId, int placeholderResId) {
         if (packageName == null || packageName.isEmpty()) {
             imageView.setTag(null);
             imageView.setImageResource(placeholderResId);
             return;
         }
 
-        imageView.setTag(packageName);
-        Bitmap cached = iconCache.get(packageName);
+        String cacheKey = (userId != 0) ? (packageName + "#" + userId) : packageName;
+        imageView.setTag(cacheKey);
+        Bitmap cached = iconCache.get(cacheKey);
         if (cached != null && !cached.isRecycled()) {
             imageView.setImageBitmap(cached);
             return;
@@ -75,11 +86,11 @@ public class AppIconLoader {
         Context appContext = imageView.getContext().getApplicationContext();
 
         executor.execute(() -> {
-            Bitmap bitmap = renderAppIcon(appContext, packageName);
+            Bitmap bitmap = renderAppIcon(appContext, packageName, userId);
             if (bitmap != null) {
-                iconCache.put(packageName, bitmap);
+                iconCache.put(cacheKey, bitmap);
                 mainHandler.post(() -> {
-                    if (packageName.equals(imageView.getTag())) {
+                    if (cacheKey.equals(imageView.getTag())) {
                         imageView.setImageBitmap(bitmap);
                     }
                 });
@@ -88,11 +99,15 @@ public class AppIconLoader {
     }
 
     @Nullable
-    private Bitmap renderAppIcon(Context context, String packageName) {
+    private Bitmap renderAppIcon(Context context, String packageName, int userId) {
         try {
+            Drawable drawable = com.zygisk_enc.notivault.util.ProfileUtil.getBadgedAppIcon(context, packageName, userId);
+            if (drawable != null) {
+                return drawableToBitmap(drawable, iconSizePx);
+            }
             PackageManager pm = context.getPackageManager();
-            Drawable drawable = pm.getApplicationIcon(packageName);
-            return drawableToBitmap(drawable, iconSizePx);
+            Drawable defaultDrawable = pm.getApplicationIcon(packageName);
+            return drawableToBitmap(defaultDrawable, iconSizePx);
         } catch (Exception ignored) {
             return null;
         }

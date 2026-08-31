@@ -4,4 +4,5 @@ public class AppSummary {
     public String packageName;
     public String appName;
     public int count;
+    public int userId;
 }

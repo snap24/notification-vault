@@ -238,6 +238,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private final TextView tvAppName;
         private final TextView tvBundleTag;
         private final TextView tvTime;
+        private final TextView tvWorkBadge;
         private final TextView tvPreviewTitle;
         private final TextView tvPreviewText;
         private final ImageButton btnFavorite;
@@ -247,6 +248,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             card = itemView.findViewById(R.id.card_bundle);
             ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
             tvAppName = itemView.findViewById(R.id.tv_app_name);
+            tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
             tvBundleTag = itemView.findViewById(R.id.tv_bundle_tag);
             tvTime = itemView.findViewById(R.id.tv_time);
             tvPreviewTitle = itemView.findViewById(R.id.tv_preview_title);
@@ -260,6 +262,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvAppName.setText(bundle.appName != null && !bundle.appName.isEmpty() ? bundle.appName : bundle.packageName);
             tvBundleTag.setText(ctx.getString(R.string.bundle_tag, bundle.getCount()));
             tvTime.setText(DateUtils.getTimeString(ctx, bundle.latestTimestamp));
+
+            int bundleUserId = !bundle.notifications.isEmpty() ? bundle.notifications.get(0).userId : 0;
+            boolean isWork = com.zygisk_enc.notivault.util.ProfileUtil.isWorkProfile(ctx, bundleUserId);
+            if (tvWorkBadge != null) {
+                tvWorkBadge.setVisibility(isWork ? View.VISIBLE : View.GONE);
+            }
 
             if (!bundle.notifications.isEmpty()) {
                 NotificationEntity latest = bundle.notifications.get(0);
@@ -277,12 +285,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 tvPreviewText.setVisibility(View.GONE);
             }
 
-            try {
-                Drawable icon = ctx.getPackageManager().getApplicationIcon(bundle.packageName);
-                ivAppIcon.setImageDrawable(icon);
-            } catch (Exception e) {
-                ivAppIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-            }
+            com.zygisk_enc.notivault.util.AppIconLoader.getInstance(ctx).loadInto(
+                    ivAppIcon, bundle.packageName, bundleUserId, android.R.drawable.sym_def_app_icon);
 
             // Check if any notification in the bundle is favorited
             boolean isFavorite = false;
@@ -341,6 +345,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private final TextView tvText;
         private final TextView tvTime;
         private final TextView tvDuplicateCount;
+        private final TextView tvWorkBadge;
         private final ImageView ivNotificationImage;
         private final ImageButton btnFavorite;
 
@@ -353,6 +358,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvText = itemView.findViewById(R.id.tv_text);
             tvTime = itemView.findViewById(R.id.tv_time);
             tvDuplicateCount = itemView.findViewById(R.id.tv_duplicate_count);
+            tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
             ivNotificationImage = itemView.findViewById(R.id.iv_notification_image);
             btnFavorite = itemView.findViewById(R.id.btn_favorite);
         }
@@ -362,9 +368,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             // App icon loading with memory-safe AppIconLoader
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
-                    ivAppIcon, entity.packageName, android.R.drawable.sym_def_app_icon);
+                    ivAppIcon, entity.packageName, entity.userId, android.R.drawable.sym_def_app_icon);
 
             tvAppName.setText(entity.appName);
+
+            boolean isWork = com.zygisk_enc.notivault.util.ProfileUtil.isWorkProfile(context, entity.userId);
+            if (tvWorkBadge != null) {
+                tvWorkBadge.setVisibility(isWork ? View.VISIBLE : View.GONE);
+            }
 
             // Decrypt fields with cache
             if (entity.decryptedTitle == null) {

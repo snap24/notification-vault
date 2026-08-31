@@ -61,6 +61,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivAppIcon;
         private final TextView tvAppName;
+        private final TextView tvWorkBadge;
         private final TextView tvPackageName;
         private final TextView tvTimestamp;
         private final TextView tvDuplicateCount;
@@ -70,6 +71,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             super(itemView);
             ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
             tvAppName = itemView.findViewById(R.id.tv_app_name);
+            tvWorkBadge = itemView.findViewById(R.id.tv_work_badge);
             tvPackageName = itemView.findViewById(R.id.tv_package_name);
             tvTimestamp = itemView.findViewById(R.id.tv_timestamp);
             tvDuplicateCount = itemView.findViewById(R.id.tv_duplicate_count);
@@ -80,6 +82,12 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             tvAppName.setText(toast.appName);
             tvPackageName.setText(toast.packageName);
             tvToastText.setText(toast.decryptedText != null ? toast.decryptedText : "");
+
+            Context context = itemView.getContext();
+            boolean isWork = com.zygisk_enc.notivault.util.ProfileUtil.isWorkProfile(context, toast.userId);
+            if (tvWorkBadge != null) {
+                tvWorkBadge.setVisibility(isWork ? View.VISIBLE : View.GONE);
+            }
 
             if (toast.duplicateCount > 1) {
                 tvDuplicateCount.setVisibility(View.VISIBLE);
@@ -96,7 +104,6 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
             java.util.Calendar yesterday = java.util.Calendar.getInstance();
             yesterday.add(java.util.Calendar.DAY_OF_YEAR, -1);
 
-            Context context = itemView.getContext();
             String formattedTime = com.zygisk_enc.notivault.util.DateUtils.getTimeString(context, toast.timestamp);
 
             if (toastCal.get(java.util.Calendar.YEAR) == today.get(java.util.Calendar.YEAR) &&
@@ -111,7 +118,7 @@ public class ToastAdapter extends ListAdapter<ToastEntity, ToastAdapter.ViewHold
 
             // Load and cache App Icon asynchronously using memory-safe AppIconLoader
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(context).loadInto(
-                    ivAppIcon, toast.packageName, R.drawable.ic_code);
+                    ivAppIcon, toast.packageName, toast.userId, R.drawable.ic_code);
 
             itemView.setOnClickListener(v -> {
                 if (toast.decryptedText != null && !toast.decryptedText.isEmpty()) {

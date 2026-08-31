@@ -191,7 +191,8 @@ public class NotiVaultService extends NotificationListenerService {
             return;
         }
 
-        String appName = getAppName(packageName);
+        int userId = sbn.getUser() != null ? sbn.getUser().hashCode() : 0;
+        String appName = getAppName(packageName, userId);
         long timestamp = messageTime;
 
         // Encrypt string fields for security
@@ -201,6 +202,7 @@ public class NotiVaultService extends NotificationListenerService {
 
         NotificationEntity entity = new NotificationEntity(
                 packageName, appName, encTitle, encText, encBigText, timestamp);
+        entity.userId = userId;
 
         final String finalTitle = title;
         final String finalText = text;
@@ -398,15 +400,8 @@ public class NotiVaultService extends NotificationListenerService {
         }
     }
 
-    private String getAppName(String packageName) {
-        PackageManager pm = getPackageManager();
-        try {
-            ApplicationInfo info = pm.getApplicationInfo(packageName, 0);
-            CharSequence label = pm.getApplicationLabel(info);
-            return label != null ? label.toString() : packageName;
-        } catch (PackageManager.NameNotFoundException e) {
-            return packageName;
-        }
+    private String getAppName(String packageName, int userId) {
+        return com.zygisk_enc.notivault.util.ProfileUtil.getAppLabel(this, packageName, userId, null);
     }
 
     private boolean isExcluded(String packageName) {
