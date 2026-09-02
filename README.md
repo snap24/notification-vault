@@ -22,10 +22,9 @@
 ## Versions & Changelog
 
 * **v3.0.0 (Current Release)**
-  * **SQLCipher 256-bit Encryption**: Hardware-backed whole-database page encryption & instant migration (<150ms).
+  * **SQLCipher 256-bit Encryption**: Hardware-backed whole-database page encryption & instant migration.
   * **Sub-5ms Blind Indexing**: Cryptographic token hash indexing for instant full-history search.
   * **Notification Streak Bundling**: Groups 10+ consecutive alerts into compact interactive summary cards.
-  * **Material 3 & AMOLED**: Complete visual overhaul, pure black AMOLED mode, and live scrolling date pill.
   * **Streaming Backups**: High-speed streaming backup engine with optional plaintext JSON export.
   * **14 Languages**: 100% translation coverage across all supported locales & stability bug fixes.
 * **v2.1.0**
