@@ -123,8 +123,31 @@ public class LegacyRecordConverter {
     }
 
     public static int countLegacyRecords(Context context) {
-        ScanResult res = scanLegacyRecords(context);
-        return res.totalLegacy;
+        try {
+            AppDatabase db = AppDatabase.getInstance(context);
+            List<NotificationEntity> notifs = db.notificationDao().getLegacyEncryptedNotificationsSync();
+            List<ToastEntity> toasts = db.toastDao().getLegacyEncryptedToastsSync();
+            int count = 0;
+            if (notifs != null) {
+                for (NotificationEntity n : notifs) {
+                    if (EncryptionHelper.isEncrypted(n.title) || 
+                        EncryptionHelper.isEncrypted(n.text) || 
+                        EncryptionHelper.isEncrypted(n.bigText)) {
+                        count++;
+                    }
+                }
+            }
+            if (toasts != null) {
+                for (ToastEntity t : toasts) {
+                    if (EncryptionHelper.isEncrypted(t.text)) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static void convertAll(Context context, int unrecoverableAction, MigrationProgressListener listener) {
