@@ -4,7 +4,7 @@
   <img src=".github/assets/icon.png" width="128" height="128" />
   <br><br>
 
-  [![Latest Version](https://img.shields.io/badge/Version-v2.1.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
+  [![Latest Version](https://img.shields.io/badge/Version-v3.0.0-9575CD?style=flat&logo=github&logoColor=white)](https://github.com/snap24/notification-vault/releases)
   ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white)
   ![Android](https://img.shields.io/badge/API-26%2B-3DDC84?style=flat&logo=android&logoColor=white)
   [![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat&logo=gnu&logoColor=white)](LICENSE)
@@ -21,23 +21,25 @@
 
 ## Versions & Changelog
 
-*   **v2.1.0 (Current Release)**
-    *   **Decryption & Logic Fixes:** Fixed decryption loops and rendering/pagination layout logics.
-    *   **Easy Cloud Sync:** Added a clean way to perform automated scheduled and manual encrypted backups to cloud services (Google Drive, Nextcloud, etc.) using persistent System Access Framework (SAF) folders.
-    *   **Quick Settings (QS) Toggle:** Added a Quick Settings tile to pause/resume notification recording directly from the phone's status bar, with a settings toggle to hide/show the tile.
-*   **v2.0.1**
-    *   **Critical Migration Fix:** Adds Room database migration (`MIGRATION_1_8`) to resolve crashes when upgrading from v1.0.0. **Users are strongly advised to install v2.0.1 directly and skip v2.0.0.**
-    *   **On-Device Encryption:** Full database encryption (AES-256-GCM) protecting notification strings.
-    *   **Toast Message Recorder:** Captures system-wide on-screen toast messages using accessibility services.
-    *   **Notification Image Logger:** Extracts, encrypts, and stores picture attachments from notifications (e.g., chat images). Includes in-app image viewer and export-to-gallery capability.
-    *   **App Rules & Keyword Filtering:** Configure rules per application to block certain notifications entirely or filter incoming entries using block/allow keyword lists.
-    *   **Advanced Statistics:** Detailed dashboard displaying notification frequency, hourly breakdowns, and top logging apps.
-    *   **Encrypted Backups:** Password-protected backup export and import, with optional media attachments.
-    *   **Robust Lifecycle Security:** Biometric app lock (Fingerprint/Face/Device Credential) tied directly to app pauses and resumes.
-*   **v2.0.0 (Broken Release)**
-    *   Initial release of v2.0.0 features. Had database migration issues when upgrading directly from v1.0.0. **Do not install.**
-*   **v1.0.0 (Initial Release)**
-    *   Baseline notification capturing, full-text search, basic calendar logging, and local storage.
+* **v3.0.0 (Current Release)**
+  * **SQLCipher 256-bit Encryption**: Hardware-backed whole-database page encryption & instant migration (<150ms).
+  * **Sub-5ms Blind Indexing**: Cryptographic token hash indexing for instant full-history search.
+  * **Notification Streak Bundling**: Groups 10+ consecutive alerts into compact interactive summary cards.
+  * **Material 3 & AMOLED**: Complete visual overhaul, pure black AMOLED mode, and live scrolling date pill.
+  * **Streaming Backups**: High-speed streaming backup engine with optional plaintext JSON export.
+  * **14 Languages**: 100% translation coverage across all supported locales & stability bug fixes.
+* **v2.1.0**
+  * Automated scheduled/manual cloud backups via SAF (Google Drive, Nextcloud, etc.).
+  * Quick Settings (QS) tile to pause/resume recording directly from status bar.
+  * Decryption loops, rendering, and pagination layout fixes.
+* **v2.0.1**
+  * Fixed v1.0.0 upgrade database migration (`MIGRATION_1_8`).
+  * Added AES-256-GCM encryption, toast message recorder, and picture attachment logger.
+  * Introduced biometric app lock, per-app keyword rules, and usage statistics.
+* **v2.0.0**
+  * Initial v2 release *(deprecated due to migration bug; replaced by v2.0.1)*.
+* **v1.0.0 (Initial Release)**
+  * Core notification capture, basic search, calendar logging, and local storage.
 
 ## Core Features
 
