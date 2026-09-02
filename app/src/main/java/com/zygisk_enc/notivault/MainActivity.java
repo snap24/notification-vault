@@ -125,11 +125,7 @@ public class MainActivity extends BaseActivity {
             getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
         }
 
-        if (com.zygisk_enc.notivault.util.DatabaseMigrationHelper.needsMigration(this)) {
-            showLegacyDatabaseMigrationDialog();
-        } else {
-            initAppServicesAndViewModel();
-        }
+        initAppServicesAndViewModel();
 
         // Hide bottom navigation card when keyboard is open to prevent UI layout constraints overlapping search
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
@@ -524,56 +520,6 @@ public class MainActivity extends BaseActivity {
         });
 
         showDialog(this, dialog);
-    }
-
-    private void showLegacyDatabaseMigrationDialog() {
-        if (isFinishing() || isDestroyed()) return;
-
-        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_migration, null);
-        com.google.android.material.progressindicator.LinearProgressIndicator progressBar =
-                dialogView.findViewById(R.id.progress_migration);
-        android.widget.TextView tvProgressText = dialogView.findViewById(R.id.tv_migration_progress_text);
-
-        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setView(dialogView)
-                .setCancelable(false)
-                .create();
-
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
-        com.zygisk_enc.notivault.util.DatabaseMigrationHelper.migrateAsync(this, new com.zygisk_enc.notivault.util.DatabaseMigrationHelper.MigrationProgressListener() {
-            @Override
-            public void onProgress(int current, int total, int percentage) {
-                runOnUiThread(() -> {
-                    progressBar.setProgressCompat(percentage, true);
-                    tvProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
-                });
-            }
-
-            @Override
-            public void onComplete() {
-                runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                    com.google.android.material.snackbar.Snackbar.make(
-                            binding.getRoot(), R.string.migration_dialog_complete, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
-                    initAppServicesAndViewModel();
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                    android.widget.Toast.makeText(MainActivity.this, "Migration error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-                    initAppServicesAndViewModel();
-                });
-            }
-        });
     }
 
     private void initAppServicesAndViewModel() {
