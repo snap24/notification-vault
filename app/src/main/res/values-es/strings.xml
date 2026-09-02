@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Mostrar el selector de perfil en la navegación</string>
     <string name="no_apps_found">No se encontraron aplicaciones</string>
     <string name="helper_backup_password_optional">Dejar vacío para copia de seguridad en texto plano sin cifrar</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Verificando integridad de la base de datos</string>
+    <string name="verify_dialog_message">Validando cifrado de páginas AES-256 y analizando registros de la base de datos para verificar su integridad criptográfica. Espere...</string>
+    <string name="verify_dialog_progress">Analizados %1$d de %2$d registros (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Borrado maestro de la bóveda</string>
+    <string name="pref_master_wipe_title">Borrado maestro de la bóveda</string>
+    <string name="pref_master_wipe_summary">Destruir permanentemente el archivo de base de datos, archivos adjuntos y todos los registros</string>
+    <string name="master_wipe_confirm_title">Borrado maestro de la bóveda</string>
+    <string name="master_wipe_confirm_message">Esto destruirá permanentemente el archivo de base de datos cifrado en el disco y eliminará todas las notificaciones, registros de brindis, archivos multimedia guardados, paquetes de rachas y reglas de apps.\n\nTodo el almacenamiento de la base de datos se restablecerá instantáneamente a 0 bytes. Esta acción es irreversible.</string>
+    <string name="master_wipe_action_wipe">Borrar todo</string>
+    <string name="master_wipe_progress">Destruyendo base de datos y borrando archivos...</string>
+    <string name="master_wipe_success">Bóveda destruida y restablecida a 0 bytes</string>
+    <string name="verify_unrecoverable_title">Registros heredados irrecuperables detectados</string>
+    <string name="verify_unrecoverable_message">Se encontraron %1$d registros cifrados con una clave de hardware KeyStore anterior de una instalación previa.\n\nDebido a la seguridad AES-256, estos mensajes no se pueden descifrar. ¿Cómo desea gestionarlos?</string>
+    <string name="verify_action_keep">Conservar todo</string>
+    <string name="verify_action_delete">Eliminar todo</string>
+    <string name="verify_recoverable_title">Integridad de la base de datos verificada</string>
+    <string name="verify_recoverable_message">El cifrado de hardware de 256 bits es correcto. Se encontraron %1$d registros heredados que se pueden optimizar para una carga de alta velocidad.</string>
+    <string name="verify_action_optimize">Optimizar ahora</string>
+    <string name="verify_success_title">Integridad de la base de datos verificada</string>
+    <string name="verify_success_message">Todas las páginas de 4 KB de la base de datos están correctamente cifradas con AES-256 y totalmente autenticadas. La clave de hardware KeyStore está activa y en buen estado. La base de datos está optimizada al 100%%.</string>
+    <string name="verify_failed_title">Error en la comprobación de integridad</string>
+    <string name="verify_failed_message">No se pudo verificar la integridad de la base de datos. Compruebe los registros del sistema.</string>
 </resources>

@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Отображать переключатель профилей в навигации</string>
     <string name="no_apps_found">Приложения не найдены</string>
     <string name="helper_backup_password_optional">Оставьте пустым для незашифрованной резервной копии в виде открытого текста</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Проверка целостности базы данных</string>
+    <string name="verify_dialog_message">Проверка страничного шифрования AES-256 и сканирование записей базы данных на криптографическую целостность. Пожалуйста, подождите...</string>
+    <string name="verify_dialog_progress">Просканировано %1$d из %2$d записей (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Полная очистка хранилища</string>
+    <string name="pref_master_wipe_title">Полная очистка хранилища</string>
+    <string name="pref_master_wipe_summary">Безвозвратно уничтожить файл базы данных, медиавложения и все журналы</string>
+    <string name="master_wipe_confirm_title">Полная очистка хранилища</string>
+    <string name="master_wipe_confirm_message">Это действие безвозвратно уничтожит зашифрованный файл базы данных на диске и удалит все уведомления, журналы всплывающих сообщений, сохраненные медиафайлы, серии и правила приложений.\n\nВсе хранилище базы данных мгновенно сбросится до 0 байт. Это действие необратимо.</string>
+    <string name="master_wipe_action_wipe">Уничтожить всё</string>
+    <string name="master_wipe_progress">Уничтожение базы данных и удаление файлов...</string>
+    <string name="master_wipe_success">Хранилище уничтожено и сброшено до 0 байт</string>
+    <string name="verify_unrecoverable_title">Обнаружены невосстановимые устаревшие записи</string>
+    <string name="verify_unrecoverable_message">Найдено %1$d записей, зашифрованных старым аппаратным ключом KeyStore из предыдущей установки.\n\nИз-за защиты AES-256 эти сообщения невозможно расшифровать. Что вы хотите с ними сделать?</string>
+    <string name="verify_action_keep">Оставить все</string>
+    <string name="verify_action_delete">Удалить все</string>
+    <string name="verify_recoverable_title">Целостность базы данных подтверждена</string>
+    <string name="verify_recoverable_message">Аппаратное 256-битное шифрование работает исправно. Найдено %1$d устаревших записей, которые можно оптимизировать для быстрой загрузки.</string>
+    <string name="verify_action_optimize">Оптимизировать сейчас</string>
+    <string name="verify_success_title">Целостность базы данных подтверждена</string>
+    <string name="verify_success_message">Все страницы базы данных по 4 КБ корректно зашифрованы с помощью AES-256 и подлинны. Аппаратный ключ KeyStore активен и исправен. База данных оптимизирована на 100%%.</string>
+    <string name="verify_failed_title">Ошибка проверки целостности</string>
+    <string name="verify_failed_message">Не удалось проверить целостность базы данных. Пожалуйста, проверьте системные журналы.</string>
 </resources>

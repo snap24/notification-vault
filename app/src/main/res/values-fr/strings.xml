@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Afficher le sélecteur de profil dans la navigation</string>
     <string name="no_apps_found">Aucune application trouvée</string>
     <string name="helper_backup_password_optional">Laisser vide pour une sauvegarde en texte clair non chiffrée</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Vérification de l\'intégrité de la base de données</string>
+    <string name="verify_dialog_message">Validation du chiffrement de page AES-256 et analyse des enregistrements pour vérifier l\'intégrité cryptographique. Veuillez patienter...</string>
+    <string name="verify_dialog_progress">%1$d enregistrements analysés sur %2$d (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Effacement total du coffre-fort</string>
+    <string name="pref_master_wipe_title">Effacement total du coffre-fort</string>
+    <string name="pref_master_wipe_summary">Détruire définitivement le fichier de base de données, les médias et tous les journaux</string>
+    <string name="master_wipe_confirm_title">Effacement total du coffre-fort</string>
+    <string name="master_wipe_confirm_message">Cette action détruira définitivement le fichier de base de données chiffré sur le disque et supprimera toutes les notifications, journaux de toasts, médias enregistrés, séries et règles d\'application.\n\nTout le stockage sera instantanément réinitialisé à 0 octet. Cette action est irréversible.</string>
+    <string name="master_wipe_action_wipe">Tout effacer</string>
+    <string name="master_wipe_progress">Destruction de la base de données et effacement des fichiers...</string>
+    <string name="master_wipe_success">Coffre-fort détruit et réinitialisé à 0 octet</string>
+    <string name="verify_unrecoverable_title">Enregistrements obsolètes irrécupérables détectés</string>
+    <string name="verify_unrecoverable_message">%1$d enregistrements chiffrés avec une ancienne clé matérielle KeyStore d\'une installation précédente ont été trouvés.\n\nEn raison de la sécurité AES-256, ces messages ne peuvent pas être déchiffrés. Que souhaitez-vous faire ?</string>
+    <string name="verify_action_keep">Tout conserver</string>
+    <string name="verify_action_delete">Tout supprimer</string>
+    <string name="verify_recoverable_title">Intégrité de la base de données vérifiée</string>
+    <string name="verify_recoverable_message">Le chiffrement matériel 256 bits est opérationnel. %1$d enregistrements obsolètes peuvent être optimisés pour un chargement rapide.</string>
+    <string name="verify_action_optimize">Optimiser maintenant</string>
+    <string name="verify_success_title">Intégrité de la base de données vérifiée</string>
+    <string name="verify_success_message">Toutes les pages de 4 Ko sont correctement chiffrées en AES-256 et authentifiées. La clé matérielle KeyStore est active et saine. La base de données est optimisée à 100%%.</string>
+    <string name="verify_failed_title">Échec de la vérification d\'intégrité</string>
+    <string name="verify_failed_message">Impossible de vérifier l\'intégrité de la base de données. Veuillez consulter les journaux système.</string>
 </resources>

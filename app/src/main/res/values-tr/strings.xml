@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Gezinmede profil değiştiriciyi göster</string>
     <string name="no_apps_found">Hiçbir uygulama bulunamadı</string>
     <string name="helper_backup_password_optional">Şifrelenmemiş düz metin yedeklemesi için boş bırakın</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Veritabanı Bütünlüğü Doğrulanıyor</string>
+    <string name="verify_dialog_message">AES-256 sayfa şifrelemesi doğrulanıyor ve kriptografik bütünlük için kayıtlar taranıyor. Lütfen bekleyin...</string>
+    <string name="verify_dialog_progress">%1$d / %2$d kayıt tarandı (%%%3$d)</string>
+    <string name="encryption_btn_master_wipe">Kasayı Tamamen Sıfırla</string>
+    <string name="pref_master_wipe_title">Kasayı Tamamen Sıfırla</string>
+    <string name="pref_master_wipe_summary">Veritabanı dosyasını, medya eklerini ve tüm kayıtları kalıcı olarak yok et</string>
+    <string name="master_wipe_confirm_title">Kasayı Tamamen Sıfırla</string>
+    <string name="master_wipe_confirm_message">Bu işlem, diskteki şifreli veritabanı dosyasını kalıcı olarak yok edecek ve tüm bildirimleri, toast kayıtlarını, kaydedilen medyaları, seri paketlerini ve uygulama kurallarını silecektir.\n\nTüm veritabanı depolama alanı anında 0 bayta sıfırlanacaktır. Bu işlem geri alınamaz.</string>
+    <string name="master_wipe_action_wipe">Her Şeyi Yok Et</string>
+    <string name="master_wipe_progress">Veritabanı yok ediliyor ve dosyalar temizleniyor...</string>
+    <string name="master_wipe_success">Kasa yok edildi ve 0 bayta sıfırlandı</string>
+    <string name="verify_unrecoverable_title">Kurtarılamayan Eski Kayıtlar Tespit Edildi</string>
+    <string name="verify_unrecoverable_message">Önceki bir yüklemeden kalan eski bir donanım KeyStore anahtarıyla şifrelenmiş %1$d kayıt bulundu.\n\nAES-256 güvenliği nedeniyle bu mesajların şifresi çözülemez. Bunlarla ne yapmak istersiniz?</string>
+    <string name="verify_action_keep">Tümünü Sakla</string>
+    <string name="verify_action_delete">Tümünü Sil</string>
+    <string name="verify_recoverable_title">Veritabanı Bütünlüğü Doğrulandı</string>
+    <string name="verify_recoverable_message">Donanım 256-bit şifrelemesi sağlıklı. Yüksek hızlı yükleme için optimize edilebilecek %1$d eski kayıt bulundu.</string>
+    <string name="verify_action_optimize">Şimdi Optimize Et</string>
+    <string name="verify_success_title">Veritabanı Bütünlüğü Doğrulandı</string>
+    <string name="verify_success_message">Tüm 4 KB veritabanı sayfaları AES-256 ile düzgün şekilde şifrelenmiştir ve tamamen doğrulanmıştır. KeyStore donanım anahtarı aktif ve sağlıklıdır. Veritabanı %%100 optimize edilmiştir.</string>
+    <string name="verify_failed_title">Bütünlük Kontrolü Başarısız Oldu</string>
+    <string name="verify_failed_message">Veritabanı bütünlüğü doğrulanamadı. Lütfen sistem günlüklerini kontrol edin.</string>
 </resources>

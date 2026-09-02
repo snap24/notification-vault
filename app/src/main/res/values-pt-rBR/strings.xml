@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Exibir o alternador de perfil na navegação</string>
     <string name="no_apps_found">Nenhum aplicativo encontrado</string>
     <string name="helper_backup_password_optional">Deixe em branco para backup em texto sem formatação não criptografado</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Verificando integridade do banco de dados</string>
+    <string name="verify_dialog_message">Validando criptografia de página AES-256 e examinando registros quanto à integridade criptográfica. Aguarde...</string>
+    <string name="verify_dialog_progress">%1$d de %2$d registros examinados (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Limpeza geral do cofre</string>
+    <string name="pref_master_wipe_title">Limpeza geral do cofre</string>
+    <string name="pref_master_wipe_summary">Destruir permanentemente o banco de dados, anexos de mídia e todos os registros</string>
+    <string name="master_wipe_confirm_title">Limpeza geral do cofre</string>
+    <string name="master_wipe_confirm_message">Isso destruirá permanentemente o arquivo de banco de dados criptografado no disco e excluirá todas as notificações, registros de avisos, mídias salvas, pacotes de sequência e regras de aplicativos.\n\nTodo o armazenamento do banco de dados será redefinido instantaneamente para 0 bytes. Esta ação é irreversível.</string>
+    <string name="master_wipe_action_wipe">Limpar tudo</string>
+    <string name="master_wipe_progress">Destruindo banco de dados e apagando arquivos...</string>
+    <string name="master_wipe_success">Cofre destruído e redefinido para 0 bytes</string>
+    <string name="verify_unrecoverable_title">Registros herdados irrecuperáveis detectados</string>
+    <string name="verify_unrecoverable_message">Foram encontrados %1$d registros criptografados com uma chave de hardware KeyStore mais antiga de uma instalação anterior.\n\nDevido à segurança AES-256, essas mensagens não podem ser descriptografadas. Como deseja proceder?</string>
+    <string name="verify_action_keep">Manter tudo</string>
+    <string name="verify_action_delete">Excluir tudo</string>
+    <string name="verify_recoverable_title">Integridade do banco de dados verificada</string>
+    <string name="verify_recoverable_message">A criptografia de hardware de 256 bits está íntegra. Foram encontrados %1$d registros herdados que podem ser otimizados para carregamento ultrarrápido.</string>
+    <string name="verify_action_optimize">Otimizar agora</string>
+    <string name="verify_success_title">Integridade do banco de dados verificada</string>
+    <string name="verify_success_message">Todas as páginas de 4 KB do banco de dados estão devidamente criptografadas com AES-256 e autenticadas. A chave de hardware KeyStore está ativa e íntegra. O banco de dados está 100%% otimizado.</string>
+    <string name="verify_failed_title">Falha na verificação de integridade</string>
+    <string name="verify_failed_message">Não foi possível verificar a integridade do banco de dados. Verifique os logs do sistema.</string>
 </resources>

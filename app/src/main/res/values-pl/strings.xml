@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Wyświetlaj przełącznik profilu w nawigacji</string>
     <string name="no_apps_found">Nie znaleziono aplikacji</string>
     <string name="helper_backup_password_optional">Pozostaw puste, aby utworzyć niezaszyfrowaną kopię w postaci zwykłego tekstu</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Weryfikacja spójności bazy danych</string>
+    <string name="verify_dialog_message">Sprawdzanie szyfrowania stron AES-256 i skanowanie rekordów bazy danych pod kątem spójności kryptograficznej. Proszę czekać...</string>
+    <string name="verify_dialog_progress">Przeskanowano %1$d z %2$d rekordów (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Całkowite wyczyszczenie skarbca</string>
+    <string name="pref_master_wipe_title">Całkowite wyczyszczenie skarbca</string>
+    <string name="pref_master_wipe_summary">Trwale zniszcz plik bazy danych, załączniki multimedialne i wszystkie dzienniki</string>
+    <string name="master_wipe_confirm_title">Całkowite wyczyszczenie skarbca</string>
+    <string name="master_wipe_confirm_message">Spowoduje to bezpowrotne zniszczenie zaszyfrowanego pliku bazy danych na dysku oraz usunięcie wszystkich powiadomień, logów toast, multimediów, serii i reguł aplikacji.\n\nPamięć bazy danych zostanie natychmiast zresetowana do 0 bajtów. Tej operacji nie można cofnąć.</string>
+    <string name="master_wipe_action_wipe">Wyczyść wszystko</string>
+    <string name="master_wipe_progress">Niszczenie bazy danych i czyszczenie plików...</string>
+    <string name="master_wipe_success">Skarbiec zniszczony i zresetowany do 0 bajtów</string>
+    <string name="verify_unrecoverable_title">Wykryto nieodwracalne starsze rekordy</string>
+    <string name="verify_unrecoverable_message">Znaleziono %1$d rekordów zaszyfrowanych starszym sprzętowym kluczem KeyStore z poprzedniej instalacji.\n\nZe względu na bezpieczeństwo AES-256 te wiadomości nie mogą zostać odszyfrowane. Co chcesz z nimi zrobić?</string>
+    <string name="verify_action_keep">Zachowaj wszystkie</string>
+    <string name="verify_action_delete">Usuń wszystkie</string>
+    <string name="verify_recoverable_title">Spójność bazy danych zweryfikowana</string>
+    <string name="verify_recoverable_message">Sprzętowe szyfrowanie 256-bitowe działa prawidłowo. Znaleziono %1$d starszych rekordów, które można zoptymalizować pod kątem szybkiego ładowania.</string>
+    <string name="verify_action_optimize">Optymalizuj teraz</string>
+    <string name="verify_success_title">Spójność bazy danych zweryfikowana</string>
+    <string name="verify_success_message">Wszystkie strony bazy danych o rozmiarze 4 KB są prawidłowo zaszyfrowane za pomocą AES-256 i w pełni uwierzytelnione. Sprzętowy klucz KeyStore jest aktywny i sprawny. Baza danych jest zoptymalizowana w 100%%.</string>
+    <string name="verify_failed_title">Sprawdzanie spójności nie powiodło się</string>
+    <string name="verify_failed_message">Nie udało się zweryfikować spójności bazy danych. Sprawdź dzienniki systemowe.</string>
 </resources>

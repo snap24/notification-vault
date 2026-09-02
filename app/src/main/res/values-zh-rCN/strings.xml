@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">在导航栏中显示资料切换开关</string>
     <string name="no_apps_found">未找到应用程序</string>
     <string name="helper_backup_password_optional">留空以进行未加密的明文备份</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">正在验证数据库完整性</string>
+    <string name="verify_dialog_message">正在验证 AES-256 页面加密并扫描数据库记录以检查密码学完整性。请稍候...</string>
+    <string name="verify_dialog_progress">已扫描 %1$d / %2$d 条记录 (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">彻底清空保险库</string>
+    <string name="pref_master_wipe_title">彻底清空保险库</string>
+    <string name="pref_master_wipe_summary">永久销毁数据库文件、媒体附件和所有日志</string>
+    <string name="master_wipe_confirm_title">彻底清空保险库</string>
+    <string name="master_wipe_confirm_message">这将永久销毁磁盘上加密的数据库文件，并删除所有通知、Toast 日志、已保存的媒体、连胜数据和应用规则。\n\n所有数据库存储空间将立即重置为 0 字节。此操作不可撤销。</string>
+    <string name="master_wipe_action_wipe">清空所有内容</string>
+    <string name="master_wipe_progress">正在销毁数据库并抹除文件...</string>
+    <string name="master_wipe_success">保险库已销毁并重置为 0 字节</string>
+    <string name="verify_unrecoverable_title">检测到无法恢复的旧记录</string>
+    <string name="verify_unrecoverable_message">发现了 %1$d 条使用以前安装的旧硬件 KeyStore 密钥加密的记录。\n\n由于 AES-256 安全性限制，这些消息无法解密。您希望如何处理它们？</string>
+    <string name="verify_action_keep">全部保留</string>
+    <string name="verify_action_delete">全部删除</string>
+    <string name="verify_recoverable_title">数据库完整性已验证</string>
+    <string name="verify_recoverable_message">硬件 256 位加密状态良好。发现了 %1$d 条可优化以实现高速加载的旧记录。</string>
+    <string name="verify_action_optimize">立即优化</string>
+    <string name="verify_success_title">数据库完整性已验证</string>
+    <string name="verify_success_message">所有 4 KB 数据库页面均使用 AES-256 正确加密且已完全通过验证。KeyStore 硬件密钥处于活动状态且健康。数据库已 100%% 优化。</string>
+    <string name="verify_failed_title">完整性检查失败</string>
+    <string name="verify_failed_message">无法验证数据库完整性。请查看系统日志。</string>
 </resources>

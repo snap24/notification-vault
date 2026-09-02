@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Mostra il selettore del profilo nella navigazione</string>
     <string name="no_apps_found">Nessuna applicazione trovata</string>
     <string name="helper_backup_password_optional">Lascia vuoto per il backup in testo normale non crittografato</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Verifica dell\'integrità del database</string>
+    <string name="verify_dialog_message">Convalida della crittografia di pagina AES-256 e scansione dei record per l\'integrità crittografica. Attendere...</string>
+    <string name="verify_dialog_progress">Scansionati %1$d di %2$d record (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Cancellazione totale cassaforte</string>
+    <string name="pref_master_wipe_title">Cancellazione totale cassaforte</string>
+    <string name="pref_master_wipe_summary">Distruggi definitivamente il database, gli allegati multimediali e tutti i log</string>
+    <string name="master_wipe_confirm_title">Cancellazione totale cassaforte</string>
+    <string name="master_wipe_confirm_message">Questa azione distruggerà definitivamente il file di database crittografato su disco ed eliminerà tutte le notifiche, i log dei toast, i file multimediali salvati, le serie e le regole delle app.\n\nTutto lo spazio di archiviazione verrà immediatamente reimpostato a 0 byte. Questa azione è irreversibile.</string>
+    <string name="master_wipe_action_wipe">Cancella tutto</string>
+    <string name="master_wipe_progress">Distruzione del database e cancellazione dei file in corso...</string>
+    <string name="master_wipe_success">Cassaforte distrutta e reimpostata a 0 byte</string>
+    <string name="verify_unrecoverable_title">Rilevati record legacy non recuperabili</string>
+    <string name="verify_unrecoverable_message">Trovati %1$d record crittografati con una vecchia chiave hardware KeyStore da un\'installazione precedente.\n\nA causa della sicurezza AES-256, questi messaggi non possono essere decrittografati. Come desideri procedere?</string>
+    <string name="verify_action_keep">Mantieni tutto</string>
+    <string name="verify_action_delete">Elimina tutto</string>
+    <string name="verify_recoverable_title">Integrità del database verificata</string>
+    <string name="verify_recoverable_message">La crittografia hardware a 256 bit è integra. Trovati %1$d record legacy che possono essere ottimizzati per un caricamento rapido.</string>
+    <string name="verify_action_optimize">Ottimizza ora</string>
+    <string name="verify_success_title">Integrità del database verificata</string>
+    <string name="verify_success_message">Tutte le pagine da 4 KB del database sono crittografate correttamente con AES-256 e autenticate. La chiave hardware KeyStore è attiva e integra. Il database è ottimizzato al 100%%.</string>
+    <string name="verify_failed_title">Controllo integrità fallito</string>
+    <string name="verify_failed_message">Impossibile verificare l\'integrità del database. Controlla i log di sistema.</string>
 </resources>

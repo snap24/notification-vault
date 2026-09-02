@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">عرض مفتاح ملف التعريف في شريط التنقل</string>
     <string name="no_apps_found">لا توجد تطبيقات</string>
     <string name="helper_backup_password_optional">اتركه فارغاً للنسخ الاحتياطي بنص عادي غير مشفر</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">التحقق من سلامة قاعدة البيانات</string>
+    <string name="verify_dialog_message">جاري التحقق من تشفير صفحات AES-256 ومسح سجلات قاعدة البيانات لضمان السلامة التشفيرية. يرجى الانتظار...</string>
+    <string name="verify_dialog_progress">تم فحص %1$d من %2$d سجل (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">محو الخزينة بالكامل</string>
+    <string name="pref_master_wipe_title">محو الخزينة بالكامل</string>
+    <string name="pref_master_wipe_summary">إتلاف ملف قاعدة البيانات ومرفقات الوسائط وجميع السجلات نهائياً</string>
+    <string name="master_wipe_confirm_title">محو الخزينة بالكامل</string>
+    <string name="master_wipe_confirm_message">سيؤدي هذا إلى تدمير ملف قاعدة البيانات المشفر على القرص نهائياً وحذف جميع الإشعارات وسجلات التوست والوسائط المحفوظة والحزم وقواعد التطبيقات.\n\nسيتم إعادة تعيين مساحة التخزين فوراً إلى 0 بايت. هذا الإجراء لا يمكن التراجع عنه.</string>
+    <string name="master_wipe_action_wipe">مسح كل شيء</string>
+    <string name="master_wipe_progress">جاري تدمير قاعدة البيانات ومسح الملفات...</string>
+    <string name="master_wipe_success">تم تدمير الخزينة وإعادة تعيينها إلى 0 بايت</string>
+    <string name="verify_unrecoverable_title">تم اكتشاف سجلات قديمة لا يمكن استردادها</string>
+    <string name="verify_unrecoverable_message">تم العثور على %1$d سجل مشفر بمفتاح KeyStore عتادي أقدم من تثبيت سابق.\n\nنظراً لأمان تشفير AES-256، لا يمكن فك تشفير هذه الرسائل. كيف ترغب في التعامل معها؟</string>
+    <string name="verify_action_keep">الاحتفاظ بالكل</string>
+    <string name="verify_action_delete">حذف الكل</string>
+    <string name="verify_recoverable_title">تم التحقق من سلامة قاعدة البيانات</string>
+    <string name="verify_recoverable_message">تشفير العتاد 256-بت سليم. تم العثور على %1$d سجل قديم يمكن تحسينه للتحميل فائق السرعة.</string>
+    <string name="verify_action_optimize">التحسين الآن</string>
+    <string name="verify_success_title">تم التحقق من سلامة قاعدة البيانات</string>
+    <string name="verify_success_message">جميع صفحات قاعدة البيانات بحجم 4 كيلوبايت مشفرة بشكل صحيح باستخدام AES-256 وموثقة بالكامل. مفتاح عتاد KeyStore نشط وسليم. قاعدة البيانات محسنة بنسبة 100%%.</string>
+    <string name="verify_failed_title">فشل التحقق من السلامة</string>
+    <string name="verify_failed_message">تعذر التحقق من سلامة قاعدة البيانات. يرجى مراجعة سجلات النظام.</string>
 </resources>

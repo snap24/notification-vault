@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">ナビゲーションにプロファイル切替スイッチを表示</string>
     <string name="no_apps_found">アプリが見つかりません</string>
     <string name="helper_backup_password_optional">暗号化なしのプレーンテキストバックアップの場合は空のままにします</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">データベースの整合性を検証中</string>
+    <string name="verify_dialog_message">AES-256 ページ暗号化を検証し、暗号の整合性を確認するためにレコードをスキャンしています。お待ちください...</string>
+    <string name="verify_dialog_progress">%1$d / %2$d 件のレコードをスキャンしました (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">金庫を完全初期化</string>
+    <string name="pref_master_wipe_title">金庫を完全初期化</string>
+    <string name="pref_master_wipe_summary">データベースファイル、添付メディア、およびすべてのログを完全に破棄します</string>
+    <string name="master_wipe_confirm_title">金庫を完全初期化</string>
+    <string name="master_wipe_confirm_message">これにより、ディスク上の暗号化されたデータベースファイルが完全に破棄され、すべての通知、トーストログ、保存されたメディア、ストリーク、およびアプリアルールが削除されます。\n\nデータベースのストレージは即座に0バイトにリセットされます。この操作は元に戻せません。</string>
+    <string name="master_wipe_action_wipe">すべてを消去</string>
+    <string name="master_wipe_progress">データベースを破棄しファイルを消去中...</string>
+    <string name="master_wipe_success">金庫が破棄され0バイトにリセットされました</string>
+    <string name="verify_unrecoverable_title">復元不能なレガシーレコードが検出されました</string>
+    <string name="verify_unrecoverable_message">以前のインストール時の古いハードウェア KeyStore キーで暗号化されたレコードが %1$d 件見つかりました。\n\nAES-256 のセキュリティ仕様により、これらのメッセージは復号できません。どのように処理しますか？</string>
+    <string name="verify_action_keep">すべて保持</string>
+    <string name="verify_action_delete">すべて削除</string>
+    <string name="verify_recoverable_title">データベースの整合性を確認しました</string>
+    <string name="verify_recoverable_message">ハードウェア256ビット暗号化は正常です。高速読み込み用に最適化可能なレガシーレコードが %1$d 件見つかりました。</string>
+    <string name="verify_action_optimize">今すぐ最適化</string>
+    <string name="verify_success_title">データベースの整合性を確認しました</string>
+    <string name="verify_success_message">すべての 4 KB データベースページが AES-256 で適切に暗号化され、完全に認証されています。KeyStore ハードウェアキーはアクティブで正常です。データベースは 100%% 最適化されています。</string>
+    <string name="verify_failed_title">整合性チェックに失敗しました</string>
+    <string name="verify_failed_message">データベースの整合性を確認できませんでした。システムログをご確認ください。</string>
 </resources>

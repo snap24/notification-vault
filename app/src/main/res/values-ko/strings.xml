@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">내비게이션에 프로필 전환 스위치 표시</string>
     <string name="no_apps_found">앱을 찾을 수 없음</string>
     <string name="helper_backup_password_optional">암호화되지 않은 일반 텍스트 백업의 경우 비워 두세요</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">데이터베이스 무결성 검증 중</string>
+    <string name="verify_dialog_message">AES-256 페이지 암호화를 확인하고 암호화 무결성을 위해 데이터베이스 레코드를 검사하고 있습니다. 잠시만 기다려 주세요...</string>
+    <string name="verify_dialog_progress">레코드 %1$d/%2$d개 검사 완료 (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">보관함 전체 초기화</string>
+    <string name="pref_master_wipe_title">보관함 전체 초기화</string>
+    <string name="pref_master_wipe_summary">데이터베이스 파일, 미디어 첨부 파일 및 모든 로그를 영구적으로 파기합니다</string>
+    <string name="master_wipe_confirm_title">보관함 전체 초기화</string>
+    <string name="master_wipe_confirm_message">디스크의 암호화된 데이터베이스 파일이 영구적으로 파기되며 모든 알림, 토스트 로그, 저장된 미디어, 스트릭 번들 및 앱 규칙이 삭제됩니다.\n\n모든 데이터베이스 저장 용량이 즉시 0바이트로 초기화됩니다. 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="master_wipe_action_wipe">모든 데이터 영구 삭제</string>
+    <string name="master_wipe_progress">데이터베이스 파기 및 파일 삭제 중...</string>
+    <string name="master_wipe_success">보관함이 파기되었으며 0바이트로 초기화되었습니다</string>
+    <string name="verify_unrecoverable_title">복구 불가능한 기존 레코드 감지됨</string>
+    <string name="verify_unrecoverable_message">이전 설치의 이전 하드웨어 KeyStore 키로 암호화된 레코드 %1$d개가 발견되었습니다.\n\nAES-256 보안 정책으로 인해 이 메시지는 복호화할 수 없습니다. 어떻게 처리하시겠습니까?</string>
+    <string name="verify_action_keep">모두 유지</string>
+    <string name="verify_action_delete">모두 삭제</string>
+    <string name="verify_recoverable_title">데이터베이스 무결성 확인됨</string>
+    <string name="verify_recoverable_message">하드웨어 256비트 암호화가 정상입니다. 고속 로딩을 위해 최적화할 수 있는 기존 레코드 %1$d개가 발견되었습니다.</string>
+    <string name="verify_action_optimize">지금 최적화</string>
+    <string name="verify_success_title">데이터베이스 무결성 확인됨</string>
+    <string name="verify_success_message">모든 4KB 데이터베이스 페이지가 AES-256으로 올바르게 암호화되고 인증되었습니다. KeyStore 하드웨어 키가 활성화되어 정상 작동 중입니다. 데이터베이스가 100%% 최적화되었습니다.</string>
+    <string name="verify_failed_title">무결성 검사 실패</string>
+    <string name="verify_failed_message">데이터베이스 무결성을 확인할 수 없습니다. 시스템 로그를 확인해 주세요.</string>
 </resources>

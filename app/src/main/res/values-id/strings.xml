@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Tampilkan pengalih profil di navigasi</string>
     <string name="no_apps_found">Tidak ada aplikasi yang ditemukan</string>
     <string name="helper_backup_password_optional">Biarkan kosong untuk cadangan teks biasa yang tidak dienkripsi</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Memverifikasi Integritas Basis Data</string>
+    <string name="verify_dialog_message">Memvalidasi enkripsi halaman AES-256 dan memindai catatan basis data untuk integritas kriptografi. Harap tunggu...</string>
+    <string name="verify_dialog_progress">Dipindai %1$d dari %2$d catatan (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Hapus Total Brankas</string>
+    <string name="pref_master_wipe_title">Hapus Total Brankas</string>
+    <string name="pref_master_wipe_summary">Hancurkan file basis data, lampiran media, dan semua log secara permanen</string>
+    <string name="master_wipe_confirm_title">Hapus Total Brankas</string>
+    <string name="master_wipe_confirm_message">Ini akan menghancurkan file basis data terenkripsi di disk secara permanen dan menghapus semua notifikasi, log toast, media tersimpan, paket streak, dan aturan aplikasi.\n\nSemua penyimpanan basis data akan langsung disetel ulang ke 0 byte. Tindakan ini tidak dapat diubah.</string>
+    <string name="master_wipe_action_wipe">Hapus Semua</string>
+    <string name="master_wipe_progress">Menghancurkan basis data dan menghapus file...</string>
+    <string name="master_wipe_success">Brankas dihancurkan dan disetel ulang ke 0 byte</string>
+    <string name="verify_unrecoverable_title">Catatan Lama yang Tidak Dapat Dipulihkan Terdeteksi</string>
+    <string name="verify_unrecoverable_message">Ditemukan %1$d catatan yang dienkripsi dengan kunci perangkat keras KeyStore lama dari penginstalan sebelumnya.\n\nKarena keamanan AES-256, pesan ini tidak dapat didekripsi. Bagaimana Anda ingin menanganinya?</string>
+    <string name="verify_action_keep">Simpan Semua</string>
+    <string name="verify_action_delete">Hapus Semua</string>
+    <string name="verify_recoverable_title">Integritas Basis Data Terverifikasi</string>
+    <string name="verify_recoverable_message">Enkripsi perangkat keras 256-bit berfungsi dengan baik. Ditemukan %1$d catatan lama yang dapat dioptimalkan untuk pemuatan berkecepatan tinggi.</string>
+    <string name="verify_action_optimize">Optimalkan Sekarang</string>
+    <string name="verify_success_title">Integritas Basis Data Terverifikasi</string>
+    <string name="verify_success_message">Semua halaman basis data 4 KB dienkripsi dengan benar menggunakan AES-256 dan diautentikasi sepenuhnya. Kunci perangkat keras KeyStore aktif dan sehat. Basis data dioptimalkan 100%%.</string>
+    <string name="verify_failed_title">Pemeriksaan Integritas Gagal</string>
+    <string name="verify_failed_message">Tidak dapat memverifikasi integritas basis data. Harap periksa log sistem.</string>
 </resources>

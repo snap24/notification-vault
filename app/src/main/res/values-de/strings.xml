@@ -530,4 +530,28 @@
     <string name="pref_show_work_profile_switch_summary">Profilumschalter in der Navigation anzeigen</string>
     <string name="no_apps_found">Keine Anwendungen gefunden</string>
     <string name="helper_backup_password_optional">Leer lassen für unverschlüsseltes Klartext-Backup</string>
+
+    <!-- Database Integrity Verification & Master Wipe Vault -->
+    <string name="verify_dialog_title">Datenbankintegrität wird überprüft</string>
+    <string name="verify_dialog_message">AES-256-Seitenverschlüsselung wird validiert und Datenbankeinträge werden auf kryptografische Integrität gescannt. Bitte warten...</string>
+    <string name="verify_dialog_progress">Gescannte Einträge: %1$d von %2$d (%3$d%%)</string>
+    <string name="encryption_btn_master_wipe">Tresor vollständig löschen</string>
+    <string name="pref_master_wipe_title">Tresor vollständig löschen</string>
+    <string name="pref_master_wipe_summary">Datenbankdatei, Medienanhänge und alle Protokolle unwiderruflich vernichten</string>
+    <string name="master_wipe_confirm_title">Tresor vollständig löschen</string>
+    <string name="master_wipe_confirm_message">Dadurch wird die verschlüsselte Datenbankdatei auf dem Datenträger unwiderruflich vernichtet und alle Benachrichtigungen, Toast-Protokolle, gespeicherten Medien, Serienpakete und App-Regeln werden gelöscht.\n\nDer gesamte Datenbankspeicher wird sofort auf 0 Bytes zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="master_wipe_action_wipe">Alles unwiderruflich löschen</string>
+    <string name="master_wipe_progress">Datenbank wird vernichtet und Dateien werden bereinigt...</string>
+    <string name="master_wipe_success">Tresor vernichtet und auf 0 Bytes zurückgesetzt</string>
+    <string name="verify_unrecoverable_title">Nicht wiederherstellbare alte Datensätze erkannt</string>
+    <string name="verify_unrecoverable_message">%1$d Einträge gefunden, die mit einem älteren Hardware-KeyStore-Schlüssel einer früheren Installation verschlüsselt wurden.\n\nAufgrund der AES-256-Sicherheit können diese Nachrichten nicht entschlüsselt werden. Wie möchten Sie damit verfahren?</string>
+    <string name="verify_action_keep">Alle behalten</string>
+    <string name="verify_action_delete">Alle löschen</string>
+    <string name="verify_recoverable_title">Datenbankintegrität bestätigt</string>
+    <string name="verify_recoverable_message">Die hardwarebasierte 256-Bit-Verschlüsselung ist intakt. %1$d alte Datensätze gefunden, die für schnelles Laden optimiert werden können.</string>
+    <string name="verify_action_optimize">Jetzt optimieren</string>
+    <string name="verify_success_title">Datenbankintegrität bestätigt</string>
+    <string name="verify_success_message">Alle 4-KB-Datenbankseiten sind ordnungsgemäß mit AES-256 verschlüsselt und vollständig authentifiziert. Der KeyStore-Hardwareschlüssel ist aktiv und intakt. Die Datenbank ist zu 100%% optimiert.</string>
+    <string name="verify_failed_title">Integritätsprüfung fehlgeschlagen</string>
+    <string name="verify_failed_message">Die Datenbankintegrität konnte nicht überprüft werden. Bitte Systemprotokolle prüfen.</string>
 </resources>
