@@ -56,17 +56,17 @@
 <summary><h3><b>Interface Gallery</b></h3></summary>
 <br>
 <div align="center">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpeg" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="200" hspace="10" vspace="10" />
   <br><br>
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpeg" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="200" hspace="10" vspace="10" />
   <br><br>
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/8.jpeg" width="200" hspace="10" vspace="10" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/9.jpeg" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/8.png" width="200" hspace="10" vspace="10" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/9.png" width="200" hspace="10" vspace="10" />
 </div>
 </details>
 
