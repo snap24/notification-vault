@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">알림이 가장 많이 집중되는 시간은 %1$s 경입니다.</string>
 <string name="stats_insight_balanced">활동 시간 동안 균형 잡힌 알림 흐름을 보입니다.</string>
 <string name="filter_all">전체</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">데이터베이스 및 암호화</string>
+<string name="pref_encryption_page_summary">하드웨어 지원 SQLCipher 256비트 페이지 수준 데이터베이스 암호화</string>
+<string name="encryption_status_active">SQLCipher로 암호화됨</string>
+<string name="encryption_status_desc">모든 알림 로그, 검색 색인 및 메타데이터는 하드웨어 AES-256을 사용하여 4KB 페이지 수준에서 디스크에 안전하게 암호화됩니다.</string>
+<string name="encryption_metadata_header">암호화 아키텍처</string>
+<string name="encryption_label_algorithm">암호화 알고리즘</string>
+<string name="encryption_label_key_provider">마스터 키 제공자</string>
+<string name="encryption_label_key_alias">KeyStore 별칭</string>
+<string name="encryption_label_capture">백그라운드 로깅</string>
+<string name="encryption_stats_header">데이터베이스 통계</string>
+<string name="encryption_label_notifications">알림</string>
+<string name="encryption_label_toasts">토스트</string>
+<string name="encryption_label_db_size">데이터베이스 크기</string>
+<string name="encryption_btn_verify_integrity">데이터베이스 무결성 검증</string>
 <string name="migration_dialog_title">데이터베이스 암호화 업그레이드 중</string>
 <string name="migration_dialog_message">NotiVault가 하드웨어 기반 전체 데이터베이스 암호화(SQLCipher 256비트)로 업그레이드하고 있습니다. 기존 기록을 고속 형식으로 변환하는 중입니다. 앱을 닫지 마세요...</string>
 <string name="migration_dialog_progress">%1$d / %2$d 개 기록 변환됨 (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">모든 4KB 데이터베이스 페이지가 AES-256으로 올바르게 암호화되고 인증되었습니다. KeyStore 하드웨어 키가 활성화되어 정상 작동 중입니다. 데이터베이스가 100%% 최적화되었습니다.</string>
     <string name="verify_failed_title">무결성 검사 실패</string>
     <string name="verify_failed_message">데이터베이스 무결성을 확인할 수 없습니다. 시스템 로그를 확인해 주세요.</string>
+
+    <string name="encryption_status_capture_active">연중무휴 보안 백그라운드 캡처 활성</string>
+    <string name="encryption_hardware_spec">(하드웨어 TEE / StrongBox)</string>
 </resources>

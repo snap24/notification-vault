@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">Szczyt powiadomień przypada około %1$s.</string>
 <string name="stats_insight_balanced">Zrównoważony przepływ powiadomień w ciągu aktywnego dnia.</string>
 <string name="filter_all">Wszystkie</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">Baza danych i szyfrowanie</string>
+<string name="pref_encryption_page_summary">Sprzętowo wspomagane szyfrowanie bazy danych SQLCipher 256-bit na poziomie stron</string>
+<string name="encryption_status_active">Zaszyfrowano za pomocą SQLCipher</string>
+<string name="encryption_status_desc">Wszystkie dzienniki powiadomień, indeksy wyszukiwania i metadane są bezpiecznie szyfrowane na dysku na poziomie stron 4 KB przy użyciu sprzętowego AES-256.</string>
+<string name="encryption_metadata_header">Architektura szyfrowania</string>
+<string name="encryption_label_algorithm">Algorytm szyfrowania</string>
+<string name="encryption_label_key_provider">Dostawca klucza głównego</string>
+<string name="encryption_label_key_alias">Alias KeyStore</string>
+<string name="encryption_label_capture">Rejestrowanie w tle</string>
+<string name="encryption_stats_header">Statystyki bazy danych</string>
+<string name="encryption_label_notifications">Powiadomienia</string>
+<string name="encryption_label_toasts">Komunikaty toast</string>
+<string name="encryption_label_db_size">Rozmiar bazy danych</string>
+<string name="encryption_btn_verify_integrity">Zweryfikuj spójność bazy danych</string>
 <string name="migration_dialog_title">Uaktualnianie szyfrowania bazy danych</string>
 <string name="migration_dialog_message">NotiVault przechodzi na sprzętowe szyfrowanie całej bazy danych (SQLCipher 256-bit). Trwa konwersja starszych rekordów na format wysokiej szybkości. Proszę nie zamykać aplikacji...</string>
 <string name="migration_dialog_progress">Skonwertowano %1$d z %2$d rekordów (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">Wszystkie strony bazy danych o rozmiarze 4 KB są prawidłowo zaszyfrowane za pomocą AES-256 i w pełni uwierzytelnione. Sprzętowy klucz KeyStore jest aktywny i sprawny. Baza danych jest zoptymalizowana w 100%%.</string>
     <string name="verify_failed_title">Sprawdzanie spójności nie powiodło się</string>
     <string name="verify_failed_message">Nie udało się zweryfikować spójności bazy danych. Sprawdź dzienniki systemowe.</string>
+
+    <string name="encryption_status_capture_active">Bezpieczne przechwytywanie w tle aktywne 24/7</string>
+    <string name="encryption_hardware_spec">(Sprzętowy TEE / StrongBox)</string>
 </resources>

@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">تحدث ذروة الإشعارات حول %1$s.</string>
 <string name="stats_insight_balanced">تدفق متوازن للإشعارات طوال يومك النشط.</string>
 <string name="filter_all">الكل</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">قاعدة البيانات والتشفير</string>
+<string name="pref_encryption_page_summary">تشفير قاعدة البيانات على مستوى الصفحة بتقنية SQLCipher 256-بت المدعومة بالعتاد</string>
+<string name="encryption_status_active">مشفر باستخدام SQLCipher</string>
+<string name="encryption_status_desc">جميع سجلات الإشعارات وفهارس البحث والبيانات الوصفية مشفرة بأمان على القرص على مستوى صفحات 4 كيلوبايت باستخدام AES-256 العتادي.</string>
+<string name="encryption_metadata_header">بنية التشفير</string>
+<string name="encryption_label_algorithm">خوارزمية التشفير</string>
+<string name="encryption_label_key_provider">موفر المفتاح الرئيسي</string>
+<string name="encryption_label_key_alias">الاسم المستعار في KeyStore</string>
+<string name="encryption_label_capture">التسجيل في الخلفية</string>
+<string name="encryption_stats_header">إحصائيات قاعدة البيانات</string>
+<string name="encryption_label_notifications">الإشعارات</string>
+<string name="encryption_label_toasts">رسائل التوست</string>
+<string name="encryption_label_db_size">حجم قاعدة البيانات</string>
+<string name="encryption_btn_verify_integrity">التحقق من سلامة قاعدة البيانات</string>
 <string name="migration_dialog_title">ترقية تشفير قاعدة البيانات</string>
 <string name="migration_dialog_message">يقوم NotiVault بالترقية إلى تشفير قاعدة البيانات بالكامل على مستوى العتاد (SQLCipher 256-bit). جارٍ تحويل السجلات القديمة إلى التنسيق عالي السرعة. يُرجى عدم إغلاق التطبيق...</string>
 <string name="migration_dialog_progress">تم تحويل %1$d من %2$d سجل (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">جميع صفحات قاعدة البيانات بحجم 4 كيلوبايت مشفرة بشكل صحيح باستخدام AES-256 وموثقة بالكامل. مفتاح عتاد KeyStore نشط وسليم. قاعدة البيانات محسنة بنسبة 100%%.</string>
     <string name="verify_failed_title">فشل التحقق من السلامة</string>
     <string name="verify_failed_message">تعذر التحقق من سلامة قاعدة البيانات. يرجى مراجعة سجلات النظام.</string>
+
+    <string name="encryption_status_capture_active">الالتقاط الآمن في الخلفية على مدار الساعة نشط</string>
+    <string name="encryption_hardware_spec">(عتاد TEE / StrongBox)</string>
 </resources>

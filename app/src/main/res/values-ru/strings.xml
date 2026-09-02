@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">Пик уведомлений приходится примерно на %1$s.</string>
 <string name="stats_insight_balanced">Сбалансированный поток уведомлений в течение дня.</string>
 <string name="filter_all">Все</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">База данных и шифрование</string>
+<string name="pref_encryption_page_summary">Аппаратное страничное шифрование базы данных SQLCipher 256 бит</string>
+<string name="encryption_status_active">Зашифровано с помощью SQLCipher</string>
+<string name="encryption_status_desc">Все журналы уведомлений, поисковые индексы и метаданные надежно зашифрованы на диске на уровне страниц по 4 КБ с помощью аппаратного AES-256.</string>
+<string name="encryption_metadata_header">Архитектура шифрования</string>
+<string name="encryption_label_algorithm">Алгоритм шифрования</string>
+<string name="encryption_label_key_provider">Поставщик мастер-ключа</string>
+<string name="encryption_label_key_alias">Псевдоним KeyStore</string>
+<string name="encryption_label_capture">Фоновое протоколирование</string>
+<string name="encryption_stats_header">Статистика базы данных</string>
+<string name="encryption_label_notifications">Уведомления</string>
+<string name="encryption_label_toasts">Всплывающие сообщения</string>
+<string name="encryption_label_db_size">Размер базы данных</string>
+<string name="encryption_btn_verify_integrity">Проверить целостность базы данных</string>
 <string name="migration_dialog_title">Обновление шифрования базы данных</string>
 <string name="migration_dialog_message">NotiVault переходит на аппаратное шифрование всей базы данных (SQLCipher 256-бит). Выполняется конвертация старых записей в высокоскоростной формат. Пожалуйста, не закрывайте приложение...</string>
 <string name="migration_dialog_progress">Преобразовано %1$d из %2$d записей (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">Все страницы базы данных по 4 КБ корректно зашифрованы с помощью AES-256 и подлинны. Аппаратный ключ KeyStore активен и исправен. База данных оптимизирована на 100%%.</string>
     <string name="verify_failed_title">Ошибка проверки целостности</string>
     <string name="verify_failed_message">Не удалось проверить целостность базы данных. Пожалуйста, проверьте системные журналы.</string>
+
+    <string name="encryption_status_capture_active">Безопасный круглосуточный фоновый захват активен</string>
+    <string name="encryption_hardware_spec">(Аппаратный TEE / StrongBox)</string>
 </resources>

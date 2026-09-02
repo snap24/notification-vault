@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">Il tuo picco di notifiche si verifica intorno alle %1$s.</string>
 <string name="stats_insight_balanced">Flusso di notifiche bilanciato durante la tua giornata attiva.</string>
 <string name="filter_all">Tutti</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">Database e crittografia</string>
+<string name="pref_encryption_page_summary">Crittografia del database a livello di pagina SQLCipher a 256 bit basata su hardware</string>
+<string name="encryption_status_active">Crittografato con SQLCipher</string>
+<string name="encryption_status_desc">Tutti i registri delle notifiche, gli indici di ricerca e i metadati sono crittografati in modo sicuro su disco a livello di pagina da 4 KB con AES-256 hardware.</string>
+<string name="encryption_metadata_header">Architettura di crittografia</string>
+<string name="encryption_label_algorithm">Algoritmo di cifratura</string>
+<string name="encryption_label_key_provider">Provider della chiave master</string>
+<string name="encryption_label_key_alias">Alias KeyStore</string>
+<string name="encryption_label_capture">Registrazione in background</string>
+<string name="encryption_stats_header">Statistiche del database</string>
+<string name="encryption_label_notifications">Notifiche</string>
+<string name="encryption_label_toasts">Toast</string>
+<string name="encryption_label_db_size">Dimensione database</string>
+<string name="encryption_btn_verify_integrity">Verifica integrità database</string>
 <string name="migration_dialog_title">Aggiornamento crittografia database</string>
 <string name="migration_dialog_message">NotiVault sta passando alla crittografia hardware dell\'intero database (SQLCipher 256-bit). Conversione dei record legacy nel formato ad alta velocità. Non chiudere l\'app...</string>
 <string name="migration_dialog_progress">Convertiti %1$d di %2$d record (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">Tutte le pagine da 4 KB del database sono crittografate correttamente con AES-256 e autenticate. La chiave hardware KeyStore è attiva e integra. Il database è ottimizzato al 100%%.</string>
     <string name="verify_failed_title">Controllo integrità fallito</string>
     <string name="verify_failed_message">Impossibile verificare l\'integrità del database. Controlla i log di sistema.</string>
+
+    <string name="encryption_status_capture_active">Acquisizione sicura in background attiva 24/7</string>
+    <string name="encryption_hardware_spec">(Hardware TEE / StrongBox)</string>
 </resources>

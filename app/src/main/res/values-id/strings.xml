@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">Lonjakan notifikasi puncak terjadi sekitar pukul %1$s.</string>
 <string name="stats_insight_balanced">Aliran notifikasi seimbang sepanjang hari aktif Anda.</string>
 <string name="filter_all">Semua</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">Basis Data &amp; Enkripsi</string>
+<string name="pref_encryption_page_summary">Enkripsi basis data tingkat halaman SQLCipher 256-bit yang didukung perangkat keras</string>
+<string name="encryption_status_active">Dienkripsi dengan SQLCipher</string>
+<string name="encryption_status_desc">Semua log notifikasi, indeks pencarian, dan metadata dienkripsi dengan aman di disk pada tingkat halaman 4 KB menggunakan AES-256 perangkat keras.</string>
+<string name="encryption_metadata_header">Arsitektur Enkripsi</string>
+<string name="encryption_label_algorithm">Algoritma Sandi</string>
+<string name="encryption_label_key_provider">Penyedia Kunci Utama</string>
+<string name="encryption_label_key_alias">Alias KeyStore</string>
+<string name="encryption_label_capture">Pencatatan Latar Belakang</string>
+<string name="encryption_stats_header">Statistik Basis Data</string>
+<string name="encryption_label_notifications">Notifikasi</string>
+<string name="encryption_label_toasts">Toast</string>
+<string name="encryption_label_db_size">Ukuran Basis Data</string>
+<string name="encryption_btn_verify_integrity">Verifikasi Integritas Basis Data</string>
 <string name="migration_dialog_title">Meningkatkan Enkripsi Basis Data</string>
 <string name="migration_dialog_message">NotiVault sedang meningkatkan ke Enkripsi Basis Data Penuh berbasis Perangkat Keras (SQLCipher 256-bit). Mengonversi rekaman lama ke format kecepatan tinggi. Mohon jangan tutup aplikasi...</string>
 <string name="migration_dialog_progress">Terkonversi %1$d dari %2$d catatan (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">Semua halaman basis data 4 KB dienkripsi dengan benar menggunakan AES-256 dan diautentikasi sepenuhnya. Kunci perangkat keras KeyStore aktif dan sehat. Basis data dioptimalkan 100%%.</string>
     <string name="verify_failed_title">Pemeriksaan Integritas Gagal</string>
     <string name="verify_failed_message">Tidak dapat memverifikasi integritas basis data. Harap periksa log sistem.</string>
+
+    <string name="encryption_status_capture_active">Perekaman Latar Belakang Aman 24/7 Aktif</string>
+    <string name="encryption_hardware_spec">(Perangkat Keras TEE / StrongBox)</string>
 </resources>

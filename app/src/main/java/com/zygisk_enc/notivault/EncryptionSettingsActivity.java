@@ -92,9 +92,9 @@ public class EncryptionSettingsActivity extends BaseActivity {
                 tvDbSizeValue.setText(sizeStr);
 
                 tvAlgorithmValue.setText("SQLCipher 256-bit AES-CBC (Page-Level)");
-                tvKeyProviderValue.setText(DatabaseKeyManager.getKeyStoreProvider() + " (Hardware TEE / StrongBox)");
+                tvKeyProviderValue.setText(DatabaseKeyManager.getKeyStoreProvider() + " " + getString(R.string.encryption_hardware_spec));
                 tvKeyAliasValue.setText(DatabaseKeyManager.getMasterKeyAlias());
-                tvCaptureStatusValue.setText("24/7 Secure Background Capture Active");
+                tvCaptureStatusValue.setText(R.string.encryption_status_capture_active);
             });
         });
     }

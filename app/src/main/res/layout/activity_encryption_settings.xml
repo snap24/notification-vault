@@ -140,7 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="AndroidKeyStore (TEE / StrongBox)"
+                        android:text="@string/encryption_hardware_spec"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -175,7 +175,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="24/7 Secure Background Capture Active"
+                        android:text="@string/encryption_status_capture_active"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="14sp" />
 

@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">Bildirim yoğunluğunun en yüksek olduğu saat: %1$s civarı.</string>
 <string name="stats_insight_balanced">Aktif gününüz boyunca dengeli bildirim akışı.</string>
 <string name="filter_all">Tümü</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">Veritabanı ve Şifreleme</string>
+<string name="pref_encryption_page_summary">Donanım destekli SQLCipher 256-bit sayfa düzeyinde veritabanı şifrelemesi</string>
+<string name="encryption_status_active">SQLCipher ile Şifrelendi</string>
+<string name="encryption_status_desc">Tüm bildirim günlükleri, arama dizinleri ve meta veriler, donanım AES-256 kullanılarak 4 KB sayfa düzeyinde diskte güvenli bir şekilde şifrelenir.</string>
+<string name="encryption_metadata_header">Şifreleme Mimarisi</string>
+<string name="encryption_label_algorithm">Şifreleme Algoritması</string>
+<string name="encryption_label_key_provider">Ana Anahtar Sağlayıcısı</string>
+<string name="encryption_label_key_alias">KeyStore Takma Adı</string>
+<string name="encryption_label_capture">Arka Plan Kaydı</string>
+<string name="encryption_stats_header">Veritabanı İstatistikleri</string>
+<string name="encryption_label_notifications">Bildirimler</string>
+<string name="encryption_label_toasts">Toast Mesajları</string>
+<string name="encryption_label_db_size">Veritabanı Boyutu</string>
+<string name="encryption_btn_verify_integrity">Veritabanı Bütünlüğünü Doğrula</string>
 <string name="migration_dialog_title">Veritabanı Şifrelemesi Yükseltiliyor</string>
 <string name="migration_dialog_message">NotiVault, Donanım Tabanlı Tüm Veritabanı Şifrelemesine (SQLCipher 256-bit) yükseltiliyor. Eski kayıtlar yüksek hızlı biçime dönüştürülüyor. Lütfen uygulamayı kapatmayın...</string>
 <string name="migration_dialog_progress">%1$d / %2$d kayıt dönüştürüldü (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">Tüm 4 KB veritabanı sayfaları AES-256 ile düzgün şekilde şifrelenmiştir ve tamamen doğrulanmıştır. KeyStore donanım anahtarı aktif ve sağlıklıdır. Veritabanı %%100 optimize edilmiştir.</string>
     <string name="verify_failed_title">Bütünlük Kontrolü Başarısız Oldu</string>
     <string name="verify_failed_message">Veritabanı bütünlüğü doğrulanamadı. Lütfen sistem günlüklerini kontrol edin.</string>
+
+    <string name="encryption_status_capture_active">7/24 Güvenli Arka Plan Yakalama Aktif</string>
+    <string name="encryption_hardware_spec">(Donanım TEE / StrongBox)</string>
 </resources>

@@ -565,6 +565,8 @@
 <string name="encryption_label_toasts">Toasts</string>
 <string name="encryption_label_db_size">Database Size</string>
 <string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="encryption_status_capture_active">24/7 Secure Background Capture Active</string>
+<string name="encryption_hardware_spec">(Hardware TEE / StrongBox)</string>
 <string name="migration_dialog_title">Upgrading Database Encryption</string>
 <string name="migration_dialog_message">NotiVault is upgrading to Hardware Whole-Database Encryption (SQLCipher 256-bit). Converting legacy records to the high-speed format. Please do not close the app...</string>
     <string name="migration_dialog_progress">Converted %1$d of %2$d records (%3$d%%)</string>

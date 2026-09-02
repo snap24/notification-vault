@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">通知のピークは %1$s 頃に発生しています。</string>
 <string name="stats_insight_balanced">アクティブな時間帯を通じてバランスの取れた通知フローです。</string>
 <string name="filter_all">すべて</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">データベースと暗号化</string>
+<string name="pref_encryption_page_summary">ハードウェア支援のSQLCipher 256ビット ページレベルデータベース暗号化</string>
+<string name="encryption_status_active">SQLCipher で暗号化済み</string>
+<string name="encryption_status_desc">すべての通知ログ、検索インデックス、およびメタデータは、ハードウェア AES-256 を使用して 4 KB ページレベルでディスク上に安全に暗号化されます。</string>
+<string name="encryption_metadata_header">暗号化アーキテクチャ</string>
+<string name="encryption_label_algorithm">暗号化アルゴリズム</string>
+<string name="encryption_label_key_provider">マスターキープロバイダー</string>
+<string name="encryption_label_key_alias">KeyStore エイリアス</string>
+<string name="encryption_label_capture">バックグラウンドログ記録</string>
+<string name="encryption_stats_header">データベース統計</string>
+<string name="encryption_label_notifications">通知</string>
+<string name="encryption_label_toasts">トースト</string>
+<string name="encryption_label_db_size">データベースサイズ</string>
+<string name="encryption_btn_verify_integrity">データベースの整合性を検証</string>
 <string name="migration_dialog_title">データベース暗号化のアップグレード</string>
 <string name="migration_dialog_message">NotiVaultはハードウェア全体のデータベース暗号化（SQLCipher 256-bit）にアップグレードしています。古いレコードを高速形式に変換しています。アプリを閉じないでください...</string>
 <string name="migration_dialog_progress">%1$d / %2$d 件のレコードを変換しました (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">すべての 4 KB データベースページが AES-256 で適切に暗号化され、完全に認証されています。KeyStore ハードウェアキーはアクティブで正常です。データベースは 100%% 最適化されています。</string>
     <string name="verify_failed_title">整合性チェックに失敗しました</string>
     <string name="verify_failed_message">データベースの整合性を確認できませんでした。システムログをご確認ください。</string>
+
+    <string name="encryption_status_capture_active">24時間365日の安全なバックグラウンドキャプチャが有効</string>
+    <string name="encryption_hardware_spec">(ハードウェア TEE / StrongBox)</string>
 </resources>

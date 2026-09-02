@@ -506,20 +506,20 @@
 <string name="stats_insight_peak_spike">您的通知高峰发生在 %1$s 左右。</string>
 <string name="stats_insight_balanced">您在活跃时间段内的通知分布非常均衡。</string>
 <string name="filter_all">全部</string>
-<string name="pref_encryption_page_title">Database &amp; Encryption</string>
-<string name="pref_encryption_page_summary">Hardware-backed SQLCipher 256-bit page-level database encryption</string>
-<string name="encryption_status_active">Encrypted with SQLCipher</string>
-<string name="encryption_status_desc">All notification logs, search indexes, and metadata are securely encrypted on disk at the 4 KB page level using hardware AES-256.</string>
-<string name="encryption_metadata_header">Encryption Architecture</string>
-<string name="encryption_label_algorithm">Cipher Algorithm</string>
-<string name="encryption_label_key_provider">Master Key Provider</string>
-<string name="encryption_label_key_alias">KeyStore Alias</string>
-<string name="encryption_label_capture">Background Logging</string>
-<string name="encryption_stats_header">Database Statistics</string>
-<string name="encryption_label_notifications">Notifications</string>
-<string name="encryption_label_toasts">Toasts</string>
-<string name="encryption_label_db_size">Database Size</string>
-<string name="encryption_btn_verify_integrity">Verify Database Integrity</string>
+<string name="pref_encryption_page_title">数据库与加密</string>
+<string name="pref_encryption_page_summary">硬件支持的 SQLCipher 256 位页面级数据库加密</string>
+<string name="encryption_status_active">已使用 SQLCipher 加密</string>
+<string name="encryption_status_desc">所有通知日志、搜索索引和元数据均使用硬件 AES-256 在 4 KB 页面级别安全地加密存储在磁盘上。</string>
+<string name="encryption_metadata_header">加密架构</string>
+<string name="encryption_label_algorithm">加密算法</string>
+<string name="encryption_label_key_provider">主密钥提供者</string>
+<string name="encryption_label_key_alias">KeyStore 别名</string>
+<string name="encryption_label_capture">后台日志记录</string>
+<string name="encryption_stats_header">数据库统计信息</string>
+<string name="encryption_label_notifications">通知</string>
+<string name="encryption_label_toasts">Toast 提示</string>
+<string name="encryption_label_db_size">数据库大小</string>
+<string name="encryption_btn_verify_integrity">验证数据库完整性</string>
 <string name="migration_dialog_title">正在升级数据库加密</string>
 <string name="migration_dialog_message">NotiVault 正在升级至硬件全数据库加密（SQLCipher 256 位）。正在将旧记录转换为高速格式。请勿关闭应用...</string>
 <string name="migration_dialog_progress">已转换 %1$d / %2$d 条记录 (%3$d%%)</string>
@@ -554,4 +554,7 @@
     <string name="verify_success_message">所有 4 KB 数据库页面均使用 AES-256 正确加密且已完全通过验证。KeyStore 硬件密钥处于活动状态且健康。数据库已 100%% 优化。</string>
     <string name="verify_failed_title">完整性检查失败</string>
     <string name="verify_failed_message">无法验证数据库完整性。请查看系统日志。</string>
+
+    <string name="encryption_status_capture_active">24/7 全天候安全后台捕获处于活动状态</string>
+    <string name="encryption_hardware_spec">(硬件 TEE / StrongBox)</string>
 </resources>
