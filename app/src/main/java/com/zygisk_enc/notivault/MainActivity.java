@@ -642,39 +642,54 @@ public class MainActivity extends BaseActivity {
 
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+        registerActiveDialog(dialog);
 
         com.zygisk_enc.notivault.util.LegacyRecordConverter.convertAll(this, com.zygisk_enc.notivault.util.LegacyRecordConverter.ACTION_PLACEHOLDER, new com.zygisk_enc.notivault.util.LegacyRecordConverter.MigrationProgressListener() {
             @Override
             public void onProgress(int current, int total, int percentage) {
                 runOnUiThread(() -> {
-                    progressBar.setProgressCompat(percentage, true);
-                    tvProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
+                    if (isFinishing() || isDestroyed()) return;
+                    try {
+                        progressBar.setProgressCompat(percentage, true);
+                        tvProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
+                    } catch (Exception ignored) {}
                 });
             }
 
             @Override
             public void onComplete() {
                 runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                    com.google.android.material.snackbar.Snackbar.make(
-                            binding.getRoot(), R.string.migration_dialog_complete, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
+                    try {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                    } catch (Exception ignored) {}
 
-                    // Refresh feed with clean plaintext
-                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
-                            new androidx.lifecycle.ViewModelProvider(MainActivity.this)
-                            .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
-                    vm.resetAllFilters();
+                    if (isFinishing() || isDestroyed()) return;
+
+                    try {
+                        if (binding != null && binding.getRoot() != null) {
+                            com.google.android.material.snackbar.Snackbar.make(
+                                    binding.getRoot(), R.string.migration_dialog_complete, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
+                        }
+
+                        // Refresh feed with clean plaintext
+                        com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                                new androidx.lifecycle.ViewModelProvider(MainActivity.this)
+                                .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                        vm.resetAllFilters();
+                    } catch (Exception ignored) {}
                 });
             }
 
             @Override
             public void onError(Exception e) {
                 runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    try {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                    } catch (Exception ignored) {}
                 });
             }
         });
