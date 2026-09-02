@@ -126,22 +126,30 @@ public abstract class AppDatabase extends RoomDatabase {
                     Context appContext = context.getApplicationContext();
                     com.zygisk_enc.notivault.util.DatabaseMigrationHelper.ensureMigrated(appContext);
 
-                    byte[] passphrase = com.zygisk_enc.notivault.util.DatabaseKeyManager.getDatabasePassphrase(appContext);
-                    net.zetetic.database.sqlcipher.SupportOpenHelperFactory factory =
-                            new net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase);
+                    if (INSTANCE == null) {
+                        byte[] passphrase = com.zygisk_enc.notivault.util.DatabaseKeyManager.getDatabasePassphrase(appContext);
+                        net.zetetic.database.sqlcipher.SupportOpenHelperFactory factory =
+                                new net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase);
 
-                    INSTANCE = Room.databaseBuilder(
-                            appContext,
-                            AppDatabase.class,
-                            DATABASE_NAME
-                    )
-                    .openHelperFactory(factory)
-                    .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13)
-                    .build();
+                        INSTANCE = Room.databaseBuilder(
+                                appContext,
+                                AppDatabase.class,
+                                DATABASE_NAME
+                        )
+                        .openHelperFactory(factory)
+                        .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13)
+                        .build();
+                    }
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static void setInstance(AppDatabase instance) {
+        synchronized (AppDatabase.class) {
+            INSTANCE = instance;
+        }
     }
 
     public static void destroyInstance() {
