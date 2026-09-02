@@ -34,6 +34,9 @@ public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
     private NavController navController;
     private android.content.SharedPreferences.OnSharedPreferenceChangeListener profilePrefListener;
+    private androidx.appcompat.app.AlertDialog migrationDialog = null;
+    private com.google.android.material.progressindicator.LinearProgressIndicator migrationProgressBar = null;
+    private android.widget.TextView migrationProgressText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -329,6 +332,13 @@ public class MainActivity extends BaseActivity {
         setupProfileSwitcher(notifViewModel);
         checkPermissionsSequence();
         checkPendingPostImportVerification();
+        checkAndPerformLegacyMigration();
+    }
+
+    @Override
+    protected void onAuthenticated() {
+        super.onAuthenticated();
+        checkAndPerformLegacyMigration();
     }
 
     private void checkPendingPostImportVerification() {
@@ -615,8 +625,21 @@ public class MainActivity extends BaseActivity {
 
     private void checkAndPerformLegacyMigration() {
         if (com.zygisk_enc.notivault.util.LegacyRecordConverter.isMigrationCompleted(this)) {
+            if (migrationDialog != null && migrationDialog.isShowing()) {
+                try { migrationDialog.dismiss(); } catch (Exception ignored) {}
+                migrationDialog = null;
+            }
+            try {
+                getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            } catch (Exception ignored) {}
             return;
         }
+
+        if (com.zygisk_enc.notivault.util.LegacyRecordConverter.isConverting()) {
+            runOnUiThread(() -> showMigrationDialog(com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastTotal()));
+            return;
+        }
+
         com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
             int legacyCount = com.zygisk_enc.notivault.util.LegacyRecordConverter.countLegacyRecords(this);
             if (legacyCount > 0) {
@@ -630,28 +653,62 @@ public class MainActivity extends BaseActivity {
     private void showMigrationDialog(int totalRecords) {
         if (isFinishing() || isDestroyed()) return;
 
-        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_migration, null);
-        com.google.android.material.progressindicator.LinearProgressIndicator progressBar =
-                dialogView.findViewById(R.id.progress_migration);
-        android.widget.TextView tvProgressText = dialogView.findViewById(R.id.tv_migration_progress_text);
+        // Bypass screen timer: keep screen awake while migration is taking place!
+        try {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } catch (Exception ignored) {}
 
-        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        if (migrationDialog != null && migrationDialog.isShowing()) {
+            if (migrationProgressBar != null && totalRecords > 0) {
+                int current = com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastCurrent();
+                int pct = com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastPercentage();
+                migrationProgressBar.setProgressCompat(pct, true);
+                if (migrationProgressText != null) {
+                    migrationProgressText.setText(getString(R.string.migration_dialog_progress, current, totalRecords, pct));
+                }
+            }
+            return;
+        }
+
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_migration, null);
+        migrationProgressBar = dialogView.findViewById(R.id.progress_migration);
+        migrationProgressText = dialogView.findViewById(R.id.tv_migration_progress_text);
+
+        int initCurrent = com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastCurrent();
+        int initTotal = totalRecords > 0 ? totalRecords : com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastTotal();
+        int initPct = com.zygisk_enc.notivault.util.LegacyRecordConverter.getLastPercentage();
+        if (migrationProgressBar != null) {
+            migrationProgressBar.setProgressCompat(initPct, false);
+        }
+        if (migrationProgressText != null && initTotal > 0) {
+            migrationProgressText.setText(getString(R.string.migration_dialog_progress, initCurrent, initTotal, initPct));
+        }
+
+        migrationDialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setView(dialogView)
                 .setCancelable(false)
                 .create();
 
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        registerActiveDialog(dialog);
+        migrationDialog.setCanceledOnTouchOutside(false);
+        if (migrationDialog.getWindow() != null) {
+            migrationDialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        migrationDialog.show();
+        registerActiveDialog(migrationDialog);
 
-        com.zygisk_enc.notivault.util.LegacyRecordConverter.convertAll(this, com.zygisk_enc.notivault.util.LegacyRecordConverter.ACTION_PLACEHOLDER, new com.zygisk_enc.notivault.util.LegacyRecordConverter.MigrationProgressListener() {
+        com.zygisk_enc.notivault.util.LegacyRecordConverter.MigrationProgressListener listener =
+                new com.zygisk_enc.notivault.util.LegacyRecordConverter.MigrationProgressListener() {
             @Override
             public void onProgress(int current, int total, int percentage) {
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;
                     try {
-                        progressBar.setProgressCompat(percentage, true);
-                        tvProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
+                        if (migrationProgressBar != null) {
+                            migrationProgressBar.setProgressCompat(percentage, true);
+                        }
+                        if (migrationProgressText != null) {
+                            migrationProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
+                        }
                     } catch (Exception ignored) {}
                 });
             }
@@ -660,10 +717,15 @@ public class MainActivity extends BaseActivity {
             public void onComplete() {
                 runOnUiThread(() -> {
                     try {
-                        if (dialog != null && dialog.isShowing()) {
-                            dialog.dismiss();
+                        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } catch (Exception ignored) {}
+
+                    try {
+                        if (migrationDialog != null && migrationDialog.isShowing()) {
+                            migrationDialog.dismiss();
                         }
                     } catch (Exception ignored) {}
+                    migrationDialog = null;
 
                     if (isFinishing() || isDestroyed()) return;
 
@@ -686,13 +748,25 @@ public class MainActivity extends BaseActivity {
             public void onError(Exception e) {
                 runOnUiThread(() -> {
                     try {
-                        if (dialog != null && dialog.isShowing()) {
-                            dialog.dismiss();
+                        getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } catch (Exception ignored) {}
+
+                    try {
+                        if (migrationDialog != null && migrationDialog.isShowing()) {
+                            migrationDialog.dismiss();
                         }
                     } catch (Exception ignored) {}
+                    migrationDialog = null;
                 });
             }
-        });
+        };
+
+        if (com.zygisk_enc.notivault.util.LegacyRecordConverter.isConverting()) {
+            com.zygisk_enc.notivault.util.LegacyRecordConverter.setListener(listener);
+        } else {
+            com.zygisk_enc.notivault.util.LegacyRecordConverter.convertAll(
+                    this, com.zygisk_enc.notivault.util.LegacyRecordConverter.ACTION_PLACEHOLDER, listener);
+        }
     }
 
     public void setToolbarScrollDate(String label, boolean visible) {
@@ -728,6 +802,17 @@ public class MainActivity extends BaseActivity {
         }
         if (!isChangingConfigurations()) {
             com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+        }
+        try {
+            getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } catch (Exception ignored) {}
+        if (migrationDialog != null) {
+            try {
+                if (migrationDialog.isShowing()) {
+                    migrationDialog.dismiss();
+                }
+            } catch (Exception ignored) {}
+            migrationDialog = null;
         }
         super.onDestroy();
     }

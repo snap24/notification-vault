@@ -150,7 +150,53 @@ public class LegacyRecordConverter {
         }
     }
 
+    private static final java.util.concurrent.atomic.AtomicBoolean isConverting = new java.util.concurrent.atomic.AtomicBoolean(false);
+    private static final Object LISTENER_LOCK = new Object();
+    private static MigrationProgressListener activeListener = null;
+    private static volatile int lastCurrent = 0;
+    private static volatile int lastTotal = 0;
+    private static volatile int lastPercentage = 0;
+
+    public static boolean isConverting() {
+        return isConverting.get();
+    }
+
+    public static int getLastCurrent() {
+        return lastCurrent;
+    }
+
+    public static int getLastTotal() {
+        return lastTotal;
+    }
+
+    public static int getLastPercentage() {
+        return lastPercentage;
+    }
+
+    public static void setListener(MigrationProgressListener listener) {
+        synchronized (LISTENER_LOCK) {
+            activeListener = listener;
+            if (activeListener != null && isConverting.get() && lastTotal > 0) {
+                activeListener.onProgress(lastCurrent, lastTotal, lastPercentage);
+            }
+        }
+    }
+
     public static void convertAll(Context context, int unrecoverableAction, MigrationProgressListener listener) {
+        synchronized (LISTENER_LOCK) {
+            activeListener = listener;
+        }
+
+        if (isConverting.getAndSet(true)) {
+            // Already running! Update listener with current progress
+            synchronized (LISTENER_LOCK) {
+                if (activeListener != null && lastTotal > 0) {
+                    activeListener.onProgress(lastCurrent, lastTotal, lastPercentage);
+                }
+            }
+            return;
+        }
+
         AppExecutor.execute(() -> {
             try {
                 AppDatabase db = AppDatabase.getInstance(context);
@@ -178,10 +224,19 @@ public class LegacyRecordConverter {
                 }
 
                 final int total = legacyNotifs.size() + legacyToasts.size();
+                lastTotal = total;
+                lastCurrent = 0;
+                lastPercentage = 0;
 
                 if (total == 0) {
+                    isConverting.set(false);
                     setMigrationCompleted(context, true);
-                    if (listener != null) listener.onComplete();
+                    synchronized (LISTENER_LOCK) {
+                        if (activeListener != null) {
+                            activeListener.onComplete();
+                            activeListener = null;
+                        }
+                    }
                     return;
                 }
 
@@ -256,9 +311,13 @@ public class LegacyRecordConverter {
                                 }
 
                                 int current = processed.incrementAndGet();
-                                if (listener != null) {
-                                    int pct = Math.min(99, (current * 100) / total);
-                                    listener.onProgress(current, total, pct);
+                                int pct = Math.min(99, (current * 100) / total);
+                                lastCurrent = current;
+                                lastPercentage = pct;
+                                synchronized (LISTENER_LOCK) {
+                                    if (activeListener != null) {
+                                        activeListener.onProgress(current, total, pct);
+                                    }
                                 }
                             }
                         }));
@@ -323,9 +382,13 @@ public class LegacyRecordConverter {
                                 }
 
                                 int current = processed.incrementAndGet();
-                                if (listener != null) {
-                                    int pct = Math.min(99, (current * 100) / total);
-                                    listener.onProgress(current, total, pct);
+                                int pct = Math.min(99, (current * 100) / total);
+                                lastCurrent = current;
+                                lastPercentage = pct;
+                                synchronized (LISTENER_LOCK) {
+                                    if (activeListener != null) {
+                                        activeListener.onProgress(current, total, pct);
+                                    }
                                 }
                             }
                         }));
@@ -354,16 +417,26 @@ public class LegacyRecordConverter {
                 pool.shutdown();
 
                 // Successfully processed all records - mark completed flag
+                isConverting.set(false);
                 setMigrationCompleted(context, true);
+                lastCurrent = total;
+                lastPercentage = 100;
 
-                if (listener != null) {
-                    listener.onProgress(total, total, 100);
-                    listener.onComplete();
+                synchronized (LISTENER_LOCK) {
+                    if (activeListener != null) {
+                        activeListener.onProgress(total, total, 100);
+                        activeListener.onComplete();
+                        activeListener = null;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                if (listener != null) {
-                    listener.onError(e);
+                isConverting.set(false);
+                synchronized (LISTENER_LOCK) {
+                    if (activeListener != null) {
+                        activeListener.onError(e);
+                        activeListener = null;
+                    }
                 }
             }
         });
