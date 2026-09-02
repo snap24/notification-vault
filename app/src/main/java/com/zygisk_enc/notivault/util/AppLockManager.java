@@ -38,6 +38,7 @@ public class AppLockManager {
             activeActivities.remove(activity);
             if (activeActivities.isEmpty() && !activity.isChangingConfigurations() && !isExpectingActivityResult) {
                 isUnlocked = false;
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
             }
         }
     }
@@ -46,5 +47,6 @@ public class AppLockManager {
         isUnlocked = false;
         isExpectingActivityResult = false;
         activeActivities.clear();
+        com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
     }
 }

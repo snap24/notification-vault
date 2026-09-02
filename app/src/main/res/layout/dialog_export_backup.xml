@@ -19,6 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         app:passwordToggleEnabled="true"
+        app:helperText="@string/helper_backup_password_optional"
+        app:helperTextEnabled="true"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText

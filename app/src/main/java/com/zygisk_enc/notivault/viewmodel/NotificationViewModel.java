@@ -27,6 +27,12 @@ public class NotificationViewModel extends AndroidViewModel {
     private LiveData<List<NotificationEntity>> currentSource = null;
     private final MediatorLiveData<List<AppSummary>> appSummaries = new MediatorLiveData<>();
     private final LiveData<Integer> unreadCount;
+    private final java.util.concurrent.atomic.AtomicBoolean isClearingAll = new java.util.concurrent.atomic.AtomicBoolean(false);
+    private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+
+    public boolean isClearingAll() {
+        return isClearingAll.get();
+    }
 
     public static class DecryptedText {
         public final String title;
@@ -69,23 +75,27 @@ public class NotificationViewModel extends AndroidViewModel {
         globalOperationProgress.postValue(new OperationProgress(type, progress));
     }
 
+    private static final MutableLiveData<Boolean> postImportVerificationTrigger =
+            new MutableLiveData<>(null);
+
+    public static void triggerPostImportVerification() {
+        postImportVerificationTrigger.postValue(true);
+    }
+
+    public LiveData<Boolean> getPostImportVerificationTrigger() {
+        return postImportVerificationTrigger;
+    }
+
+    public void clearPostImportVerificationTrigger() {
+        postImportVerificationTrigger.postValue(null);
+    }
+
+    public static final int PAGE_SIZE = 3000;
     private final MutableLiveData<Integer> loadProgress = new MutableLiveData<>(-1);
     private final MutableLiveData<OperationProgress> operationProgress = globalOperationProgress;
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final int PARALLEL_THREADS = Math.max(2, Math.min(8, CPU_COUNT));
-    private final java.util.concurrent.ExecutorService coordinatorExecutor =
-            java.util.concurrent.Executors.newSingleThreadExecutor();
-    private final java.util.concurrent.ExecutorService parallelDecryptionPool =
-            java.util.concurrent.Executors.newFixedThreadPool(PARALLEL_THREADS, new java.util.concurrent.ThreadFactory() {
-                private final java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(1);
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "NotiVault-Decryptor-" + count.getAndIncrement());
-                }
-            });
     private long currentRunToken = 0;
     private List<NotificationEntity> lastRawList = null;
-    private final MutableLiveData<Integer> filterLimit = new MutableLiveData<>(500);
+    private final MutableLiveData<Integer> filterLimit = new MutableLiveData<>(PAGE_SIZE);
 
     public LiveData<Integer> getLoadProgress() {
         return loadProgress;
@@ -136,6 +146,31 @@ public class NotificationViewModel extends AndroidViewModel {
                 updateSource();
             }
         });
+
+        // Connect to ClearAllService in case deletion was running in background
+        if (com.zygisk_enc.notivault.service.ClearAllService.isClearingInProgress()) {
+            isClearingAll.set(true);
+            notifications.setValue(new java.util.ArrayList<>());
+            appSummaries.setValue(new java.util.ArrayList<>());
+            int curProg = com.zygisk_enc.notivault.service.ClearAllService.getCurrentProgress();
+            operationProgress.setValue(new OperationProgress(OperationProgress.TYPE_DELETING, Math.max(0, curProg)));
+        }
+
+        com.zygisk_enc.notivault.service.ClearAllService.getProgressLiveData().observeForever(progress -> {
+            if (progress != null && progress >= 0) {
+                isClearingAll.set(true);
+                notifications.postValue(new java.util.ArrayList<>());
+                appSummaries.postValue(new java.util.ArrayList<>());
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
+            } else if (isClearingAll.get()) {
+                isClearingAll.set(false);
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                mainHandler.post(() -> {
+                    updateSource();
+                    refreshAppSummaries();
+                });
+            }
+        });
     }
 
     private void updateAppSummariesSource() {
@@ -145,14 +180,18 @@ public class NotificationViewModel extends AndroidViewModel {
         int mode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
         currentAppSummariesSource = repository.getAppSummaries(mode);
         appSummaries.addSource(currentAppSummariesSource, list -> {
+            if (isClearingAll.get()) {
+                appSummaries.setValue(new java.util.ArrayList<>());
+                return;
+            }
             appSummaries.setValue(list != null ? list : new java.util.ArrayList<>());
         });
     }
 
     private void postDecryptionProgress(long runToken, int progress) {
         if (runToken != currentRunToken) return;
-        OperationProgress currentOp = globalOperationProgress.getValue();
-        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
+        OperationProgress currentOp = operationProgress.getValue();
+        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_DELETING || currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
         }
         int clampedProgress = Math.min(100, Math.max(0, progress));
@@ -161,8 +200,8 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     private void clearOperationProgress(long runToken) {
-        OperationProgress currentOp = globalOperationProgress.getValue();
-        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
+        OperationProgress currentOp = operationProgress.getValue();
+        if (currentOp != null && (currentOp.type == OperationProgress.TYPE_DELETING || currentOp.type == OperationProgress.TYPE_IMPORTING || currentOp.type == OperationProgress.TYPE_BUNDLING) && currentOp.progress >= 0) {
             return;
         }
         loadProgress.postValue(-1);
@@ -172,11 +211,11 @@ public class NotificationViewModel extends AndroidViewModel {
     private boolean isResettingLimit = false;
 
     private void resetLimit() {
-        if (filterLimit.getValue() != null && filterLimit.getValue() == 500) {
+        if (filterLimit.getValue() != null && filterLimit.getValue() == PAGE_SIZE) {
             return;
         }
         isResettingLimit = true;
-        filterLimit.setValue(500);
+        filterLimit.setValue(PAGE_SIZE);
         isResettingLimit = false;
     }
 
@@ -186,10 +225,11 @@ public class NotificationViewModel extends AndroidViewModel {
         }
 
         lastRawList = null;
+        ++currentRunToken;
 
         String rawQuery = searchQuery.getValue();
         boolean isSearching = rawQuery != null && !rawQuery.trim().isEmpty();
-        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : PAGE_SIZE;
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
         int profileMode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
@@ -223,6 +263,10 @@ public class NotificationViewModel extends AndroidViewModel {
         }
 
         notifications.addSource(currentSource, list -> {
+            if (isClearingAll.get()) {
+                notifications.setValue(new java.util.ArrayList<>());
+                return;
+            }
             final long runToken = ++currentRunToken;
 
             if (list == null) {
@@ -234,168 +278,63 @@ public class NotificationViewModel extends AndroidViewModel {
             if (isListIdentical(list, lastRawList)) {
                 return;
             }
+            final int previousCount = lastRawList != null ? lastRawList.size() : 0;
             lastRawList = list;
 
-            coordinatorExecutor.execute(() -> {
+            com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
                 try {
                     while (com.zygisk_enc.notivault.util.BundleManager.isBundlingInProgress()) {
                         try { Thread.sleep(50); } catch (InterruptedException ignored) {}
                     }
-                    if (runToken != currentRunToken) return;
+                    if (runToken != currentRunToken || isClearingAll.get()) return;
 
                     final int total = list.size();
                     if (total == 0) {
                         if (runToken == currentRunToken) {
                             loadProgress.postValue(-1);
-                            operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                            OperationProgress currentOp = operationProgress.getValue();
+                            if (currentOp == null || currentOp.type == OperationProgress.TYPE_DECRYPTING || currentOp.type == OperationProgress.TYPE_NONE) {
+                                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+                            }
                             notifications.postValue(new java.util.ArrayList<>());
                         }
                         return;
                     }
 
+                    postDecryptionProgress(runToken, 0);
+
+                    final boolean isAppendedBatch = (total > previousCount && previousCount > 0);
+                    final int batchStartIndex = isAppendedBatch ? previousCount : 0;
+                    final int batchSize = isAppendedBatch ? (total - previousCount) : total;
+
                     String query = searchQuery.getValue();
                     final String lowerQuery = query != null ? query.toLowerCase().trim() : "";
                     final boolean searchingMode = !lowerQuery.isEmpty();
-                    final String currentPkgFilter = filterPackage.getValue();
-                    final boolean isMainFeedMode = (!searchingMode && (currentPkgFilter == null || currentPkgFilter.isEmpty()));
 
-                    // Pre-mark exact items that actually need decryption (not in cache)
-                    int itemsToDecrypt = 0;
-                    final boolean[] needsDecryption = new boolean[total];
-                    final boolean[] isSubsequentBundleItem = new boolean[total];
+                    final int cores = com.zygisk_enc.notivault.util.AppExecutor.getCpuCores();
+                    final java.util.concurrent.atomic.AtomicInteger processedInBatch = new java.util.concurrent.atomic.AtomicInteger(0);
+                    final java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(cores);
 
-                    for (int i = 0; i < total; i++) {
-                        if (runToken != currentRunToken) return;
-                        NotificationEntity currentEntity = list.get(i);
-
-                        // In Main Feed mode, skip full decryption for subsequent items of a bundle streak
-                        if (isMainFeedMode && currentEntity.bundleId != null && !currentEntity.bundleId.isEmpty()) {
-                            if (i > 0 && currentEntity.bundleId.equals(list.get(i - 1).bundleId)) {
-                                isSubsequentBundleItem[i] = true;
-                                needsDecryption[i] = false;
-                                continue;
-                            }
+                    final int chunkSize = Math.max(25, (total + cores - 1) / cores);
+                    for (int c = 0; c < cores; c++) {
+                        final int startIdx = c * chunkSize;
+                        final int endIdx = Math.min(startIdx + chunkSize, total);
+                        if (startIdx >= total) {
+                            latch.countDown();
+                            continue;
                         }
 
-                        if (decryptedCache.get(currentEntity.id) == null) {
-                            needsDecryption[i] = true;
-                            itemsToDecrypt++;
-                        }
-                    }
-
-                    final boolean showProgress = itemsToDecrypt > 0;
-                    final int totalToDecrypt = Math.max(1, itemsToDecrypt);
-                    final java.util.concurrent.atomic.AtomicInteger newlyDecryptedCount = new java.util.concurrent.atomic.AtomicInteger(0);
-
-                    android.util.Log.d("NotiVault_Decryption", "Starting processDecryption for pkg: " + filterPackage.getValue() + ", limit: " + limit + ", total items: " + total + ", itemsToDecrypt: " + itemsToDecrypt + " at " + System.currentTimeMillis());
-
-                    if (showProgress && runToken == currentRunToken) {
-                        postDecryptionProgress(runToken, 0);
-                    }
-
-                    final boolean isInitialLoad = (limit <= 500);
-
-                    // Phase 1: Pre-decrypt top 30 items sequentially for instant screen rendering
-                    // Only active when viewing a specific app filter on initial load
-                    final int preDecryptCount = (isInitialLoad && currentPkgFilter != null && !currentPkgFilter.isEmpty())
-                            ? Math.min(30, total) : 0;
-
-                    // Slicing current page across parallel threads (covers full range; Phase 2 skips pre-decrypted items)
-                    int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 99) / 100));
-                    int chunkSize = (total + numChunks - 1) / numChunks;
-
-                    java.util.concurrent.atomic.AtomicInteger processedCount = new java.util.concurrent.atomic.AtomicInteger(0);
-                    java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numChunks);
-                    @SuppressWarnings("unchecked")
-                    final java.util.List<NotificationEntity>[] chunkResults = new java.util.List[numChunks];
-                    for (int c = 0; c < numChunks; c++) {
-                        chunkResults[c] = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
-                    }
-                    final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
-
-                    // ── Phase 1: Sequential decrypt of top 30 items ──
-                    if (preDecryptCount > 0 && runToken == currentRunToken) {
-                        for (int i = 0; i < preDecryptCount; i++) {
-                            if (runToken != currentRunToken) break;
-                            NotificationEntity entity = list.get(i);
-                            if (!isSubsequentBundleItem[i]) {
-                                decryptEntity(entity);
-                            }
-                            if (needsDecryption[i]) {
-                                newlyDecryptedCount.incrementAndGet();
-                            }
-                            if (matchesQuery(entity, searchingMode, lowerQuery)) {
-                                int chunkIdx = i / chunkSize;
-                                chunkResults[chunkIdx].add(entity);
-                            }
-                        }
-                        // Post Phase 1 snapshot immediately for instant screen display
-                        if (runToken == currentRunToken) {
-                            java.util.List<NotificationEntity> phase1Snapshot = new java.util.ArrayList<>();
-                            for (int k = 0; k < numChunks; k++) {
-                                synchronized (chunkResults[k]) {
-                                    phase1Snapshot.addAll(chunkResults[k]);
-                                }
-                            }
-                            if (!phase1Snapshot.isEmpty()) {
-                                android.util.Log.d("NotiVault_Decryption", "Phase 1: posted " + phase1Snapshot.size() + " items instantly at " + System.currentTimeMillis());
-                                notifications.postValue(phase1Snapshot);
-                                // Give the main thread 80ms to render Phase 1 cards before Phase 2 parallel starts
-                                try { Thread.sleep(80); } catch (InterruptedException ignored) {}
-                            }
-                        }
-                    }
-
-                    // ── Phase 2: Parallel 8-core decryption for remaining items ──
-                    for (int c = 0; c < numChunks; c++) {
-                        final int chunkIndex = c;
-                        final int rawStartIdx = c * chunkSize;
-                        final int rawEndIdx = Math.min(total, rawStartIdx + chunkSize);
-                        // Skip items already decrypted in Phase 1
-                        final int startIdx = Math.max(rawStartIdx, preDecryptCount);
-                        final int endIdx = rawEndIdx;
-
-                        parallelDecryptionPool.execute(() -> {
-                            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
+                        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
                             try {
                                 for (int i = startIdx; i < endIdx; i++) {
                                     if (runToken != currentRunToken) return;
-
                                     NotificationEntity entity = list.get(i);
-                                    if (!isSubsequentBundleItem[i]) {
-                                        decryptEntity(entity);
-                                    }
-
-                                    int processed = processedCount.incrementAndGet();
-
-                                    if (showProgress && needsDecryption[i]) {
-                                        int decrypted = newlyDecryptedCount.incrementAndGet();
-                                        int progress = Math.min(100, (decrypted * 100) / totalToDecrypt);
-                                        if (decrypted % 15 == 0 || decrypted == totalToDecrypt) {
+                                    decryptEntity(entity);
+                                    if (i >= batchStartIndex) {
+                                        int done = processedInBatch.incrementAndGet();
+                                        if (done % 25 == 0 || done == batchSize) {
+                                            int progress = Math.min(99, (done * 100) / batchSize);
                                             postDecryptionProgress(runToken, progress);
-                                        }
-                                    }
-
-                                    if (matchesQuery(entity, searchingMode, lowerQuery)) {
-                                        chunkResults[chunkIndex].add(entity);
-                                    }
-
-                                    // 10% progressive streaming for initial load (0-500 items) up to 50% only (10%, 20%, 30%, 40%, 50%)
-                                    if (isInitialLoad && processed <= (total / 2)) {
-                                        int streamProgress = (processed * 100) / total;
-                                        int milestone = streamProgress / 10;
-                                        boolean milestoneTrigger = (milestone > 0 && milestone <= 5 && milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
-                                        if (milestoneTrigger && runToken == currentRunToken) {
-                                            java.util.List<NotificationEntity> snapshot = new java.util.ArrayList<>();
-                                            for (int k = 0; k < numChunks; k++) {
-                                                synchronized (chunkResults[k]) {
-                                                    snapshot.addAll(chunkResults[k]);
-                                                }
-                                            }
-                                            if (!snapshot.isEmpty() && runToken == currentRunToken) {
-                                                android.util.Log.d("NotiVault_Decryption", "Milestone trigger " + milestone + " (" + streamProgress + "%), posting snapshot size: " + snapshot.size() + " at " + System.currentTimeMillis());
-                                                notifications.postValue(snapshot);
-                                            }
                                         }
                                     }
                                 }
@@ -405,31 +344,20 @@ public class NotificationViewModel extends AndroidViewModel {
                         });
                     }
 
-                    // Wait for current page decryption to finish
                     latch.await();
-                    if (runToken != currentRunToken) {
-                        clearOperationProgress(runToken);
-                        return;
-                    }
+                    if (runToken != currentRunToken) return;
 
-                    // Final complete list in strict chronological order
-                    java.util.List<NotificationEntity> finalMerged = new java.util.ArrayList<>(total);
-                    for (int k = 0; k < numChunks; k++) {
-                        synchronized (chunkResults[k]) {
-                            finalMerged.addAll(chunkResults[k]);
+                    java.util.List<NotificationEntity> filteredList = new java.util.ArrayList<>(total);
+                    for (int i = 0; i < total; i++) {
+                        NotificationEntity entity = list.get(i);
+                        if (matchesQuery(entity, searchingMode, lowerQuery)) {
+                            filteredList.add(entity);
                         }
                     }
 
                     if (runToken == currentRunToken) {
-                        android.util.Log.d("NotiVault_Decryption", "Latch complete! Posting finalMerged size: " + finalMerged.size() + " at " + System.currentTimeMillis());
-                        notifications.postValue(finalMerged);
-                    }
-
-                    if (showProgress) {
+                        notifications.postValue(filteredList);
                         postDecryptionProgress(runToken, 100);
-                        try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-                        clearOperationProgress(runToken);
-                    } else {
                         clearOperationProgress(runToken);
                     }
                 } catch (Exception e) {
@@ -451,7 +379,7 @@ public class NotificationViewModel extends AndroidViewModel {
     public void loadNextPage() {
         Integer current = filterLimit.getValue();
         if (current != null) {
-            filterLimit.setValue(current + 500);
+            filterLimit.setValue(current + PAGE_SIZE);
         }
     }
 
@@ -490,7 +418,11 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void refreshAppSummaries() {
-        coordinatorExecutor.execute(() -> {
+        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+            if (isClearingAll.get()) {
+                appSummaries.postValue(new java.util.ArrayList<>());
+                return;
+            }
             int mode = filterProfileMode.getValue() != null ? filterProfileMode.getValue() : 0;
             List<AppSummary> list = repository.getAppSummariesSync(mode);
             appSummaries.postValue(list != null ? list : new java.util.ArrayList<>());
@@ -507,13 +439,12 @@ public class NotificationViewModel extends AndroidViewModel {
 
     public void setSearchQuery(String query) {
         String current = searchQuery.getValue();
-        if (query == null && current == null) {
+        if ((query == null && current == null) || (query != null && query.equals(current))) {
             return;
         }
-        if (query != null && query.equals(current)) {
-            List<NotificationEntity> currentList = notifications.getValue();
-            if (currentList == null || currentList.isEmpty()) {
-                updateSource();
+        if (query != null && query.trim().isEmpty()) {
+            if (current != null && !current.isEmpty()) {
+                searchQuery.setValue(null);
             }
             return;
         }
@@ -542,6 +473,8 @@ public class NotificationViewModel extends AndroidViewModel {
             return;
         }
         resetLimit();
+        lastRawList = null;
+        ++currentRunToken;
         filterPackage.setValue(packageName);
     }
 
@@ -616,31 +549,21 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public void deleteAll() {
+        if (!isClearingAll.compareAndSet(false, true)) {
+            return;
+        }
+
         final long runToken = ++currentRunToken;
         decryptedCache.evictAll();
         lastRawList = null;
+
         notifications.postValue(new java.util.ArrayList<>());
+        appSummaries.postValue(new java.util.ArrayList<>());
+        searchQuery.postValue(null);
         loadProgress.postValue(-1);
         operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 0));
 
-        repository.deleteAll(new NotificationRepository.ProgressCallback() {
-            @Override
-            public void onProgress(int progress) {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
-                }
-            }
-
-            @Override
-            public void onComplete() {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
-                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                }
-                refreshAppSummaries();
-            }
-        });
+        com.zygisk_enc.notivault.service.ClearAllService.start(getApplication());
     }
 
     public void deleteByDateRange(long startTime, long endTime) {
@@ -653,18 +576,20 @@ public class NotificationViewModel extends AndroidViewModel {
         repository.deleteByDateRange(startTime, endTime, new NotificationRepository.ProgressCallback() {
             @Override
             public void onProgress(int progress) {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
-                }
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
             }
 
             @Override
             public void onComplete() {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
-                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                }
+                ++currentRunToken;
+                decryptedCache.evictAll();
+                lastRawList = null;
+
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                loadProgress.postValue(-1);
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+
                 refreshAppSummaries();
             }
         });
@@ -691,7 +616,7 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<NotificationEntity>> getFavorites() {
-        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : PAGE_SIZE;
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
         return repository.getFavorites(limit, dateStart, dateEnd);
@@ -719,18 +644,20 @@ public class NotificationViewModel extends AndroidViewModel {
         repository.deleteByPackages(packages, new NotificationRepository.ProgressCallback() {
             @Override
             public void onProgress(int progress) {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
-                }
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, progress));
             }
 
             @Override
             public void onComplete() {
-                if (runToken == currentRunToken) {
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
-                    try { Thread.sleep(300); } catch (InterruptedException ignored) {}
-                    operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
-                }
+                ++currentRunToken;
+                decryptedCache.evictAll();
+                lastRawList = null;
+
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_DELETING, 100));
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                loadProgress.postValue(-1);
+                operationProgress.postValue(new OperationProgress(OperationProgress.TYPE_NONE, -1));
+
                 refreshAppSummaries();
             }
         });
@@ -771,6 +698,14 @@ public class NotificationViewModel extends AndroidViewModel {
     }
 
     private void decryptEntity(NotificationEntity entity) {
+        if (!EncryptionHelper.isEncrypted(entity.title) && 
+            !EncryptionHelper.isEncrypted(entity.text) && 
+            !EncryptionHelper.isEncrypted(entity.bigText)) {
+            entity.decryptedTitle = entity.title;
+            entity.decryptedText = entity.text;
+            entity.decryptedBigText = entity.bigText;
+            return;
+        }
         DecryptedText cached = decryptedCache.get(entity.id);
         if (cached != null) {
             entity.decryptedTitle = cached.title;
@@ -825,12 +760,5 @@ public class NotificationViewModel extends AndroidViewModel {
 
     private boolean equalsNullable(Object a, Object b) {
         return (a == b) || (a != null && a.equals(b));
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        coordinatorExecutor.shutdownNow();
-        parallelDecryptionPool.shutdownNow();
     }
 }

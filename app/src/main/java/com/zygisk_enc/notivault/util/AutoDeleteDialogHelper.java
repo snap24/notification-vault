@@ -195,12 +195,36 @@ public class AutoDeleteDialogHelper {
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_custom_auto_delete_days, null);
         TextInputEditText etDays = dialogView.findViewById(R.id.et_custom_days);
-        ImageButton btnMinus = dialogView.findViewById(R.id.btn_minus_days);
-        ImageButton btnPlus = dialogView.findViewById(R.id.btn_plus_days);
+        View cardMinus = dialogView.findViewById(R.id.card_minus_days);
+        View cardPlus = dialogView.findViewById(R.id.card_plus_days);
+        TextView tvSummary = dialogView.findViewById(R.id.tv_retention_live_summary);
 
         etDays.setText(String.valueOf(workingDays[0]));
 
-        btnMinus.setOnClickListener(v -> {
+        Runnable updateSummary = () -> {
+            int val = parseDays(etDays.getText());
+            if (tvSummary != null) {
+                if (val == 0) {
+                    tvSummary.setText(context.getString(R.string.retention_never_delete));
+                } else if (val == 1) {
+                    tvSummary.setText(context.getString(R.string.toast_auto_delete_set_1_day));
+                } else {
+                    tvSummary.setText(context.getString(R.string.toast_auto_delete_set_x_days, val));
+                }
+            }
+        };
+
+        updateSummary.run();
+
+        etDays.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateSummary.run();
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        View.OnClickListener minusListener = v -> {
             int val = parseDays(etDays.getText());
             if (val > 0) {
                 val--;
@@ -208,9 +232,9 @@ public class AutoDeleteDialogHelper {
                 etDays.setText(String.valueOf(val));
                 if (etDays.getText() != null) etDays.setSelection(etDays.getText().length());
             }
-        });
+        };
 
-        btnPlus.setOnClickListener(v -> {
+        View.OnClickListener plusListener = v -> {
             int val = parseDays(etDays.getText());
             if (val < 9999) {
                 val++;
@@ -218,43 +242,39 @@ public class AutoDeleteDialogHelper {
                 etDays.setText(String.valueOf(val));
                 if (etDays.getText() != null) etDays.setSelection(etDays.getText().length());
             }
-        });
+        };
 
-        dialogView.findViewById(R.id.chip_preset_never).setOnClickListener(v -> {
-            workingDays[0] = 0;
-            etDays.setText("0");
-            etDays.setSelection(1);
-        });
-        dialogView.findViewById(R.id.chip_preset_7).setOnClickListener(v -> {
-            workingDays[0] = 7;
-            etDays.setText("7");
-            etDays.setSelection(1);
-        });
-        dialogView.findViewById(R.id.chip_preset_15).setOnClickListener(v -> {
-            workingDays[0] = 15;
-            etDays.setText("15");
-            etDays.setSelection(2);
-        });
-        dialogView.findViewById(R.id.chip_preset_30).setOnClickListener(v -> {
-            workingDays[0] = 30;
-            etDays.setText("30");
-            etDays.setSelection(2);
-        });
-        dialogView.findViewById(R.id.chip_preset_60).setOnClickListener(v -> {
-            workingDays[0] = 60;
-            etDays.setText("60");
-            etDays.setSelection(2);
-        });
-        dialogView.findViewById(R.id.chip_preset_90).setOnClickListener(v -> {
-            workingDays[0] = 90;
-            etDays.setText("90");
-            etDays.setSelection(2);
-        });
-        dialogView.findViewById(R.id.chip_preset_180).setOnClickListener(v -> {
-            workingDays[0] = 180;
-            etDays.setText("180");
-            etDays.setSelection(3);
-        });
+        if (cardMinus != null) cardMinus.setOnClickListener(minusListener);
+        View btnMinus = dialogView.findViewById(R.id.btn_minus_days);
+        if (btnMinus != null) btnMinus.setOnClickListener(minusListener);
+
+        if (cardPlus != null) cardPlus.setOnClickListener(plusListener);
+        View btnPlus = dialogView.findViewById(R.id.btn_plus_days);
+        if (btnPlus != null) btnPlus.setOnClickListener(plusListener);
+
+        int[][] presetMappings = new int[][]{
+                {R.id.chip_preset_never, 0},
+                {R.id.chip_preset_1, 1},
+                {R.id.chip_preset_3, 3},
+                {R.id.chip_preset_7, 7},
+                {R.id.chip_preset_14, 14},
+                {R.id.chip_preset_30, 30},
+                {R.id.chip_preset_90, 90},
+                {R.id.chip_preset_180, 180},
+                {R.id.chip_preset_365, 365}
+        };
+
+        for (int[] mapping : presetMappings) {
+            View chip = dialogView.findViewById(mapping[0]);
+            if (chip != null) {
+                final int daysVal = mapping[1];
+                chip.setOnClickListener(v -> {
+                    workingDays[0] = daysVal;
+                    etDays.setText(String.valueOf(daysVal));
+                    if (etDays.getText() != null) etDays.setSelection(etDays.getText().length());
+                });
+            }
+        }
 
         com.zygisk_enc.notivault.BaseActivity.showDialog(context, new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.dialog_custom_days_title)
@@ -424,18 +444,34 @@ public class AutoDeleteDialogHelper {
             int globalDays = globalDaysProvider.getGlobalDays();
             String globalLabel = globalDays == 0 ? context.getString(R.string.chip_rule_never_delete) : globalDays + "d";
 
+            android.util.TypedValue typedValue = new android.util.TypedValue();
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorPrimaryContainer, typedValue, true);
+            int primaryContainer = typedValue.data;
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnPrimaryContainer, typedValue, true);
+            int onPrimaryContainer = typedValue.data;
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorSurfaceContainerHigh, typedValue, true);
+            int surfaceContainerHigh = typedValue.data;
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurfaceVariant, typedValue, true);
+            int onSurfaceVariant = typedValue.data;
+
             if (rule == null) {
-                holder.chipRule.setText(context.getString(R.string.chip_rule_global_format, globalLabel));
-                holder.chipRule.setChipIconResource(R.drawable.ic_clock);
-                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+                holder.tvRuleLabel.setText(context.getString(R.string.chip_rule_global_format, globalLabel));
+                holder.ivRuleIcon.setImageResource(R.drawable.ic_clock);
+                holder.cardRuleBadge.setCardBackgroundColor(surfaceContainerHigh);
+                holder.tvRuleLabel.setTextColor(onSurfaceVariant);
+                holder.ivRuleIcon.setColorFilter(onSurfaceVariant);
             } else if (rule == -1) {
-                holder.chipRule.setText(R.string.chip_rule_never_delete);
-                holder.chipRule.setChipIconResource(R.drawable.ic_lock);
-                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+                holder.tvRuleLabel.setText(R.string.chip_rule_never_delete);
+                holder.ivRuleIcon.setImageResource(R.drawable.ic_lock);
+                holder.cardRuleBadge.setCardBackgroundColor(primaryContainer);
+                holder.tvRuleLabel.setTextColor(onPrimaryContainer);
+                holder.ivRuleIcon.setColorFilter(onPrimaryContainer);
             } else {
-                holder.chipRule.setText(rule == 1 ? context.getString(R.string.retention_after_1_day) : context.getString(R.string.retention_after_x_days, rule));
-                holder.chipRule.setChipIconResource(R.drawable.ic_delete_sweep);
-                holder.chipRule.setChipBackgroundColorResource(android.R.color.transparent);
+                holder.tvRuleLabel.setText(rule == 1 ? context.getString(R.string.retention_after_1_day) : context.getString(R.string.retention_after_x_days, rule));
+                holder.ivRuleIcon.setImageResource(R.drawable.ic_delete_sweep);
+                holder.cardRuleBadge.setCardBackgroundColor(primaryContainer);
+                holder.tvRuleLabel.setTextColor(onPrimaryContainer);
+                holder.ivRuleIcon.setColorFilter(onPrimaryContainer);
             }
 
             holder.itemView.setOnClickListener(v -> showRuleSelectorDialog(item));
@@ -531,17 +567,23 @@ public class AutoDeleteDialogHelper {
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
+            final com.google.android.material.card.MaterialCardView cardAppItem;
             final ImageView ivAppIcon;
             final TextView tvAppName;
             final TextView tvPackageName;
-            final Chip chipRule;
+            final com.google.android.material.card.MaterialCardView cardRuleBadge;
+            final ImageView ivRuleIcon;
+            final TextView tvRuleLabel;
 
             ViewHolder(@NonNull View itemView) {
                 super(itemView);
+                cardAppItem = itemView.findViewById(R.id.card_app_item);
                 ivAppIcon = itemView.findViewById(R.id.iv_app_icon);
                 tvAppName = itemView.findViewById(R.id.tv_app_name);
                 tvPackageName = itemView.findViewById(R.id.tv_package_name);
-                chipRule = itemView.findViewById(R.id.chip_app_rule);
+                cardRuleBadge = itemView.findViewById(R.id.card_rule_badge);
+                ivRuleIcon = itemView.findViewById(R.id.iv_rule_icon);
+                tvRuleLabel = itemView.findViewById(R.id.tv_rule_label);
             }
         }
     }

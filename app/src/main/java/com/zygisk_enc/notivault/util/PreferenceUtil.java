@@ -16,6 +16,8 @@ public class PreferenceUtil {
     private static final String KEY_LAST_AUTO_DELETE = "last_auto_delete_time";
     public static final String KEY_ACTIVE_PROFILE_MODE = "active_profile_mode"; // 0 = Personal, 1 = Work
     public static final String KEY_CAPTURE_EXTENDED_METADATA = "capture_extended_metadata";
+    // Encryption toggle key
+    private static final String KEY_ENCRYPTION_ENABLED = "encryption_enabled";
 
     public static boolean isExtendedMetadataEnabled(Context context) {
         if (context == null) return false;
@@ -230,10 +232,14 @@ public class PreferenceUtil {
 
     public static String getWidgetFeedPackage(Context context, int appWidgetId, int profileMode) {
         if (context == null) return null;
-        String key = "widget_feed_filter_pkg_" + profileMode + "_" + appWidgetId;
+        int targetMode = (profileMode <= 0) ? 0 : profileMode;
+        String key = "widget_feed_filter_pkg_" + targetMode + "_" + appWidgetId;
         String val = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null);
-        if (val == null && profileMode <= 0) {
+        if (val == null && targetMode == 0) {
             val = PreferenceManager.getDefaultSharedPreferences(context).getString("widget_feed_filter_pkg_" + appWidgetId, null);
+            if (val == null) {
+                val = PreferenceManager.getDefaultSharedPreferences(context).getString("widget_feed_filter_pkg_-1_" + appWidgetId, null);
+            }
         }
         return val;
     }
@@ -246,7 +252,8 @@ public class PreferenceUtil {
 
     public static void setWidgetFeedPackage(Context context, int appWidgetId, String packageName, int profileMode) {
         if (context == null) return;
-        String key = "widget_feed_filter_pkg_" + profileMode + "_" + appWidgetId;
+        int targetMode = (profileMode <= 0) ? 0 : profileMode;
+        String key = "widget_feed_filter_pkg_" + targetMode + "_" + appWidgetId;
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit().putString(key, packageName).commit();
     }

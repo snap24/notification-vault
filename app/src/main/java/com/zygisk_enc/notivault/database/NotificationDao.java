@@ -26,6 +26,21 @@ public interface NotificationDao {
     @Query("DELETE FROM notifications WHERE isFavorite = 0")
     void deleteAll();
 
+    @Query("SELECT MAX(id) FROM notifications")
+    Long getMaxId();
+
+    @Query("SELECT imagePath FROM notifications WHERE isFavorite = 0 AND id <= :maxId AND timestamp <= :cutOffTime AND imagePath IS NOT NULL")
+    List<String> getDeletableImagePathsUpTo(long maxId, long cutOffTime);
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE isFavorite = 0 AND id <= :maxId AND timestamp <= :cutOffTime")
+    int getCountUpTo(long maxId, long cutOffTime);
+
+    @Query("DELETE FROM notifications WHERE id IN (SELECT id FROM notifications WHERE isFavorite = 0 AND id <= :maxId AND timestamp <= :cutOffTime LIMIT :limit)")
+    int deleteBatchUpTo(long maxId, long cutOffTime, int limit);
+
+    @Query("DELETE FROM notifications WHERE isFavorite = 0 AND id <= :maxId AND timestamp <= :cutOffTime")
+    void deleteAllUpTo(long maxId, long cutOffTime);
+
     @Query("DELETE FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0")
     void deleteOlderThan(long timestamp);
 
@@ -49,6 +64,18 @@ public interface NotificationDao {
 
     @Query("SELECT imagePath FROM notifications WHERE timestamp < :timestamp AND isFavorite = 0 AND imagePath IS NOT NULL")
     List<String> getOldImagePaths(long timestamp);
+
+    @Query("SELECT imagePath FROM notifications WHERE isFavorite = 0 AND imagePath IS NOT NULL")
+    List<String> getAllDeletableImagePaths();
+
+    @Query("SELECT imagePath FROM notifications WHERE timestamp >= :startTime AND timestamp <= :endTime AND isFavorite = 0 AND imagePath IS NOT NULL")
+    List<String> getImagePathsForDateRange(long startTime, long endTime);
+
+    @Query("DELETE FROM search_tokens WHERE notificationId IN (SELECT id FROM notifications WHERE timestamp >= :startTime AND timestamp <= :endTime AND isFavorite = 0)")
+    void deleteSearchTokensForDateRange(long startTime, long endTime);
+
+    @Query("DELETE FROM search_tokens WHERE notificationId IN (SELECT id FROM notifications WHERE packageName IN (:packages))")
+    void deleteSearchTokensForPackages(List<String> packages);
 
     @Query("DELETE FROM notifications WHERE timestamp >= :startTime AND timestamp <= :endTime AND isFavorite = 0")
     void deleteByDateRange(long startTime, long endTime);
@@ -101,7 +128,7 @@ public interface NotificationDao {
            "ORDER BY timestamp DESC, id DESC LIMIT :limit")
     LiveData<List<NotificationEntity>> searchByTokenHashes(List<Long> tokenHashes, int tokenCount, String packageName, int isFavoriteOnly, int limit, Long dateStart, Long dateEnd, int profileMode);
 
-    @Query("SELECT * FROM notifications WHERE id NOT IN (SELECT DISTINCT notificationId FROM search_tokens) ORDER BY id DESC LIMIT :limit")
+    @Query("SELECT * FROM notifications WHERE NOT EXISTS (SELECT 1 FROM search_tokens st WHERE st.notificationId = notifications.id) ORDER BY id DESC LIMIT :limit")
     List<NotificationEntity> getUnindexedNotifications(int limit);
 
     @Query("SELECT packageName, appName, COUNT(*) as count, userId FROM notifications " +
@@ -119,6 +146,9 @@ public interface NotificationDao {
            "WHERE isRead = 0 " +
            "AND ((:profileMode = -1) OR (:profileMode = 0 AND userId = 0) OR (:profileMode = 1 AND userId != 0))")
     LiveData<Integer> getUnreadCount(int profileMode);
+
+    @Query("SELECT COUNT(*) FROM notifications")
+    int getTotalCountSync();
 
     @Query("SELECT COUNT(*) FROM notifications WHERE timestamp >= :startTimestamp")
     LiveData<Integer> getCountSince(long startTimestamp);
@@ -232,4 +262,16 @@ public interface NotificationDao {
 
     @Query("SELECT * FROM notifications WHERE bundleId = :bundleId ORDER BY timestamp DESC, id DESC")
     List<NotificationEntity> getNotificationsByBundleIdSync(String bundleId);
+
+    @androidx.room.Update
+    void updateAll(List<NotificationEntity> notifications);
+
+    @Query("SELECT * FROM notifications WHERE title LIKE '%:%' OR text LIKE '%:%' OR bigText LIKE '%:%'")
+    List<NotificationEntity> getLegacyEncryptedNotificationsSync();
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE title LIKE '%:%' OR text LIKE '%:%' OR bigText LIKE '%:%'")
+    int getLegacyEncryptedCountSync();
+
+    @androidx.room.Delete
+    void deleteAllEntities(List<NotificationEntity> notifications);
 }

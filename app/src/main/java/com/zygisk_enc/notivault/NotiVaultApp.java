@@ -13,16 +13,24 @@ public class NotiVaultApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        try {
+            System.loadLibrary("sqlcipher");
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
         // Initialize dynamic shortcuts on app process start
         ShortcutHelper.updateDynamicShortcuts(this);
 
-        // Immediately lock app when the device screen turns off / power button is pressed
+        // Immediately lock app and purge decrypted cache when the device screen turns off / power button is pressed
         android.content.IntentFilter screenOffFilter = new android.content.IntentFilter(android.content.Intent.ACTION_SCREEN_OFF);
         registerReceiver(new android.content.BroadcastReceiver() {
             @Override
             public void onReceive(android.content.Context context, android.content.Intent intent) {
                 if (android.content.Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                     AppLockManager.setUnlocked(false);
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
                 }
             }
         }, screenOffFilter);
@@ -73,7 +81,7 @@ public class NotiVaultApp extends Application {
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        if (level >= TRIM_MEMORY_BACKGROUND) {
+        if (level >= TRIM_MEMORY_UI_HIDDEN) {
             com.zygisk_enc.notivault.util.AppIconLoader.getInstance(this).clearCache();
             com.zygisk_enc.notivault.adapter.NotificationAdapter.clearImageCache();
             com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();

@@ -1,5 +1,6 @@
 package com.zygisk_enc.notivault.fragment;
 
+import com.zygisk_enc.notivault.MainActivity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -87,6 +88,8 @@ public class HistoryFragment extends Fragment {
     private boolean isLoadingPage = false;
     private boolean userHasScrolled = false;
     private String currentScrollingDateLabel = "";
+    private boolean isSearchBoxScrolledAway = false;
+    private long listBuildGeneration = 0;
 
     // SAF folder picker for cloud backup destination
     private final ActivityResultLauncher<Uri> folderPickerLauncher = registerForActivityResult(
@@ -138,15 +141,7 @@ public class HistoryFragment extends Fragment {
             startActivity(intent);
         });
 
-        binding.chipCloudBackup.setOnClickListener(v -> {
-            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(this::showCloudBackupDialog, getString(R.string.auth_cloud_backup));
-            } else {
-                showCloudBackupDialog();
-            }
-        });
+        binding.chipCloudBackup.setOnClickListener(v -> showCloudBackupDialog());
         binding.chipClearLogs.setOnClickListener(v -> showDeleteCalendar());
 
         viewModel.getFilterFavorites().observe(getViewLifecycleOwner(), favsOnly -> {
@@ -331,6 +326,21 @@ public class HistoryFragment extends Fragment {
             }
         });
 
+        binding.appBarHistory.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            boolean scrolledAway = Math.abs(verticalOffset) > 40;
+            if (scrolledAway != isSearchBoxScrolledAway) {
+                isSearchBoxScrolledAway = scrolledAway;
+                updateToolbarDatePill();
+            }
+        });
+
+        binding.etSearch.setOnFocusChangeListener((v, hasFocus) -> {
+            if (searchBackPressedCallback != null) {
+                String query = binding.etSearch.getText() != null ? binding.etSearch.getText().toString().trim() : "";
+                searchBackPressedCallback.setEnabled(hasFocus || !query.isEmpty());
+            }
+        });
+
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
@@ -338,7 +348,7 @@ public class HistoryFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s != null ? s.toString().trim() : "";
                 if (searchBackPressedCallback != null) {
-                    searchBackPressedCallback.setEnabled(!query.isEmpty());
+                    searchBackPressedCallback.setEnabled(binding.etSearch.hasFocus() || !query.isEmpty());
                 }
 
                 if (!query.isEmpty()) {
@@ -472,7 +482,13 @@ public class HistoryFragment extends Fragment {
 
     private void openSearchBox() {
         if (binding == null || !isAdded()) return;
+        if (binding.appBarHistory != null) {
+            binding.appBarHistory.setExpanded(true, true);
+        }
         binding.etSearch.requestFocus();
+        if (searchBackPressedCallback != null) {
+            searchBackPressedCallback.setEnabled(true);
+        }
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
@@ -485,6 +501,7 @@ public class HistoryFragment extends Fragment {
         }
         if (binding == null) return;
         binding.etSearch.setText("");
+        binding.etSearch.clearFocus();
         viewModel.setSearchQuery(null);
         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
@@ -585,37 +602,21 @@ public class HistoryFragment extends Fragment {
                         }));
             };
 
-            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedToDeleteDate, getString(R.string.auth_delete_notifications));
-            } else {
-                proceedToDeleteDate.run();
-            }
+            proceedToDeleteDate.run();
         });
 
         picker.show(getParentFragmentManager(), "DELETE_CALENDAR_PICKER");
     }
 
     private void confirmDeleteAll() {
-        Runnable proceedToClear = () -> {
-            BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.clear_all_title)
-                    .setMessage(R.string.clear_all_message)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.clear, (dialog, which) -> {
-                        viewModel.deleteAll();
-                        showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.snackbar_all_notifications_cleared, Snackbar.LENGTH_SHORT));
-                    }));
-        };
-
-        boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("biometric_lock", false);
-        if (isBiometricEnabled) {
-            verifyBiometricsToProceed(proceedToClear, getString(R.string.auth_clear_all_notifications));
-        } else {
-            proceedToClear.run();
-        }
+        BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.clear_all_title)
+                .setMessage(R.string.clear_all_message)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.clear, (dialog, which) -> {
+                    viewModel.deleteAll();
+                    showAnchoredSnackbar(Snackbar.make(binding.getRoot(), R.string.snackbar_all_notifications_cleared, Snackbar.LENGTH_SHORT));
+                }));
     }
 
     private void showAnchoredSnackbar(Snackbar snackbar) {
@@ -686,6 +687,7 @@ public class HistoryFragment extends Fragment {
 
     private void observeNotifications() {
         viewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            final long currentGen = ++listBuildGeneration;
             rawNotificationCount = notifications != null ? notifications.size() : 0;
             if (binding != null) {
                 binding.swipeRefresh.removeCallbacks(stopRefreshRunnable);
@@ -693,67 +695,75 @@ public class HistoryFragment extends Fragment {
             }
             if (notifications == null || notifications.isEmpty()) {
                 showRecyclerView(false);
-            } else {
-                android.util.Log.d("NotiVault_Decryption", "HistoryFragment observer received notifications list size: " + (notifications != null ? notifications.size() : 0) + " at " + System.currentTimeMillis());
-                showRecyclerView(true);
+                adapter.submitList(new ArrayList<>());
+                return;
+            }
+            android.util.Log.d("NotiVault_Decryption", "HistoryFragment observer received notifications list size: " + (notifications != null ? notifications.size() : 0) + " at " + System.currentTimeMillis());
+            showRecyclerView(true);
 
-                final boolean viewingMsg = isViewingMessage;
-                isViewingMessage = false;
+            final boolean viewingMsg = isViewingMessage;
+            isViewingMessage = false;
 
-                androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
-                        (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                int firstVisiblePos = -1;
-                int topOffset = 0;
-                if (layoutManager != null) {
-                    firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
-                    android.view.View firstVisibleView = layoutManager.findViewByPosition(firstVisiblePos);
-                    if (firstVisibleView != null) {
-                        topOffset = firstVisibleView.getTop() - binding.recyclerView.getPaddingTop();
-                    }
+            androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
+                    (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+            int firstVisiblePos = -1;
+            int topOffset = 0;
+            if (layoutManager != null) {
+                firstVisiblePos = layoutManager.findFirstVisibleItemPosition();
+                android.view.View firstVisibleView = layoutManager.findViewByPosition(firstVisiblePos);
+                if (firstVisibleView != null) {
+                    topOffset = firstVisibleView.getTop() - binding.recyclerView.getPaddingTop();
                 }
+            }
 
-                final int restorePos = firstVisiblePos;
-                final int restoreOffset = topOffset;
-                final Context ctx = getContext();
+            final int restorePos = firstVisiblePos;
+            final int restoreOffset = topOffset;
+            final Context ctx = getContext();
 
-                AppExecutor.execute(() -> {
-                    List<NotificationAdapter.ListItem> items = buildListWithHeaders(ctx, notifications);
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            if (binding == null) return;
-                            android.util.Log.d("NotiVault_Decryption", "HistoryFragment submitting list to adapter size: " + items.size() + " at " + System.currentTimeMillis());
-                            adapter.submitList(items, () -> {
-                                isLoadingPage = false;
-                                if (binding != null) {
-                                    if (viewingMsg && layoutManager != null && restorePos >= 0) {
-                                        layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
-                                    } else if (!userHasScrolled) {
-                                        androidx.recyclerview.widget.LinearLayoutManager lm =
-                                                (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
-                                        if (lm != null) {
-                                            lm.scrollToPositionWithOffset(0, 0);
-                                        }
-                                    }
-                                    if (layoutManager != null) {
-                                        updateScrollingDateBadge(layoutManager.findFirstVisibleItemPosition());
-                                    }
-                                    // Auto-load next page if the list doesn't fill the screen and more data exists
-                                    if (!binding.recyclerView.canScrollVertically(1)
-                                            && !binding.recyclerView.canScrollVertically(-1)) {
-                                        Integer currentLimit = viewModel.getFilterLimit().getValue();
-                                        int rawCount = viewModel.getNotifications().getValue() != null
-                                                ? viewModel.getNotifications().getValue().size() : 0;
-                                        if (!isLoadingPage && currentLimit != null && rawCount >= currentLimit) {
-                                            isLoadingPage = true;
-                                            viewModel.loadNextPage();
-                                        }
+            AppExecutor.execute(() -> {
+                if (currentGen != listBuildGeneration) {
+                    return;
+                }
+                List<NotificationAdapter.ListItem> items = buildListWithHeaders(ctx, notifications);
+                if (currentGen != listBuildGeneration) {
+                    return;
+                }
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (binding == null || currentGen != listBuildGeneration) return;
+                        android.util.Log.d("NotiVault_Decryption", "HistoryFragment submitting list to adapter size: " + items.size() + " at " + System.currentTimeMillis());
+                        adapter.submitList(items, () -> {
+                            if (currentGen != listBuildGeneration) return;
+                            isLoadingPage = false;
+                            if (binding != null) {
+                                if (viewingMsg && layoutManager != null && restorePos >= 0) {
+                                    layoutManager.scrollToPositionWithOffset(restorePos, restoreOffset);
+                                } else if (!userHasScrolled) {
+                                    androidx.recyclerview.widget.LinearLayoutManager lm =
+                                            (androidx.recyclerview.widget.LinearLayoutManager) binding.recyclerView.getLayoutManager();
+                                    if (lm != null) {
+                                        lm.scrollToPositionWithOffset(0, 0);
                                     }
                                 }
-                            });
+                                if (layoutManager != null) {
+                                    updateScrollingDateBadge(layoutManager.findFirstVisibleItemPosition());
+                                }
+                                // Auto-load next page if the list doesn't fill the screen and more data exists
+                                if (!binding.recyclerView.canScrollVertically(1)
+                                        && !binding.recyclerView.canScrollVertically(-1)) {
+                                    Integer currentLimit = viewModel.getFilterLimit().getValue();
+                                    int rawCount = viewModel.getNotifications().getValue() != null
+                                            ? viewModel.getNotifications().getValue().size() : 0;
+                                    if (!isLoadingPage && currentLimit != null && rawCount >= currentLimit) {
+                                        isLoadingPage = true;
+                                        viewModel.loadNextPage();
+                                    }
+                                }
+                            }
                         });
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
 
         viewModel.getScrollToTopEvent().observe(getViewLifecycleOwner(), scroll -> {
@@ -779,6 +789,11 @@ public class HistoryFragment extends Fragment {
 
     private void animateScrollToTop() {
         if (binding == null) return;
+        if (binding.appBarHistory != null) {
+            binding.appBarHistory.setExpanded(true, true);
+        }
+        isSearchBoxScrolledAway = false;
+        updateToolbarDatePill();
         binding.recyclerView.stopScroll();
         userHasScrolled = false;
         androidx.recyclerview.widget.LinearLayoutManager lm = 
@@ -800,12 +815,25 @@ public class HistoryFragment extends Fragment {
                 .start();
     }
 
+    private void updateToolbarDatePill() {
+        if (getActivity() instanceof MainActivity) {
+            MainActivity activity = (MainActivity) getActivity();
+            boolean hasQuery = binding != null && binding.etSearch.getText() != null && binding.etSearch.getText().length() > 0;
+            if (isSearchBoxScrolledAway && !hasQuery && currentScrollingDateLabel != null && !currentScrollingDateLabel.isEmpty()) {
+                activity.setToolbarScrollDate(currentScrollingDateLabel, true);
+            } else {
+                activity.setToolbarScrollDate(null, false);
+            }
+        }
+    }
+
     private void updateScrollingDateBadge(int firstVisiblePos) {
         if (binding == null || adapter == null) return;
         if (binding.etSearch.getText() != null && binding.etSearch.getText().length() > 0) {
             if (binding.cardSearchScrollDate.getVisibility() != View.GONE) {
                 binding.cardSearchScrollDate.setVisibility(View.GONE);
             }
+            updateToolbarDatePill();
             return;
         }
 
@@ -814,6 +842,7 @@ public class HistoryFragment extends Fragment {
             if (binding.cardSearchScrollDate.getVisibility() != View.GONE) {
                 binding.cardSearchScrollDate.setVisibility(View.GONE);
             }
+            updateToolbarDatePill();
             return;
         }
 
@@ -831,6 +860,9 @@ public class HistoryFragment extends Fragment {
             if (!label.equals(currentScrollingDateLabel)) {
                 currentScrollingDateLabel = label;
                 binding.tvSearchScrollDate.setText(label);
+                if (isSearchBoxScrolledAway) {
+                    updateToolbarDatePill();
+                }
             }
             if (binding.cardSearchScrollDate.getVisibility() != View.VISIBLE) {
                 binding.cardSearchScrollDate.animate().cancel();
@@ -842,6 +874,12 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showRecyclerView(boolean show) {
+        if (binding != null && binding.layoutFeedLoading.getVisibility() == View.VISIBLE) {
+            binding.layoutFeedLoading.animate().alpha(0f).setDuration(180)
+                    .withEndAction(() -> {
+                        if (binding != null) binding.layoutFeedLoading.setVisibility(View.GONE);
+                    });
+        }
         if (show) {
             if (binding.recyclerView.getVisibility() != View.VISIBLE) {
                 binding.recyclerView.setAlpha(0f);
@@ -850,7 +888,9 @@ public class HistoryFragment extends Fragment {
             }
             if (binding.emptyState.getVisibility() == View.VISIBLE) {
                 binding.emptyState.animate().alpha(0f).setDuration(200)
-                        .withEndAction(() -> binding.emptyState.setVisibility(View.GONE));
+                        .withEndAction(() -> {
+                            if (binding != null) binding.emptyState.setVisibility(View.GONE);
+                        });
             }
         } else {
             if (binding.emptyState.getVisibility() != View.VISIBLE) {
@@ -860,7 +900,9 @@ public class HistoryFragment extends Fragment {
             }
             if (binding.recyclerView.getVisibility() == View.VISIBLE) {
                 binding.recyclerView.animate().alpha(0f).setDuration(200)
-                        .withEndAction(() -> binding.recyclerView.setVisibility(View.GONE));
+                        .withEndAction(() -> {
+                            if (binding != null) binding.recyclerView.setVisibility(View.GONE);
+                        });
             }
         }
     }
@@ -1117,7 +1159,8 @@ public class HistoryFragment extends Fragment {
                 dialogView.findViewById(R.id.progress_bundle_decrypt);
 
         rv.setAdapter(bundleAdapter);
-        int maxRvHeight = (int) (380 * getResources().getDisplayMetrics().density);
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        int maxRvHeight = Math.max((int) (560 * getResources().getDisplayMetrics().density), (int) (screenHeight * 0.72f));
         ViewGroup.LayoutParams rvLp = rv.getLayoutParams();
         if (rvLp != null) {
             rvLp.height = maxRvHeight;
@@ -1126,6 +1169,10 @@ public class HistoryFragment extends Fragment {
 
         dialog.setContentView(dialogView);
         setupDialogWindowAndBlur(dialog);
+        if (dialog.getWindow() != null) {
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.95f);
+            dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
         BaseActivity.showDialog(requireContext(), dialog);
 
         // Check if items in bundle are already decrypted
@@ -1507,39 +1554,6 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
-        Executor executor = ContextCompat.getMainExecutor(requireContext());
-        BiometricPrompt biometricPrompt = new BiometricPrompt(this,
-                executor, new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-            }
-
-            @Override
-            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(onSuccess);
-                }
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-            }
-        });
-
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.biometric_identity_verification))
-                .setSubtitle(subtitle)
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
-                                          BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                .build();
-
-        biometricPrompt.authenticate(promptInfo);
-    }
-
     // ── Cloud Backup ──────────────────────────────────────────────────────────
 
     /**
@@ -1582,41 +1596,13 @@ public class HistoryFragment extends Fragment {
             androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
                     .setTitle(R.string.cloud_backup_setup_title)
                     .setView(scrollView)
-                    .setPositiveButton(getString(R.string.pick_folder_countdown, 2), null)
+                    .setPositiveButton(R.string.pick_folder, (d, w) -> {
+                        AppLockManager.setExpectingActivityResult(true);
+                        folderPickerLauncher.launch(null);
+                    })
                     .setNegativeButton(R.string.cancel, null)
                     .setCancelable(true)
                     .create();
-
-            dialog.setOnShowListener(dialogInterface -> {
-                android.widget.Button btnPositive = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
-                btnPositive.setEnabled(false);
-                btnPositive.setOnClickListener(v -> {
-                    AppLockManager.setExpectingActivityResult(true);
-                    folderPickerLauncher.launch(null);
-                    dialog.dismiss();
-                });
-
-                // 2 seconds countdown handler
-                final int[] count = {2};
-                final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!dialog.isShowing() || !isAdded() || getActivity() == null) {
-                            return;
-                        }
-                        if (count[0] > 0) {
-                            btnPositive.setText(getString(R.string.pick_folder_countdown, count[0]));
-                            count[0]--;
-                            handler.postDelayed(this, 1000);
-                        } else {
-                            btnPositive.setText(R.string.pick_folder);
-                            btnPositive.setEnabled(true);
-                        }
-                    }
-                };
-                handler.post(runnable);
-            });
 
             BaseActivity.showDialog(ctx, dialog);
         }
@@ -1687,6 +1673,8 @@ public class HistoryFragment extends Fragment {
         com.google.android.material.textfield.TextInputLayout tilPass =
                 new com.google.android.material.textfield.TextInputLayout(ctx);
         tilPass.setHint(getString(R.string.hint_backup_password));
+        tilPass.setHelperText(getString(R.string.helper_backup_password_optional));
+        tilPass.setHelperTextEnabled(true);
         tilPass.setEndIconMode(com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE);
         TextInputEditText etPass = new TextInputEditText(ctx);
         etPass.setInputType(android.text.InputType.TYPE_CLASS_TEXT |
@@ -1751,10 +1739,6 @@ public class HistoryFragment extends Fragment {
         dialog.setOnShowListener(d -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String password = etPass.getText() != null ? etPass.getText().toString().trim() : "";
-                if (password.isEmpty()) {
-                    Toast.makeText(ctx, R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 int selectedIdx = spinner.getSelectedItemPosition();
                 int hours = scheduleHours[selectedIdx];
                 boolean includeMedia = switchMedia.isChecked();
@@ -1793,7 +1777,7 @@ public class HistoryFragment extends Fragment {
         String folderUriStr = PreferenceUtil.getCloudBackupUri(ctx);
         String password     = PreferenceUtil.getCloudBackupPassword(ctx);
 
-        if (folderUriStr == null || password == null || password.isEmpty()) {
+        if (folderUriStr == null || folderUriStr.isEmpty()) {
             Toast.makeText(ctx, R.string.toast_backup_folder_not_set, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -1821,7 +1805,7 @@ public class HistoryFragment extends Fragment {
         Intent intent = new Intent(ctx, com.zygisk_enc.notivault.service.BackupService.class);
         intent.setAction(com.zygisk_enc.notivault.service.BackupService.ACTION_EXPORT);
         intent.putExtra("uri", newFile.getUri().toString());
-        intent.putExtra("password", password);
+        intent.putExtra("password", password != null ? password : "");
         intent.putExtra("includeMedia", includeMedia);
         intent.putExtra("isCloudBackup", true);
         androidx.core.content.ContextCompat.startForegroundService(ctx, intent);
@@ -1854,6 +1838,9 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setToolbarScrollDate(null, false);
+        }
         if (searchDebounceRunnable != null) {
             searchDebounceHandler.removeCallbacks(searchDebounceRunnable);
         }

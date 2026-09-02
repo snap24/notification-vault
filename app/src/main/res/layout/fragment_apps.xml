@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="8dp"
+    android:paddingTop="0dp"
     android:paddingHorizontal="16dp">
 
     <!-- Batch Selection Bar (shown in multi-select mode) -->
@@ -13,12 +13,12 @@
         android:id="@+id/layout_batch_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
+        android:layout_marginBottom="6dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="2dp"
         app:strokeWidth="1dp"
         app:strokeColor="?attr/colorOutlineVariant"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
         android:visibility="gone">
 
         <LinearLayout
@@ -26,182 +26,235 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp">
+            android:paddingStart="8dp"
+            android:paddingEnd="10dp"
+            android:paddingVertical="6dp">
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/cb_select_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_all"
-                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
-
-            <TextView
-                android:id="@+id/tv_selected_count"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="@string/selected_count_format"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_delete_selected"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete"
-                style="@style/Widget.Material3.Button.TonalButton"
-                app:icon="@drawable/ic_trash_bin"
-                app:iconTint="?attr/colorError"
-                android:textColor="?attr/colorError"
-                app:cornerRadius="12dp"
-                android:layout_marginEnd="6dp" />
-
+            <!-- Cancel / Exit Selection Button -->
             <ImageButton
                 android:id="@+id/btn_cancel_selection"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:background="@drawable/bg_button_circle_ripple"
                 android:src="@drawable/ic_close"
                 android:contentDescription="@string/desc_cancel_selection"
-                app:tint="?attr/colorPrimary" />
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <!-- Select All CheckBox -->
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_select_all"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="@string/select_all"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                android:textColor="?attr/colorOnSurface"
+                android:textStyle="bold"
+                app:useMaterialThemeColors="true" />
+
+            <!-- Selected Count Pill Badge -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_selected_count"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer">
+
+                <TextView
+                    android:id="@+id/tv_selected_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/selected_count_format"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textColor="?attr/colorOnSecondaryContainer"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spacer pushing Delete to the right -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Delete Selected Action Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_selected"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/delete"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnErrorContainer"
+                app:backgroundTint="?attr/colorErrorContainer"
+                app:icon="@drawable/ic_trash_bin"
+                app:iconSize="16dp"
+                app:iconTint="?attr/colorOnErrorContainer"
+                app:iconPadding="4dp"
+                app:iconGravity="textStart"
+                app:cornerRadius="18dp"
+                app:elevation="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingHorizontal="14dp"
+                style="@style/Widget.Material3.Button.TonalButton" />
 
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Header Stats Banner -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/layout_header_stats"
+    <!-- Search bar for apps with Live Total Alerts Pill Badge -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="?attr/colorOutlineVariant"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
+        android:layout_marginBottom="4dp">
 
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_search_apps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="10dp">
+            app:hintEnabled="false"
+            app:startIconDrawable="@drawable/ic_search"
+            app:endIconMode="clear_text"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp">
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_nav_apps_selected"
-                app:tint="?attr/colorPrimary"
-                android:layout_marginEnd="8dp"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:id="@+id/tv_apps_header_summary"
-                android:layout_width="0dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_search_apps"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/tracked_applications"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                android:textColor="?attr/colorOnSurface"
-                android:textStyle="bold" />
+                android:hint="@string/search_tracked_apps_hint"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:paddingStart="48dp"
+                android:paddingEnd="110dp"
+                android:paddingVertical="10dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Live Total Alerts Pill Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_apps_total_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer">
 
             <TextView
                 android:id="@+id/tv_total_notifications_badge"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 notifications"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:text="0 alerts"
                 android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                 android:textColor="?attr/colorOnSecondaryContainer"
-                android:textStyle="bold"
-                android:background="@drawable/bg_widget_pill"
-                android:backgroundTint="?attr/colorSecondaryContainer"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp" />
+                android:textStyle="bold" />
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
-    <!-- Search bar for apps -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_search_apps"
+    <!-- Sorting Filter Chips & Delete Action Button Row -->
+    <LinearLayout
+        android:id="@+id/layout_sort_and_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/search_tracked_apps_hint"
-        android:layout_marginBottom="8dp"
-        app:startIconDrawable="@drawable/ic_search"
-        app:endIconMode="clear_text"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        app:boxCornerRadiusTopStart="24dp"
-        app:boxCornerRadiusTopEnd="24dp"
-        app:boxCornerRadiusBottomStart="24dp"
-        app:boxCornerRadiusBottomEnd="24dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_search_apps"
-            android:layout_width="match_parent"
+        <HorizontalScrollView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:singleLine="true"
-            android:maxLines="1"
-            android:paddingStart="48dp"
-            android:paddingVertical="10dp" />
+            android:layout_weight="1"
+            android:scrollbars="none">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:singleLine="true">
 
-    <!-- Sorting Filter Chips -->
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:scrollbars="none">
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sort_volume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sort_most_alerts"
+                    app:chipCornerRadius="12dp"
+                    app:chipStrokeWidth="1dp"
+                    app:chipStrokeColor="?attr/colorOutlineVariant"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chip_group_sort"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sort_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sort_name_az"
+                    android:checked="true"
+                    app:chipCornerRadius="12dp"
+                    app:chipStrokeWidth="1dp"
+                    app:chipStrokeColor="?attr/colorOutlineVariant"
+                    style="@style/Widget.Material3.Chip.Filter" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sort_least"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sort_least_alerts"
+                    app:chipCornerRadius="12dp"
+                    app:chipStrokeWidth="1dp"
+                    app:chipStrokeColor="?attr/colorOutlineVariant"
+                    style="@style/Widget.Material3.Chip.Filter" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </HorizontalScrollView>
+
+        <!-- Delete Trigger Button (Styled with neutral theme / grey to match chips) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_trigger_delete_apps"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:singleLine="true">
+            android:layout_height="34dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/delete"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:backgroundTint="?attr/colorSurfaceContainerLow"
+            app:icon="@drawable/ic_trash_bin"
+            app:iconSize="14dp"
+            app:iconTint="?attr/colorOnSurfaceVariant"
+            app:iconPadding="4dp"
+            app:iconGravity="textStart"
+            app:cornerRadius="12dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            android:paddingHorizontal="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:elevation="0dp"
+            style="@style/Widget.Material3.Button.TonalButton" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_sort_volume"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sort_most_alerts"
-                app:chipCornerRadius="12dp"
-                app:chipStrokeWidth="1dp"
-                app:chipStrokeColor="?attr/colorOutlineVariant"
-                style="@style/Widget.Material3.Chip.Filter" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_sort_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sort_name_az"
-                android:checked="true"
-                app:chipCornerRadius="12dp"
-                app:chipStrokeWidth="1dp"
-                app:chipStrokeColor="?attr/colorOutlineVariant"
-                style="@style/Widget.Material3.Chip.Filter" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_sort_least"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sort_least_alerts"
-                app:chipCornerRadius="12dp"
-                app:chipStrokeWidth="1dp"
-                app:chipStrokeColor="?attr/colorOutlineVariant"
-                style="@style/Widget.Material3.Chip.Filter" />
-
-        </com.google.android.material.chip.ChipGroup>
-
-    </HorizontalScrollView>
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

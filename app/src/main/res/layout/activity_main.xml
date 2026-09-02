@@ -125,6 +125,48 @@
                 app:iconTint="?attr/colorPrimary"
                 android:textColor="?attr/colorPrimary" />
 
+            <!-- Scrolling Feed Date Pill Badge (Visible on the left side of Source button when search box is scrolled away) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_toolbar_scroll_date"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="10dp">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="?attr/colorOnSecondaryContainer"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:id="@+id/tv_toolbar_scroll_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Today"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Work Profile Active Tag (Visible ONLY in Work Profile mode, to the left of Source button) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_toolbar_work_tag"
@@ -164,18 +206,6 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-            <ImageButton
-                android:id="@+id/btn_delete_apps"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_button_circle_ripple"
-                android:src="@drawable/ic_trash_bin"
-                android:contentDescription="@string/desc_delete_app_logs"
-                app:tint="?attr/colorPrimary"
-                android:visibility="gone" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 

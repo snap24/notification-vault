@@ -33,6 +33,7 @@ public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
+    private android.content.SharedPreferences.OnSharedPreferenceChangeListener profilePrefListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,16 +98,14 @@ public class MainActivity extends BaseActivity {
             });
 
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                if (destination.getId() == R.id.navigation_apps) {
-                    binding.btnDeleteApps.setVisibility(android.view.View.VISIBLE);
-                } else {
-                    binding.btnDeleteApps.setVisibility(android.view.View.GONE);
-                }
-
                 if (destination.getId() == R.id.navigation_settings) {
                     binding.btnToolbarWidgets.setVisibility(android.view.View.VISIBLE);
                 } else {
                     binding.btnToolbarWidgets.setVisibility(android.view.View.GONE);
+                }
+
+                if (destination.getId() != R.id.navigation_history) {
+                    setToolbarScrollDate(null, false);
                 }
             });
         }
@@ -119,35 +118,77 @@ public class MainActivity extends BaseActivity {
         // Check and trigger background database bundling (first 3 opens + weekly maintenance)
         com.zygisk_enc.notivault.util.BundleManager.checkAndTriggerAppLaunchBundling(this);
 
+        // Check and perform one-time migration for legacy per-record encrypted entries
+        checkAndPerformLegacyMigration();
+
         com.zygisk_enc.notivault.viewmodel.NotificationViewModel notifViewModel =
                 new androidx.lifecycle.ViewModelProvider(this)
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
 
+        profilePrefListener = (prefs, key) -> {
+            if ("force_show_work_profile".equals(key)) {
+                com.zygisk_enc.notivault.util.ProfileUtil.invalidateCache();
+                runOnUiThread(() -> {
+                    setupProfileSwitcher(notifViewModel);
+                    boolean isEnabled = prefs.getBoolean("force_show_work_profile", false);
+                    if (!isEnabled && notifViewModel.getProfileMode().getValue() != null && notifViewModel.getProfileMode().getValue() != 0) {
+                        notifViewModel.setProfileMode(0);
+                    }
+                });
+            }
+        };
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(profilePrefListener);
+
+        final android.os.Handler progressHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable hideProgressRunnable = () -> {
+            if (binding != null && binding.cardToolbarDecryption != null) {
+                binding.cardToolbarDecryption.animate().cancel();
+                binding.cardToolbarDecryption.animate().alpha(0f).setDuration(180).withEndAction(() -> {
+                    if (binding != null) {
+                        binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
+                    }
+                }).start();
+            }
+        };
+
         notifViewModel.getOperationProgress().observe(this, op -> {
-            boolean shouldShow = op != null && op.progress >= 0 && (op.progress < 100 || op.type != com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE);
-            int newVisibility = shouldShow ? android.view.View.VISIBLE : android.view.View.GONE;
-            if (binding.cardToolbarDecryption.getVisibility() != newVisibility) {
-                if (shouldShow) {
+            boolean shouldShow = op != null && op.type != com.zygisk_enc.notivault.viewmodel.NotificationViewModel.OperationProgress.TYPE_NONE && op.progress >= 0;
+            if (shouldShow) {
+                progressHandler.removeCallbacks(hideProgressRunnable);
+                if (binding.cardToolbarDecryption.getVisibility() != android.view.View.VISIBLE) {
                     binding.cardToolbarDecryption.animate().cancel();
                     binding.cardToolbarDecryption.setAlpha(0f);
                     binding.cardToolbarDecryption.setVisibility(android.view.View.VISIBLE);
-                    binding.cardToolbarDecryption.animate().alpha(1f).setDuration(150).start();
-                } else {
-                    binding.cardToolbarDecryption.animate().cancel();
-                    binding.cardToolbarDecryption.animate().alpha(0f).setDuration(150).withEndAction(() -> {
-                        binding.cardToolbarDecryption.setVisibility(android.view.View.GONE);
-                    }).start();
+                    binding.cardToolbarDecryption.animate().alpha(1f).setDuration(120).start();
                 }
-            }
-            if (shouldShow) {
                 int progress = Math.min(100, Math.max(0, op.progress));
                 binding.progressToolbarDecryption.setProgressCompat(progress, true);
+                if (progress >= 100) {
+                    progressHandler.removeCallbacks(hideProgressRunnable);
+                    progressHandler.postDelayed(hideProgressRunnable, 200);
+                }
+            } else {
+                progressHandler.removeCallbacks(hideProgressRunnable);
+                progressHandler.postDelayed(hideProgressRunnable, 80);
             }
         });
 
         // Observe search query and notifications to update search count pill
         notifViewModel.getSearchQuery().observe(this, query -> updateSearchCountPill(query, notifViewModel.getNotifications().getValue()));
         notifViewModel.getNotifications().observe(this, list -> updateSearchCountPill(notifViewModel.getSearchQuery().getValue(), list));
+
+        // Observe post-import verification event
+        notifViewModel.getPostImportVerificationTrigger().observe(this, trigger -> {
+            if (trigger != null && trigger) {
+                notifViewModel.clearPostImportVerificationTrigger();
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                        .edit().remove("pending_post_import_verify").apply();
+                com.zygisk_enc.notivault.util.DatabaseIntegrityHelper.runIntegrityCheck(this, () -> {
+                    notifViewModel.refreshAppSummaries();
+                });
+            }
+        });
 
         // Make the bottom navigation card translucent glass-like
         int surfaceColor = com.google.android.material.color.MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, android.graphics.Color.WHITE);
@@ -213,10 +254,30 @@ public class MainActivity extends BaseActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleShortcutIntent(intent);
+        checkPendingPostImportVerification();
     }
 
     private void handleShortcutIntent(Intent intent) {
         if (intent == null) return;
+
+        // Check if intent came from tapping a widget feed notification item
+        String pkgName = intent.getStringExtra("package_name");
+        if (pkgName != null && !pkgName.trim().isEmpty()) {
+            if (navController != null) {
+                navController.navigate(R.id.navigation_history);
+                com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                        new androidx.lifecycle.ViewModelProvider(this)
+                        .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                vm.setFilterFavorites(false);
+                vm.setDateFilter(null, null);
+                vm.setFilterPackage(pkgName.trim());
+                vm.requestScrollToTop();
+            }
+            intent.removeExtra("package_name");
+            intent.removeExtra("notification_id");
+            return;
+        }
+
         String action = intent.getStringExtra("shortcut_action");
         if (action == null) return;
 
@@ -346,6 +407,28 @@ public class MainActivity extends BaseActivity {
                 .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
         setupProfileSwitcher(notifViewModel);
         checkPermissionsSequence();
+        checkPendingPostImportVerification();
+    }
+
+    private void checkPendingPostImportVerification() {
+        boolean pending = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("pending_post_import_verify", false);
+        boolean fromIntent = getIntent() != null && getIntent().getBooleanExtra("trigger_verify_integrity", false);
+        if (pending || fromIntent) {
+            androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                    .edit().remove("pending_post_import_verify").apply();
+            if (getIntent() != null) {
+                getIntent().removeExtra("trigger_verify_integrity");
+            }
+            com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                    new androidx.lifecycle.ViewModelProvider(this)
+                    .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+            vm.clearPostImportVerificationTrigger();
+
+            com.zygisk_enc.notivault.util.DatabaseIntegrityHelper.runIntegrityCheck(this, () -> {
+                vm.refreshAppSummaries();
+            });
+        }
     }
 
     private boolean isNotificationServiceEnabled() {
@@ -461,12 +544,6 @@ public class MainActivity extends BaseActivity {
         showDialog(this, activePermissionDialog);
     }
 
-    public void setOnDeleteAppsClickListener(android.view.View.OnClickListener listener) {
-        if (binding != null && binding.btnDeleteApps != null) {
-            binding.btnDeleteApps.setOnClickListener(listener);
-        }
-    }
-
     private void showWidgetsGuideDialog() {
         com.google.android.material.bottomsheet.BottomSheetDialog dialog =
                 new com.google.android.material.bottomsheet.BottomSheetDialog(this);
@@ -524,8 +601,107 @@ public class MainActivity extends BaseActivity {
         showDialog(this, dialog);
     }
 
+    private void checkAndPerformLegacyMigration() {
+        if (com.zygisk_enc.notivault.util.LegacyRecordConverter.isMigrationCompleted(this)) {
+            return;
+        }
+        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+            int legacyCount = com.zygisk_enc.notivault.util.LegacyRecordConverter.countLegacyRecords(this);
+            if (legacyCount > 0) {
+                runOnUiThread(() -> showMigrationDialog(legacyCount));
+            } else {
+                com.zygisk_enc.notivault.util.LegacyRecordConverter.setMigrationCompleted(this, true);
+            }
+        });
+    }
+
+    private void showMigrationDialog(int totalRecords) {
+        if (isFinishing() || isDestroyed()) return;
+
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_migration, null);
+        com.google.android.material.progressindicator.LinearProgressIndicator progressBar =
+                dialogView.findViewById(R.id.progress_migration);
+        android.widget.TextView tvProgressText = dialogView.findViewById(R.id.tv_migration_progress_text);
+
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        com.zygisk_enc.notivault.util.LegacyRecordConverter.convertAll(this, com.zygisk_enc.notivault.util.LegacyRecordConverter.ACTION_PLACEHOLDER, new com.zygisk_enc.notivault.util.LegacyRecordConverter.MigrationProgressListener() {
+            @Override
+            public void onProgress(int current, int total, int percentage) {
+                runOnUiThread(() -> {
+                    progressBar.setProgressCompat(percentage, true);
+                    tvProgressText.setText(getString(R.string.migration_dialog_progress, current, total, percentage));
+                });
+            }
+
+            @Override
+            public void onComplete() {
+                runOnUiThread(() -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    com.google.android.material.snackbar.Snackbar.make(
+                            binding.getRoot(), R.string.migration_dialog_complete, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show();
+
+                    // Refresh feed with clean plaintext
+                    com.zygisk_enc.notivault.viewmodel.NotificationViewModel vm =
+                            new androidx.lifecycle.ViewModelProvider(MainActivity.this)
+                            .get(com.zygisk_enc.notivault.viewmodel.NotificationViewModel.class);
+                    vm.resetAllFilters();
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+    }
+
+    public void setToolbarScrollDate(String label, boolean visible) {
+        if (binding == null) return;
+        if (visible && label != null && !label.isEmpty()) {
+            binding.tvToolbarScrollDate.setText(label);
+            if (binding.cardToolbarScrollDate.getVisibility() != android.view.View.VISIBLE) {
+                binding.cardToolbarScrollDate.animate().cancel();
+                binding.cardToolbarScrollDate.setAlpha(0f);
+                binding.cardToolbarScrollDate.setVisibility(android.view.View.VISIBLE);
+                binding.cardToolbarScrollDate.animate().alpha(1f).setDuration(150).start();
+            }
+        } else {
+            if (binding.cardToolbarScrollDate.getVisibility() != android.view.View.GONE) {
+                binding.cardToolbarScrollDate.animate().cancel();
+                binding.cardToolbarScrollDate.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+                    if (binding != null) binding.cardToolbarScrollDate.setVisibility(android.view.View.GONE);
+                }).start();
+            }
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         return navController != null && navController.navigateUp() || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (profilePrefListener != null) {
+            PreferenceManager.getDefaultSharedPreferences(this)
+                    .unregisterOnSharedPreferenceChangeListener(profilePrefListener);
+        }
+        if (!isChangingConfigurations()) {
+            com.zygisk_enc.notivault.viewmodel.NotificationViewModel.clearDecryptedCache();
+        }
+        super.onDestroy();
     }
 }

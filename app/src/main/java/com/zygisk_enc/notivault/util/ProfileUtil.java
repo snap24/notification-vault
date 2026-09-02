@@ -53,15 +53,35 @@ public final class ProfileUtil {
         return false;
     }
 
+    public static void invalidateCache() {
+        synchronized (ProfileUtil.class) {
+            lastProfileCacheUpdate = 0;
+            WORK_PROFILE_CACHE.clear();
+            USER_HANDLE_CACHE.clear();
+        }
+    }
+
     /**
      * Returns true if the device has at least one active Work Profile.
      */
     public static boolean hasWorkProfile(@NonNull Context context) {
         refreshCacheIfNeeded(context);
+        boolean detected = false;
         for (Boolean isWork : WORK_PROFILE_CACHE.values()) {
-            if (Boolean.TRUE.equals(isWork)) return true;
+            if (Boolean.TRUE.equals(isWork)) {
+                detected = true;
+                break;
+            }
         }
-        return false;
+        android.content.SharedPreferences prefs =
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        if (detected) {
+            if (!prefs.contains("force_show_work_profile")) {
+                prefs.edit().putBoolean("force_show_work_profile", true).apply();
+            }
+            return true;
+        }
+        return prefs.getBoolean("force_show_work_profile", false);
     }
 
     /**
@@ -195,6 +215,8 @@ public final class ProfileUtil {
                         UserManager um = (UserManager) context.getSystemService(Context.USER_SERVICE);
                         if (um != null) {
                             List<UserHandle> profiles = um.getUserProfiles();
+                            USER_HANDLE_CACHE.clear();
+                            WORK_PROFILE_CACHE.clear();
                             if (profiles != null) {
                                 for (UserHandle p : profiles) {
                                     int uid = getUserId(p);

@@ -14,6 +14,9 @@ public interface AppRuleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(AppRuleEntity rule);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<AppRuleEntity> rules);
+
     @Delete
     void delete(AppRuleEntity rule);
 

@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -114,22 +116,47 @@ public class BackupUtil {
         byte[] iv = new byte[12];
         System.arraycopy(encryptedBytes, 16, iv, 0, 12);
         
-        int ciphertextLen = encryptedBytes.length - 28;
-        byte[] ciphertext = new byte[ciphertextLen];
-        System.arraycopy(encryptedBytes, 28, ciphertext, 0, ciphertextLen);
-        
         SecretKey key = deriveKey(password, salt);
         
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
         cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
         
-        return cipher.doFinal(ciphertext);
+        return cipher.doFinal(encryptedBytes, 28, encryptedBytes.length - 28);
     }
 
     private static boolean isZip(byte[] bytes) {
         if (bytes == null || bytes.length < 4) return false;
         return bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04;
+    }
+
+    public static boolean isPlaintextBackup(byte[] bytes) {
+        if (bytes == null || bytes.length < 4) return false;
+        if (isZip(bytes)) return true;
+        // Check if JSON: skip UTF-8 BOM if present, skip whitespace, check '{'
+        int offset = 0;
+        if (bytes.length >= 3 && (bytes[0] & 0xFF) == 0xEF && (bytes[1] & 0xFF) == 0xBB && (bytes[2] & 0xFF) == 0xBF) {
+            offset = 3;
+        }
+        while (offset < bytes.length && (bytes[offset] == ' ' || bytes[offset] == '\t' || bytes[offset] == '\r' || bytes[offset] == '\n')) {
+            offset++;
+        }
+        return offset < bytes.length && bytes[offset] == '{';
+    }
+
+    public static boolean isBackupEncrypted(Context context, Uri fileUri) {
+        if (context == null || fileUri == null) return false;
+        try (InputStream is = context.getContentResolver().openInputStream(fileUri)) {
+            if (is == null) return false;
+            byte[] header = new byte[64];
+            int read = is.read(header);
+            if (read < 4) return false;
+            byte[] actual = new byte[read];
+            System.arraycopy(header, 0, actual, 0, read);
+            return !isPlaintextBackup(actual);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static void exportBackup(Context context, Uri fileUri, String password, boolean includeMedia, BackupCallback callback) {
@@ -150,6 +177,7 @@ public class BackupUtil {
                 final int toastTotal = toasts.size();
                 final int totalItems = notifTotal + toastTotal;
                 final AtomicInteger processedCounter = new AtomicInteger(0);
+                final AtomicInteger lastReportedPercent = new AtomicInteger(-1);
 
                 final JSONObject[] exportNotifs = new JSONObject[notifTotal];
                 final Map<String, byte[]> mediaFiles = new ConcurrentHashMap<>();
@@ -184,17 +212,15 @@ public class BackupUtil {
                                 if (includeMedia && notif.imagePath != null && !notif.imagePath.isEmpty()) {
                                     String[] paths = notif.imagePath.split("\\|");
                                     StringBuilder savedFileNames = new StringBuilder();
-                                    for (String p : paths) {
-                                        if (p != null && !p.trim().isEmpty()) {
-                                            File imgFile = new File(p.trim());
-                                            if (imgFile.exists()) {
-                                                byte[] decryptedImageBytes = EncryptionHelper.decryptFile(imgFile);
-                                                if (decryptedImageBytes != null) {
-                                                    String fileName = imgFile.getName();
-                                                    mediaFiles.put(fileName, decryptedImageBytes);
-                                                    if (savedFileNames.length() > 0) savedFileNames.append("|");
-                                                    savedFileNames.append(fileName);
-                                                }
+                                    for (String path : paths) {
+                                        File imgFile = new File(path.trim());
+                                        if (imgFile.exists()) {
+                                            byte[] decBytes = EncryptionHelper.decryptFile(imgFile);
+                                            if (decBytes != null) {
+                                                String fileName = imgFile.getName();
+                                                mediaFiles.put(fileName, decBytes);
+                                                if (savedFileNames.length() > 0) savedFileNames.append("|");
+                                                savedFileNames.append(fileName);
                                             }
                                         }
                                     }
@@ -214,7 +240,10 @@ public class BackupUtil {
                             int count = processedCounter.incrementAndGet();
                             if (callback instanceof BackupProgressListener && totalItems > 0) {
                                 int progress = (count * 90) / totalItems;
-                                ((BackupProgressListener) callback).onProgress(progress);
+                                int last = lastReportedPercent.get();
+                                if (progress != last && lastReportedPercent.compareAndSet(last, progress)) {
+                                    ((BackupProgressListener) callback).onProgress(progress);
+                                }
                             }
                         }
                     }));
@@ -243,7 +272,10 @@ public class BackupUtil {
                             int count = processedCounter.incrementAndGet();
                             if (callback instanceof BackupProgressListener && totalItems > 0) {
                                 int progress = (count * 90) / totalItems;
-                                ((BackupProgressListener) callback).onProgress(progress);
+                                int last = lastReportedPercent.get();
+                                if (progress != last && lastReportedPercent.compareAndSet(last, progress)) {
+                                    ((BackupProgressListener) callback).onProgress(progress);
+                                }
                             }
                         }
                     }));
@@ -292,11 +324,16 @@ public class BackupUtil {
                     finalBytesToEncrypt = jsonBytes;
                 }
 
-                byte[] encryptedData = encryptBytes(finalBytesToEncrypt, password);
+                byte[] dataToWrite;
+                if (password != null && !password.trim().isEmpty()) {
+                    dataToWrite = encryptBytes(finalBytesToEncrypt, password.trim());
+                } else {
+                    dataToWrite = finalBytesToEncrypt;
+                }
 
                 try (OutputStream os = context.getContentResolver().openOutputStream(fileUri)) {
                     if (os != null) {
-                        os.write(encryptedData);
+                        os.write(dataToWrite);
                         if (callback instanceof BackupProgressListener) {
                             ((BackupProgressListener) callback).onProgress(100);
                         }
@@ -336,73 +373,91 @@ public class BackupUtil {
                     fileBytes = bos.toByteArray();
                 }
 
-                // Decrypt using user password
+                // Decrypt using user password IF encrypted, or load directly if plaintext
                 byte[] decrypted;
-                try {
-                    decrypted = decryptBytes(fileBytes, password);
-                } catch (Exception e) {
-                    callback.onFailure(new Exception("Incorrect password or corrupted backup file."));
-                    return;
+                if (isPlaintextBackup(fileBytes)) {
+                    decrypted = fileBytes;
+                } else {
+                    if (password == null || password.trim().isEmpty()) {
+                        callback.onFailure(new Exception("This backup file is encrypted. Please enter the password."));
+                        return;
+                    }
+                    try {
+                        decrypted = decryptBytes(fileBytes, password.trim());
+                    } catch (Exception e) {
+                        callback.onFailure(new Exception("Incorrect password or corrupted backup file."));
+                        return;
+                    }
                 }
 
-                byte[] jsonBytes = null;
+                File tempJsonFile = null;
                 Map<String, String> mediaPathMap = new ConcurrentHashMap<>();
-                List<Future<?>> mediaTasks = new ArrayList<>();
 
                 if (isZip(decrypted)) {
                     ByteArrayInputStream bis = new ByteArrayInputStream(decrypted);
                     ZipInputStream zis = new ZipInputStream(bis);
                     ZipEntry entry;
-                    byte[] buffer = new byte[4096];
+                    byte[] buffer = new byte[8192];
 
                     while ((entry = zis.getNextEntry()) != null) {
-                        ByteArrayOutputStream entryBos = new ByteArrayOutputStream();
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            entryBos.write(buffer, 0, len);
-                        }
-                        byte[] entryBytes = entryBos.toByteArray();
-
-                        if (entry.getName().equals("backup_data.json")) {
-                            jsonBytes = entryBytes;
-                        } else if (entry.getName().startsWith("media/")) {
-                            String fileName = new File(entry.getName()).getName();
-                            File localFile = new File(context.getFilesDir(), fileName);
-                            mediaTasks.add(threadPool.submit(() -> {
-                                boolean success = EncryptionHelper.encryptFile(entryBytes, localFile);
-                                if (success) {
-                                    mediaPathMap.put(fileName, localFile.getAbsolutePath());
+                        String entryName = entry.getName();
+                        if ("backup_data.json".equals(entryName)) {
+                            tempJsonFile = new File(context.getCacheDir(), "import_temp_backup_data.json");
+                            try (FileOutputStream fos = new FileOutputStream(tempJsonFile)) {
+                                int len;
+                                while ((len = zis.read(buffer)) > 0) {
+                                    fos.write(buffer, 0, len);
                                 }
-                            }));
+                            }
+                        } else if (entryName.startsWith("media/")) {
+                            String fileName = new File(entryName).getName();
+                            File localFile = new File(context.getFilesDir(), fileName);
+                            ByteArrayOutputStream entryBos = new ByteArrayOutputStream();
+                            int len;
+                            while ((len = zis.read(buffer)) > 0) {
+                                entryBos.write(buffer, 0, len);
+                            }
+                            byte[] entryBytes = entryBos.toByteArray();
+                            boolean success = EncryptionHelper.encryptFile(entryBytes, localFile);
+                            if (success) {
+                                mediaPathMap.put(fileName, localFile.getAbsolutePath());
+                            }
                         }
                         zis.closeEntry();
                     }
                     zis.close();
 
-                    if (jsonBytes == null) {
+                    if (tempJsonFile == null || !tempJsonFile.exists()) {
                         callback.onFailure(new Exception("Backup JSON data not found in Zip."));
                         return;
                     }
                 } else {
-                    jsonBytes = decrypted;
+                    tempJsonFile = new File(context.getCacheDir(), "import_temp_backup_data.json");
+                    try (FileOutputStream fos = new FileOutputStream(tempJsonFile)) {
+                        fos.write(decrypted);
+                    }
                 }
 
-                // Wait for all concurrent media encryptions to complete
-                for (Future<?> task : mediaTasks) {
-                    task.get();
-                }
+                // Immediately release large memory buffers
+                decrypted = null;
+                fileBytes = null;
 
-                // Streaming Parse JSON via JsonReader
+                // Streaming Parse JSON via JsonReader directly from disk temp file
                 List<RawNotificationItem> rawNotifs = new ArrayList<>();
                 List<RawToastItem> rawToasts = new ArrayList<>();
-                try (ByteArrayInputStream jsonStream = new ByteArrayInputStream(jsonBytes)) {
+                try (FileInputStream jsonStream = new FileInputStream(tempJsonFile)) {
                     parseJsonStreaming(jsonStream, rawNotifs, rawToasts);
+                } finally {
+                    if (tempJsonFile != null && tempJsonFile.exists()) {
+                        tempJsonFile.delete();
+                    }
                 }
 
                 int totalItems = rawNotifs.size() + rawToasts.size();
                 AtomicInteger processedCounter = new AtomicInteger(0);
+                AtomicInteger lastImportProgress = new AtomicInteger(-1);
 
-                // Multi-Core Parallel Chunk Encryption
+                // Multi-Core Parallel Chunk Conversion
                 NotificationEntity[] encryptedNotifs = new NotificationEntity[rawNotifs.size()];
                 int notifChunkSize = Math.max(50, (rawNotifs.size() + cores - 1) / cores);
                 List<Future<?>> encryptTasks = new ArrayList<>();
@@ -413,12 +468,9 @@ public class BackupUtil {
                     encryptTasks.add(threadPool.submit(() -> {
                         for (int j = start; j < end; j++) {
                             RawNotificationItem raw = rawNotifs.get(j);
-                            String encTitle = EncryptionHelper.encrypt(raw.title);
-                            String encText = EncryptionHelper.encrypt(raw.text);
-                            String encBigText = raw.bigText != null ? EncryptionHelper.encrypt(raw.bigText) : null;
 
                             NotificationEntity notif = new NotificationEntity(
-                                    raw.packageName, raw.appName, encTitle, encText, encBigText, raw.timestamp);
+                                    raw.packageName, raw.appName, raw.title, raw.text, raw.bigText, raw.timestamp);
                             notif.isRead = raw.isRead;
                             notif.isFavorite = raw.isFavorite;
                             notif.userId = raw.userId;
@@ -441,7 +493,10 @@ public class BackupUtil {
                             int count = processedCounter.incrementAndGet();
                             if (callback instanceof BackupProgressListener && totalItems > 0) {
                                 int progress = (count * 65) / totalItems;
-                                ((BackupProgressListener) callback).onProgress(progress);
+                                int last = lastImportProgress.get();
+                                if (progress != last && lastImportProgress.compareAndSet(last, progress)) {
+                                    ((BackupProgressListener) callback).onProgress(progress);
+                                }
                             }
                         }
                     }));
@@ -455,15 +510,17 @@ public class BackupUtil {
                     encryptTasks.add(threadPool.submit(() -> {
                         for (int j = start; j < end; j++) {
                             RawToastItem raw = rawToasts.get(j);
-                            String encText = EncryptionHelper.encrypt(raw.text);
                             ToastEntity toast = new ToastEntity(
-                                    raw.packageName, raw.appName, encText, raw.timestamp);
+                                    raw.packageName, raw.appName, raw.text, raw.timestamp);
                             toast.userId = raw.userId;
                             encryptedToasts[j] = toast;
                             int count = processedCounter.incrementAndGet();
                             if (callback instanceof BackupProgressListener && totalItems > 0) {
                                 int progress = (count * 65) / totalItems;
-                                ((BackupProgressListener) callback).onProgress(progress);
+                                int last = lastImportProgress.get();
+                                if (progress != last && lastImportProgress.compareAndSet(last, progress)) {
+                                    ((BackupProgressListener) callback).onProgress(progress);
+                                }
                             }
                         }
                     }));
@@ -473,34 +530,22 @@ public class BackupUtil {
                     task.get();
                 }
 
-                // Batch insert into database in chunks with progress reporting (65% -> 100%)
+                // Batch insert into database in one single atomic transaction with chunking
                 AppDatabase db = AppDatabase.getInstance(context);
                 List<NotificationEntity> notifList = Arrays.asList(encryptedNotifs);
                 List<ToastEntity> toastList = Arrays.asList(encryptedToasts);
 
-                int totalToInsert = notifList.size() + toastList.size();
-                int insertedSoFar = 0;
                 final int DB_CHUNK = 500;
-
-                for (int i = 0; i < notifList.size(); i += DB_CHUNK) {
-                    int end = Math.min(i + DB_CHUNK, notifList.size());
-                    db.notificationDao().insertAll(notifList.subList(i, end));
-                    insertedSoFar += (end - i);
-                    if (callback instanceof BackupProgressListener && totalToInsert > 0) {
-                        int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
-                        ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
+                db.runInTransaction(() -> {
+                    for (int i = 0; i < notifList.size(); i += DB_CHUNK) {
+                        int end = Math.min(i + DB_CHUNK, notifList.size());
+                        db.notificationDao().insertAll(notifList.subList(i, end));
                     }
-                }
-
-                for (int i = 0; i < toastList.size(); i += DB_CHUNK) {
-                    int end = Math.min(i + DB_CHUNK, toastList.size());
-                    db.toastDao().insertAll(toastList.subList(i, end));
-                    insertedSoFar += (end - i);
-                    if (callback instanceof BackupProgressListener && totalToInsert > 0) {
-                        int progress = 65 + ((insertedSoFar * 35) / totalToInsert);
-                        ((BackupProgressListener) callback).onProgress(Math.min(99, progress));
+                    for (int i = 0; i < toastList.size(); i += DB_CHUNK) {
+                        int end = Math.min(i + DB_CHUNK, toastList.size());
+                        db.toastDao().insertAll(toastList.subList(i, end));
                     }
-                }
+                });
 
                 if (callback instanceof BackupProgressListener) {
                     ((BackupProgressListener) callback).onProgress(100);

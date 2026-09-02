@@ -8,6 +8,14 @@ import androidx.room.RoomDatabase;
 @Database(entities = {NotificationEntity.class, AppRuleEntity.class, ToastEntity.class, SearchTokenEntity.class}, version = 13, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
+    static {
+        try {
+            System.loadLibrary("sqlcipher");
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
     private static volatile AppDatabase INSTANCE;
 
     public abstract NotificationDao notificationDao();
@@ -109,20 +117,81 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    public static final String DATABASE_NAME = "notivault_database_encrypted.db";
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
+                    Context appContext = context.getApplicationContext();
+                    com.zygisk_enc.notivault.util.DatabaseMigrationHelper.ensureMigrated(appContext);
+
+                    byte[] passphrase = com.zygisk_enc.notivault.util.DatabaseKeyManager.getDatabasePassphrase(appContext);
+                    net.zetetic.database.sqlcipher.SupportOpenHelperFactory factory =
+                            new net.zetetic.database.sqlcipher.SupportOpenHelperFactory(passphrase);
+
                     INSTANCE = Room.databaseBuilder(
-                            context.getApplicationContext(),
+                            appContext,
                             AppDatabase.class,
-                            "notivault_database"
+                            DATABASE_NAME
                     )
+                    .openHelperFactory(factory)
                     .addMigrations(MIGRATION_1_8, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13)
                     .build();
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static void destroyInstance() {
+        synchronized (AppDatabase.class) {
+            if (INSTANCE != null) {
+                try {
+                    if (INSTANCE.isOpen()) {
+                        INSTANCE.close();
+                    }
+                } catch (Exception ignored) {}
+                INSTANCE = null;
+            }
+        }
+    }
+
+    public void checkpointAndVacuum() {
+        try {
+            androidx.sqlite.db.SupportSQLiteDatabase sdb = getOpenHelper().getWritableDatabase();
+            // 1. Truncate WAL file down to 0 bytes
+            try (android.database.Cursor c = sdb.query("PRAGMA wal_checkpoint(TRUNCATE);", null)) {
+                if (c != null) {
+                    while (c.moveToNext()) {}
+                }
+            } catch (Exception ignored) {}
+
+            // 2. Allow Room's InvalidationTracker background cursor to close
+            try {
+                Thread.sleep(120);
+            } catch (InterruptedException ignored) {}
+
+            // 3. Rebuild and shrink the encrypted database file via VACUUM with retry
+            for (int i = 0; i < 3; i++) {
+                try {
+                    sdb.execSQL("VACUUM;");
+                    break;
+                } catch (Exception ex) {
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException ignored) {}
+                }
+            }
+
+            // 4. Final WAL truncation to clean any temp vacuum journal pages
+            try (android.database.Cursor c = sdb.query("PRAGMA wal_checkpoint(TRUNCATE);", null)) {
+                if (c != null) {
+                    while (c.moveToNext()) {}
+                }
+            } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

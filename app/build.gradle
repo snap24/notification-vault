@@ -66,4 +66,8 @@ dependencies {
 
     // WorkManager for scheduled cloud backups
     implementation 'androidx.work:work-runtime:2.9.0'
+
+    // SQLCipher for whole-database encryption
+    implementation 'net.zetetic:sqlcipher-android:4.6.0@aar'
+    implementation 'androidx.sqlite:sqlite:2.4.0'
 }

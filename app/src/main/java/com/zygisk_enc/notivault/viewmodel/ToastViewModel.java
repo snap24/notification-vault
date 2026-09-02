@@ -17,10 +17,11 @@ import java.util.ArrayList;
 public class ToastViewModel extends AndroidViewModel {
 
     private final AppDatabase database;
+    public static final int PAGE_SIZE = 3000;
     private final MutableLiveData<Long> filterDateStart = new MutableLiveData<>(null);
     private final MutableLiveData<Long> filterDateEnd = new MutableLiveData<>(null);
     private final MutableLiveData<String> filterPackage = new MutableLiveData<>(null);
-    private final MutableLiveData<Integer> filterLimit = new MutableLiveData<>(500);
+    private final MutableLiveData<Integer> filterLimit = new MutableLiveData<>(PAGE_SIZE);
     private final MediatorLiveData<List<ToastEntity>> toasts = new MediatorLiveData<>();
     private LiveData<List<ToastEntity>> currentSource = null;
     private final LiveData<List<AppSummary>> appSummaries;
@@ -28,19 +29,6 @@ public class ToastViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
     private final MutableLiveData<Boolean> scrollToTopEvent = new MutableLiveData<>(false);
 
-    private static final LruCache<Long, String> decryptedToastCache = new LruCache<>(5000);
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final int PARALLEL_THREADS = Math.max(2, Math.min(8, CPU_COUNT));
-    private final java.util.concurrent.ExecutorService coordinatorExecutor =
-            java.util.concurrent.Executors.newSingleThreadExecutor();
-    private final java.util.concurrent.ExecutorService parallelDecryptionPool =
-            java.util.concurrent.Executors.newFixedThreadPool(PARALLEL_THREADS, new java.util.concurrent.ThreadFactory() {
-                private final java.util.concurrent.atomic.AtomicInteger count = new java.util.concurrent.atomic.AtomicInteger(1);
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "NotiVault-ToastDecryptor-" + count.getAndIncrement());
-                }
-            });
     private volatile long currentRunToken = 0;
 
     public ToastViewModel(@NonNull Application application) {
@@ -61,11 +49,11 @@ public class ToastViewModel extends AndroidViewModel {
     private boolean isResettingLimit = false;
 
     private void resetLimit() {
-        if (filterLimit.getValue() != null && filterLimit.getValue() == 500) {
+        if (filterLimit.getValue() != null && filterLimit.getValue() == PAGE_SIZE) {
             return;
         }
         isResettingLimit = true;
-        filterLimit.setValue(500);
+        filterLimit.setValue(PAGE_SIZE);
         isResettingLimit = false;
     }
 
@@ -76,7 +64,7 @@ public class ToastViewModel extends AndroidViewModel {
     public void loadNextPage() {
         Integer current = filterLimit.getValue();
         if (current != null) {
-            filterLimit.setValue(current + 500);
+            filterLimit.setValue(current + PAGE_SIZE);
         }
     }
 
@@ -85,7 +73,7 @@ public class ToastViewModel extends AndroidViewModel {
             toasts.removeSource(currentSource);
         }
 
-        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
+        int limit = filterLimit.getValue() != null ? filterLimit.getValue() : PAGE_SIZE;
         Long dateStart = filterDateStart.getValue();
         Long dateEnd = filterDateEnd.getValue();
         String pkg = filterPackage.getValue();
@@ -146,163 +134,86 @@ public class ToastViewModel extends AndroidViewModel {
         requestScrollToTop();
     }
 
+    private List<ToastEntity> lastRawList = null;
+
     private void filterAndDecrypt(List<ToastEntity> list) {
         final long runToken = ++currentRunToken;
 
         if (list == null) {
             toasts.setValue(null);
+            lastRawList = null;
             loadProgress.setValue(-1);
             isLoading.setValue(false);
             return;
         }
 
+        final int previousCount = lastRawList != null ? lastRawList.size() : 0;
+        lastRawList = list;
+
         isLoading.setValue(true);
 
-        coordinatorExecutor.execute(() -> {
-            try {
-                if (runToken != currentRunToken) return;
+        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+            if (runToken != currentRunToken) return;
 
-                final int total = list.size();
-                if (total == 0) {
-                    if (runToken == currentRunToken) {
-                        loadProgress.postValue(-1);
-                        toasts.postValue(new ArrayList<>());
-                        isLoading.postValue(false);
-                    }
-                    return;
-                }
-
-                int itemsToDecrypt = 0;
-                for (int i = 0; i < total; i++) {
-                    ToastEntity entity = list.get(i);
-                    if (decryptedToastCache.get(entity.id) == null && entity.decryptedText == null) {
-                        itemsToDecrypt++;
-                    }
-                }
-
-                final boolean showProgress = itemsToDecrypt > 0;
-                if (showProgress && runToken == currentRunToken) {
-                    loadProgress.postValue(0);
-                }
-
-                int limit = filterLimit.getValue() != null ? filterLimit.getValue() : 500;
-                final boolean isInitialLoad = (limit <= 500);
-                final java.util.concurrent.atomic.AtomicInteger lastMilestone = new java.util.concurrent.atomic.AtomicInteger(0);
-
-                int numChunks = Math.min(PARALLEL_THREADS, Math.max(1, (total + 99) / 100));
-                int chunkSize = (total + numChunks - 1) / numChunks;
-
-                java.util.concurrent.atomic.AtomicInteger processedCount = new java.util.concurrent.atomic.AtomicInteger(0);
-                java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(numChunks);
-                @SuppressWarnings("unchecked")
-                final java.util.List<ToastEntity>[] chunkResults = new java.util.List[numChunks];
-                for (int c = 0; c < numChunks; c++) {
-                    chunkResults[c] = java.util.Collections.synchronizedList(new ArrayList<>());
-                }
-
-                for (int c = 0; c < numChunks; c++) {
-                    final int chunkIndex = c;
-                    final int startIdx = c * chunkSize;
-                    final int endIdx = Math.min(total, startIdx + chunkSize);
-
-                    parallelDecryptionPool.execute(() -> {
-                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_FOREGROUND);
-                        try {
-                            for (int i = startIdx; i < endIdx; i++) {
-                                if (runToken != currentRunToken) return;
-
-                                ToastEntity entity = list.get(i);
-
-                                String cached = decryptedToastCache.get(entity.id);
-                                if (cached != null) {
-                                    entity.decryptedText = cached;
-                                } else if (entity.decryptedText == null) {
-                                    entity.decryptedText = EncryptionHelper.decrypt(entity.text);
-                                    if (entity.decryptedText != null) {
-                                        decryptedToastCache.put(entity.id, entity.decryptedText);
-                                    }
-                                }
-
-                                int processed = processedCount.incrementAndGet();
-                                int progress = (processed * 100) / total;
-
-                                if (showProgress && (processed % 10 == 0 || processed == total)) {
-                                    if (runToken == currentRunToken) {
-                                        loadProgress.postValue(progress);
-                                    }
-                                }
-
-                                chunkResults[chunkIndex].add(entity);
-
-                                if (isInitialLoad && progress <= 50) {
-                                    int milestone = progress / 10;
-                                    boolean milestoneTrigger = (milestone > 0 && milestone <= 5 && milestone > lastMilestone.get() && lastMilestone.compareAndSet(lastMilestone.get(), milestone));
-                                    if (milestoneTrigger && runToken == currentRunToken) {
-                                        List<ToastEntity> snapshot = new ArrayList<>();
-                                        for (int k = 0; k < numChunks; k++) {
-                                            synchronized (chunkResults[k]) {
-                                                snapshot.addAll(chunkResults[k]);
-                                            }
-                                        }
-                                        if (!snapshot.isEmpty() && runToken == currentRunToken) {
-                                            toasts.postValue(snapshot);
-                                        }
-                                    }
-                                }
-                            }
-                        } finally {
-                            latch.countDown();
-                        }
-                    });
-                }
-
-                latch.await();
-                if (runToken != currentRunToken) return;
-
-                List<ToastEntity> finalMerged = new ArrayList<>(total);
-                for (int k = 0; k < numChunks; k++) {
-                    synchronized (chunkResults[k]) {
-                        finalMerged.addAll(chunkResults[k]);
-                    }
-                }
-
+            final int total = list.size();
+            if (total == 0) {
                 if (runToken == currentRunToken) {
-                    toasts.postValue(finalMerged);
-                }
-
-                if (showProgress) {
-                    loadProgress.postValue(100);
-                    try { Thread.sleep(250); } catch (InterruptedException ignored) {}
-                }
-                loadProgress.postValue(-1);
-                isLoading.postValue(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (runToken == currentRunToken) {
+                    toasts.postValue(new ArrayList<>());
                     loadProgress.postValue(-1);
                     isLoading.postValue(false);
                 }
+                return;
+            }
+
+            loadProgress.postValue(0);
+
+            final boolean isAppendedBatch = (total > previousCount && previousCount > 0);
+            final int batchStartIndex = isAppendedBatch ? previousCount : 0;
+            final int batchSize = isAppendedBatch ? (total - previousCount) : total;
+
+            List<ToastEntity> result = new ArrayList<>(total);
+
+            for (int i = 0; i < total; i++) {
+                if (runToken != currentRunToken) return;
+                ToastEntity entity = list.get(i);
+
+                if (!EncryptionHelper.isEncrypted(entity.text)) {
+                    entity.decryptedText = entity.text;
+                } else if (entity.decryptedText == null) {
+                    entity.decryptedText = EncryptionHelper.decrypt(entity.text);
+                }
+                result.add(entity);
+
+                if (i >= batchStartIndex) {
+                    int processedInBatch = (i - batchStartIndex) + 1;
+                    if (processedInBatch % 25 == 0 || i == total - 1) {
+                        int progress = Math.min(99, (processedInBatch * 100) / batchSize);
+                        loadProgress.postValue(progress);
+                    }
+                }
+            }
+
+            if (runToken == currentRunToken) {
+                toasts.postValue(result);
+                loadProgress.postValue(100);
+                loadProgress.postValue(-1);
+                isLoading.postValue(false);
             }
         });
     }
 
     public void clearAllToasts() {
         final long runToken = ++currentRunToken;
-        decryptedToastCache.evictAll();
         toasts.postValue(new ArrayList<>());
         loadProgress.postValue(-1);
         isLoading.postValue(false);
-        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> database.toastDao().deleteAll());
+        com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+            database.toastDao().deleteAll();
+            database.checkpointAndVacuum();
+        });
     }
 
     public LiveData<Long> getOldestTimestamp() {
         return database.toastDao().getOldestTimestamp();
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        coordinatorExecutor.shutdownNow();
-        parallelDecryptionPool.shutdownNow();
     }
 }

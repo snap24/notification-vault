@@ -27,6 +27,10 @@ public class NotificationRepository {
         executor = Executors.newSingleThreadExecutor();
     }
 
+    public static boolean isClearingAllActive() {
+        return com.zygisk_enc.notivault.service.ClearAllService.isClearingInProgress();
+    }
+
     public void insert(NotificationEntity entity) {
         executor.execute(() -> {
             dao.insert(entity);
@@ -64,22 +68,82 @@ public class NotificationRepository {
 
     public void deleteAll(ProgressCallback callback) {
         executor.execute(() -> {
+            android.os.PowerManager pm = (android.os.PowerManager) application.getSystemService(android.content.Context.POWER_SERVICE);
+            android.os.PowerManager.WakeLock wakeLock = null;
+            if (pm != null) {
+                try {
+                    wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "NotiVault:DeletionWakeLock");
+                    wakeLock.acquire(180 * 1000L); // Hold for up to 3 minutes
+                } catch (Exception ignored) {}
+            }
+
             try {
                 if (callback != null) callback.onProgress(0);
-                List<NotificationEntity> list = dao.getAllNotificationsSync();
-                if (list != null && !list.isEmpty()) {
-                    int total = list.size();
-                    for (int i = 0; i < total; i++) {
-                        deleteNotificationImage(list.get(i).imagePath);
-                        if (callback != null && (i % 25 == 0 || i == total - 1)) {
-                            callback.onProgress((i * 100) / total);
-                        }
+                Long maxIdObj = dao.getMaxId();
+                if (maxIdObj == null || maxIdObj <= 0) {
+                    if (callback != null) {
+                        callback.onProgress(100);
+                        callback.onComplete();
+                    }
+                    return;
+                }
+                final long maxId = maxIdObj;
+                final long cutOffTime = System.currentTimeMillis();
+
+                int totalCount = dao.getCountUpTo(maxId, cutOffTime);
+                if (totalCount <= 0) {
+                    if (callback != null) {
+                        callback.onProgress(100);
+                        callback.onComplete();
+                    }
+                    return;
+                }
+
+                // 0% -> 10%: Clean media attachments
+                if (callback != null) callback.onProgress(5);
+                List<String> imagePaths = dao.getDeletableImagePathsUpTo(maxId, cutOffTime);
+                deleteNotificationImagesParallel(imagePaths);
+                if (callback != null) callback.onProgress(10);
+
+                // 10% -> 75%: Delete records in measured batches with calculated accurate progress
+                AppDatabase db = AppDatabase.getInstance(application);
+                final int BATCH_SIZE = 500;
+                int deletedSoFar = 0;
+                int lastReportedProgress = 10;
+
+                while (deletedSoFar < totalCount) {
+                    int deleted = dao.deleteBatchUpTo(maxId, cutOffTime, BATCH_SIZE);
+                    if (deleted <= 0) {
+                        break;
+                    }
+                    deletedSoFar += deleted;
+                    int progress = 10 + (int) (((long) deletedSoFar * 65) / totalCount);
+                    if (progress > lastReportedProgress) {
+                        lastReportedProgress = Math.min(75, progress);
+                        if (callback != null) callback.onProgress(lastReportedProgress);
                     }
                 }
-                dao.deleteAll();
+
+                // Sweep any remaining records
+                dao.deleteAllUpTo(maxId, cutOffTime);
+                if (callback != null) callback.onProgress(75);
+
+                // 75% -> 80%: Prepare checkpoint
+                if (callback != null) callback.onProgress(80);
+
+                // 80% -> 100%: SQLite VACUUM and WAL truncate
+                db.checkpointAndVacuum();
+
                 if (callback != null) callback.onProgress(100);
                 com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
+                if (wakeLock != null && wakeLock.isHeld()) {
+                    try {
+                        wakeLock.release();
+                    } catch (Exception ignored) {}
+                }
                 if (callback != null) callback.onComplete();
             }
         });
@@ -89,11 +153,14 @@ public class NotificationRepository {
         executor.execute(() -> {
             List<NotificationEntity> list = dao.getNotificationsOlderThanSync(timestamp);
             if (list != null) {
+                List<String> paths = new java.util.ArrayList<>();
                 for (NotificationEntity entity : list) {
-                    deleteNotificationImage(entity.imagePath);
+                    if (entity.imagePath != null) paths.add(entity.imagePath);
                 }
+                deleteNotificationImagesParallel(paths);
             }
             dao.deleteOlderThan(timestamp);
+            AppDatabase.getInstance(application).checkpointAndVacuum();
             com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
@@ -102,12 +169,9 @@ public class NotificationRepository {
         executor.execute(() -> {
             if (packages == null || packages.isEmpty()) return;
             List<String> imagePaths = dao.getOldImagePathsForPackages(timestamp, packages);
-            if (imagePaths != null) {
-                for (String path : imagePaths) {
-                    deleteNotificationImage(path);
-                }
-            }
+            deleteNotificationImagesParallel(imagePaths);
             dao.deleteOlderThanForPackages(timestamp, packages);
+            AppDatabase.getInstance(application).checkpointAndVacuum();
             com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
     }
@@ -119,20 +183,23 @@ public class NotificationRepository {
     public void deleteByDateRange(long startTime, long endTime, ProgressCallback callback) {
         executor.execute(() -> {
             try {
-                if (callback != null) callback.onProgress(0);
-                List<String> imagePaths = dao.getOldImagePaths(endTime);
-                if (imagePaths != null && !imagePaths.isEmpty()) {
-                    int total = imagePaths.size();
-                    for (int i = 0; i < total; i++) {
-                        deleteNotificationImage(imagePaths.get(i));
-                        if (callback != null && (i % 20 == 0 || i == total - 1)) {
-                            callback.onProgress((i * 100) / total);
-                        }
-                    }
-                }
-                dao.deleteByDateRange(startTime, endTime);
+                if (callback != null) callback.onProgress(15);
+                List<String> imagePaths = dao.getImagePathsForDateRange(startTime, endTime);
+                deleteNotificationImagesParallel(imagePaths);
+                if (callback != null) callback.onProgress(45);
+
+                AppDatabase db = AppDatabase.getInstance(application);
+                db.runInTransaction(() -> {
+                    dao.deleteByDateRange(startTime, endTime);
+                });
+                if (callback != null) callback.onProgress(75);
+
+                db.checkpointAndVacuum();
+
                 if (callback != null) callback.onProgress(100);
                 com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 if (callback != null) callback.onComplete();
             }
@@ -152,17 +219,50 @@ public class NotificationRepository {
                 long end = local.getTimeInMillis() - 1;
                 dao.deleteByDateRange(start, end);
             }
+            AppDatabase.getInstance(application).checkpointAndVacuum();
             com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
         });
+    }
+
+    private void deleteNotificationImagesParallel(List<String> imagePaths) {
+        if (imagePaths == null || imagePaths.isEmpty()) return;
+        int cores = com.zygisk_enc.notivault.util.AppExecutor.getCpuCores();
+        int total = imagePaths.size();
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(cores);
+        int chunkSize = Math.max(10, (total + cores - 1) / cores);
+
+        for (int c = 0; c < cores; c++) {
+            final int startIdx = c * chunkSize;
+            final int endIdx = Math.min(startIdx + chunkSize, total);
+            if (startIdx >= total) {
+                latch.countDown();
+                continue;
+            }
+
+            com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+                try {
+                    for (int i = startIdx; i < endIdx; i++) {
+                        deleteNotificationImage(imagePaths.get(i));
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException ignored) {}
     }
 
     private void deleteNotificationImage(String imagePath) {
         if (imagePath != null && !imagePath.isEmpty()) {
             String[] paths = imagePath.split("\\|");
-            for (String p : paths) {
-                if (p != null && !p.trim().isEmpty()) {
+            for (String path : paths) {
+                String trimmed = path.trim();
+                if (!trimmed.isEmpty()) {
                     try {
-                        java.io.File file = new java.io.File(p.trim());
+                        java.io.File file = new java.io.File(trimmed);
                         if (file.exists()) {
                             file.delete();
                         }
@@ -181,18 +281,20 @@ public class NotificationRepository {
     public void deleteByPackages(java.util.List<String> packages, ProgressCallback callback) {
         executor.execute(() -> {
             try {
-                if (callback != null) callback.onProgress(0);
+                if (packages == null || packages.isEmpty()) return;
+                if (callback != null) callback.onProgress(15);
                 java.util.List<String> imagePaths = dao.getImagePathsForPackages(packages);
-                if (imagePaths != null && !imagePaths.isEmpty()) {
-                    int total = imagePaths.size();
-                    for (int i = 0; i < total; i++) {
-                        deleteNotificationImage(imagePaths.get(i));
-                        if (callback != null && (i % 20 == 0 || i == total - 1)) {
-                            callback.onProgress((i * 100) / total);
-                        }
-                    }
-                }
-                dao.deleteByPackages(packages);
+                deleteNotificationImagesParallel(imagePaths);
+                if (callback != null) callback.onProgress(45);
+
+                AppDatabase db = AppDatabase.getInstance(application);
+                db.runInTransaction(() -> {
+                    dao.deleteByPackages(packages);
+                });
+                if (callback != null) callback.onProgress(75);
+
+                db.checkpointAndVacuum();
+
                 if (callback != null) callback.onProgress(100);
                 com.zygisk_enc.notivault.widget.WidgetHelper.updateAllWidgets(application);
             } catch (Exception e) {

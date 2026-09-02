@@ -14,9 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="18dp"
-        android:paddingTop="18dp"
-        android:paddingBottom="18dp">
+        android:paddingHorizontal="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
 
         <!-- Header: App Icon + Name + Subtitle + Close -->
         <LinearLayout
@@ -87,7 +87,38 @@
 
         </LinearLayout>
 
-        <!-- Action Buttons Row: Copy All, Star All, Open App, Delete All (4 Equal Columns) -->
+        <!-- Divider line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/colorOutlineVariant"
+            android:alpha="0.4" />
+
+        <!-- Skeleton Loading Container -->
+        <LinearLayout
+            android:id="@+id/layout_bundle_skeleton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <include layout="@layout/item_notification_skeleton" />
+            <include layout="@layout/item_notification_skeleton" />
+            <include layout="@layout/item_notification_skeleton" />
+
+        </LinearLayout>
+
+        <!-- Scrollable Bundle Items List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_bundle_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="true"
+            android:scrollbars="vertical" />
+
+        <!-- Action Buttons Row: Copy All, Star All, Open App, Delete All (4 Equal Columns, at the bottom for thumb reach) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -163,7 +194,7 @@
                 android:paddingVertical="0dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                app:icon="@drawable/ic_delete_sweep"
+                app:icon="@drawable/ic_trash_bin"
                 app:iconSize="14dp"
                 app:iconGravity="textStart"
                 app:iconPadding="3dp"
@@ -171,37 +202,6 @@
                 style="@style/Widget.Material3.Button.TonalButton" />
 
         </LinearLayout>
-
-        <!-- Divider line -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp"
-            android:background="?attr/colorOutlineVariant"
-            android:alpha="0.4" />
-
-        <!-- Skeleton Loading Container -->
-        <LinearLayout
-            android:id="@+id/layout_bundle_skeleton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <include layout="@layout/item_notification_skeleton" />
-            <include layout="@layout/item_notification_skeleton" />
-            <include layout="@layout/item_notification_skeleton" />
-
-        </LinearLayout>
-
-        <!-- Scrollable Bundle Items List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_bundle_items"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="vertical" />
 
     </LinearLayout>
 

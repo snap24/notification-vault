@@ -37,6 +37,7 @@ public class AppsFragment extends Fragment {
     private NotificationViewModel viewModel;
     private AppFilterAdapter adapter;
     private OnBackPressedCallback backPressedCallback;
+    private OnBackPressedCallback searchBackPressedCallback;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +71,30 @@ public class AppsFragment extends Fragment {
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
 
+        searchBackPressedCallback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                if (binding == null) return;
+                binding.etSearchApps.setText("");
+                binding.etSearchApps.clearFocus();
+                android.view.inputmethod.InputMethodManager imm = 
+                        (android.view.inputmethod.InputMethodManager) requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(binding.etSearchApps.getWindowToken(), 0);
+                }
+                setEnabled(false);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), searchBackPressedCallback);
+
+        binding.etSearchApps.setOnFocusChangeListener((v, hasFocus) -> {
+            if (binding == null) return;
+            String q = binding.etSearchApps.getText() != null ? binding.etSearchApps.getText().toString().trim() : "";
+            if (searchBackPressedCallback != null) {
+                searchBackPressedCallback.setEnabled(hasFocus || !q.isEmpty());
+            }
+        });
+
         adapter.setOnAppClickListener(summary -> {
             viewModel.setFilterPackage(summary.packageName);
             Navigation.findNavController(view).navigate(R.id.navigation_history);
@@ -77,18 +102,17 @@ public class AppsFragment extends Fragment {
 
         adapter.setOnAppLongClickListener(this::showAppActionsDialog);
 
-        // Top Toolbar Delete Button (beside Source button)
-        if (requireActivity() instanceof MainActivity) {
-            ((MainActivity) requireActivity()).setOnDeleteAppsClickListener(v -> {
-                if (adapter.getItemCount() == 0) return;
-                toggleSelectionMode();
-            });
-        }
+        // Delete action button beside sort chips
+        binding.btnTriggerDeleteApps.setOnClickListener(v -> {
+            if (adapter.getItemCount() == 0) return;
+            toggleSelectionMode();
+        });
 
         // Selection changed listener
         adapter.setOnSelectionChangedListener((selectedCount, totalCount) -> {
             binding.tvSelectedCount.setText(getString(R.string.selected_count_format, selectedCount));
             binding.btnDeleteSelected.setEnabled(selectedCount > 0);
+            binding.btnDeleteSelected.setAlpha(selectedCount > 0 ? 1.0f : 0.45f);
 
             binding.cbSelectAll.setOnCheckedChangeListener(null);
             binding.cbSelectAll.setChecked(totalCount > 0 && selectedCount == totalCount);
@@ -126,13 +150,7 @@ public class AppsFragment extends Fragment {
                         .setNegativeButton(R.string.cancel, null));
             };
 
-            boolean isBiometricEnabled = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedWithDeletion, getString(R.string.auth_delete_app_logs));
-            } else {
-                proceedWithDeletion.run();
-            }
+            proceedWithDeletion.run();
         });
 
         binding.etSearchApps.addTextChangedListener(new TextWatcher() {
@@ -140,7 +158,22 @@ public class AppsFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                adapter.filter(s != null ? s.toString() : "");
+                String q = s != null ? s.toString().trim() : "";
+                adapter.filter(q);
+                if (binding.cardAppsTotalBadge != null) {
+                    if (!q.isEmpty()) {
+                        if (binding.cardAppsTotalBadge.getVisibility() != View.GONE) {
+                            binding.cardAppsTotalBadge.setVisibility(View.GONE);
+                        }
+                    } else {
+                        if (binding.cardAppsTotalBadge.getVisibility() != View.VISIBLE) {
+                            binding.cardAppsTotalBadge.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                if (searchBackPressedCallback != null) {
+                    searchBackPressedCallback.setEnabled(binding.etSearchApps.hasFocus() || !q.isEmpty());
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -150,7 +183,6 @@ public class AppsFragment extends Fragment {
             if (summaries == null || summaries.isEmpty()) {
                 binding.emptyState.setVisibility(View.VISIBLE);
                 binding.recyclerView.setVisibility(View.GONE);
-                binding.tvAppsHeaderSummary.setText(R.string.zero_tracked_apps);
                 binding.tvTotalNotificationsBadge.setText(R.string.zero_alerts);
                 adapter.submitList(new ArrayList<>());
                 exitSelectionMode();
@@ -163,7 +195,6 @@ public class AppsFragment extends Fragment {
                 for (AppSummary s : summaries) {
                     totalAlerts += s.count;
                 }
-                binding.tvAppsHeaderSummary.setText(getString(R.string.apps_header_summary_format, summaries.size()));
                 binding.tvTotalNotificationsBadge.setText(getString(R.string.total_notifications_badge_format, totalAlerts));
             }
         });
@@ -304,24 +335,14 @@ public class AppsFragment extends Fragment {
 
     private void confirmClearAppLogs(AppSummary summary) {
         String appName = summary.appName != null ? summary.appName : summary.packageName;
-        Runnable proceed = () -> {
-            BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.delete_app_logs_title)
-                    .setMessage(getString(R.string.confirm_delete_app_logs_message, summary.count, appName))
-                    .setPositiveButton(R.string.delete, (dialog, which) -> {
-                        viewModel.deleteByPackages(Collections.singletonList(summary.packageName));
-                        Toast.makeText(requireContext(), getString(R.string.toast_cleared_logs_for_app, appName), Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton(R.string.cancel, null));
-        };
-
-        boolean isBiometricEnabled = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("biometric_lock", false);
-        if (isBiometricEnabled) {
-            verifyBiometricsToProceed(proceed, getString(R.string.auth_delete_app_logs));
-        } else {
-            proceed.run();
-        }
+        BaseActivity.showDialog(requireContext(), new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.delete_app_logs_title)
+                .setMessage(getString(R.string.confirm_delete_app_logs_message, summary.count, appName))
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    viewModel.deleteByPackages(Collections.singletonList(summary.packageName));
+                    Toast.makeText(requireContext(), getString(R.string.toast_cleared_logs_for_app, appName), Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, null));
     }
 
     private void setupSelectAllListener() {
@@ -338,53 +359,21 @@ public class AppsFragment extends Fragment {
         boolean next = !adapter.isSelectionMode();
         adapter.setSelectionMode(next);
         binding.layoutBatchActions.setVisibility(next ? View.VISIBLE : View.GONE);
-        binding.layoutHeaderStats.setVisibility(next ? View.GONE : View.VISIBLE);
+        binding.btnTriggerDeleteApps.setVisibility(next ? View.GONE : View.VISIBLE);
         backPressedCallback.setEnabled(next);
         if (next) {
             binding.cbSelectAll.setChecked(false);
             binding.tvSelectedCount.setText(getString(R.string.selected_count_format, 0));
             binding.btnDeleteSelected.setEnabled(false);
+            binding.btnDeleteSelected.setAlpha(0.45f);
         }
     }
 
     private void exitSelectionMode() {
         adapter.setSelectionMode(false);
         binding.layoutBatchActions.setVisibility(View.GONE);
-        binding.layoutHeaderStats.setVisibility(View.VISIBLE);
+        binding.btnTriggerDeleteApps.setVisibility(View.VISIBLE);
         backPressedCallback.setEnabled(false);
-    }
-
-    private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
-        java.util.concurrent.Executor executor = androidx.core.content.ContextCompat.getMainExecutor(requireContext());
-        androidx.biometric.BiometricPrompt biometricPrompt = new androidx.biometric.BiometricPrompt(this,
-                executor, new androidx.biometric.BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-            }
-
-            @Override
-            public void onAuthenticationSucceeded(@NonNull androidx.biometric.BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(onSuccess);
-                }
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-            }
-        });
-
-        androidx.biometric.BiometricPrompt.PromptInfo promptInfo = new androidx.biometric.BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.verify_identity))
-                .setSubtitle(subtitle)
-                .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG | 
-                                          androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                .build();
-
-        biometricPrompt.authenticate(promptInfo);
     }
 
     @Override
@@ -398,9 +387,6 @@ public class AppsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (requireActivity() instanceof MainActivity) {
-            ((MainActivity) requireActivity()).setOnDeleteAppsClickListener(null);
-        }
         binding = null;
     }
 }

@@ -18,6 +18,9 @@ public interface SearchTokenDao {
     @Query("DELETE FROM search_tokens WHERE notificationId IN (:notificationIds)")
     void deleteByNotificationIds(List<Long> notificationIds);
 
+    @Query("DELETE FROM search_tokens WHERE notificationId IN (SELECT id FROM notifications WHERE isFavorite = 0)")
+    void deleteSearchTokensForNonFavorites();
+
     @Query("DELETE FROM search_tokens")
     void deleteAll();
 

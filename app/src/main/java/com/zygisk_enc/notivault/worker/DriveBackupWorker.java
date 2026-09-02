@@ -38,8 +38,8 @@ public class DriveBackupWorker extends Worker {
         String password     = prefs.getString(KEY_PASSWORD, null);
         boolean includeMedia = com.zygisk_enc.notivault.util.PreferenceUtil.getCloudBackupIncludeMedia(ctx);
 
-        if (folderUriStr == null || password == null || password.isEmpty()) {
-            Log.w(TAG, "No backup folder or password configured — skipping scheduled backup.");
+        if (folderUriStr == null || folderUriStr.isEmpty()) {
+            Log.w(TAG, "No backup folder configured — skipping scheduled backup.");
             return Result.failure();
         }
 
@@ -73,7 +73,7 @@ public class DriveBackupWorker extends Worker {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean success = new AtomicBoolean(false);
 
-        BackupUtil.exportBackup(ctx, fileUri, password, includeMedia, new BackupUtil.BackupProgressListener() {
+        BackupUtil.exportBackup(ctx, fileUri, password != null ? password : "", includeMedia, new BackupUtil.BackupProgressListener() {
             @Override public void onProgress(int progress) { /* no-op for worker */ }
 
             @Override

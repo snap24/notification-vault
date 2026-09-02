@@ -29,6 +29,9 @@ public interface ToastDao {
     @Query("DELETE FROM toasts")
     void deleteAll();
 
+    @Query("SELECT COUNT(*) FROM toasts")
+    int getTotalCountSync();
+
     @Query("SELECT COUNT(*) FROM toasts WHERE timestamp >= :startTimestamp")
     int getCountSinceSync(long startTimestamp);
 
@@ -62,4 +65,16 @@ public interface ToastDao {
 
     @Query("UPDATE toasts SET duplicateCount = :count, timestamp = :timestamp WHERE id = :id")
     void updateDuplicate(long id, int count, long timestamp);
+
+    @androidx.room.Update
+    void updateAll(List<ToastEntity> toasts);
+
+    @Query("SELECT * FROM toasts WHERE text LIKE '%:%'")
+    List<ToastEntity> getLegacyEncryptedToastsSync();
+
+    @Query("SELECT COUNT(*) FROM toasts WHERE text LIKE '%:%'")
+    int getLegacyEncryptedCountSync();
+
+    @androidx.room.Delete
+    void deleteAllEntities(List<ToastEntity> toasts);
 }

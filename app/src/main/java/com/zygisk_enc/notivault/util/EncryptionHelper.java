@@ -105,9 +105,22 @@ public class EncryptionHelper {
         return ivBase64 + ":" + cipherTextBase64;
     }
 
+    public static boolean isEncrypted(String text) {
+        if (text == null || text.length() < 24) return false;
+        int colonIdx = text.indexOf(':');
+        if (colonIdx != 16 && colonIdx != 24) return false;
+        for (int i = 0; i < colonIdx; i++) {
+            char c = text.charAt(i);
+            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '+' || c == '/' || c == '=')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static String decrypt(String encryptedText) {
         if (encryptedText == null) return null;
-        if (!encryptedText.contains(":")) return encryptedText; // Plain text fallback
+        if (!isEncrypted(encryptedText)) return encryptedText; // Fast plain text bypass
         try {
             return decryptInternal(encryptedText);
         } catch (android.security.keystore.KeyPermanentlyInvalidatedException e) {
@@ -119,7 +132,6 @@ public class EncryptionHelper {
                 return encryptedText;
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return encryptedText;
         }
     }

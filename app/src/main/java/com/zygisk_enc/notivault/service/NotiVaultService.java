@@ -196,13 +196,8 @@ public class NotiVaultService extends NotificationListenerService {
         String appName = getAppName(packageName, userId);
         long timestamp = messageTime;
 
-        // Encrypt string fields for security
-        String encTitle = EncryptionHelper.encrypt(title);
-        String encText = EncryptionHelper.encrypt(text);
-        String encBigText = EncryptionHelper.encrypt(bigText);
-
         NotificationEntity entity = new NotificationEntity(
-                packageName, appName, encTitle, encText, encBigText, timestamp);
+                packageName, appName, title != null ? title : "", text != null ? text : "", bigText, timestamp);
         entity.userId = userId;
 
         if (PreferenceUtil.isExtendedMetadataEnabled(this)) {
@@ -327,8 +322,7 @@ public class NotiVaultService extends NotificationListenerService {
                         displayText = (newCount > 1 ? "📷 " + newCount + " photos" : "📷 Photo");
                     }
 
-                    String encDisplay = EncryptionHelper.encrypt(displayText);
-                    db.notificationDao().updatePhotoSession(lastNotif.id, encDisplay, encDisplay, entity.timestamp, updatedImagePath, newCount);
+                    db.notificationDao().updatePhotoSession(lastNotif.id, displayText, displayText, entity.timestamp, updatedImagePath, newCount);
                     isPhotoSessionCoalesced = true;
 
                 // 2. TEXT DUPLICATE MERGING: Group consecutive identical text messages
@@ -361,8 +355,8 @@ public class NotiVaultService extends NotificationListenerService {
                         }
                         if (isGenericPhotoText(finalText) && (finalBigText == null || isGenericPhotoText(finalBigText))) {
                             String caption = (photoCount > 1 ? "📷 " + photoCount + " photos" : "📷 Photo");
-                            entity.text = EncryptionHelper.encrypt(caption);
-                            entity.bigText = EncryptionHelper.encrypt(caption);
+                            entity.text = caption;
+                            entity.bigText = caption;
                         }
                     }
                 }

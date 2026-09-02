@@ -1,5 +1,6 @@
 package com.zygisk_enc.notivault.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -49,10 +50,33 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             uri -> {
                 AppLockManager.setExpectingActivityResult(false);
                 if (uri != null) {
-                    showImportPasswordDialog(uri);
+                    com.zygisk_enc.notivault.util.AppExecutor.execute(() -> {
+                        boolean encrypted = com.zygisk_enc.notivault.util.BackupUtil.isBackupEncrypted(requireContext(), uri);
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (encrypted) {
+                                    showImportPasswordDialog(uri);
+                                } else {
+                                    startImportService(uri, "");
+                                }
+                            });
+                        }
+                    });
                 }
             }
     );
+
+    private void startImportService(Uri uri, String password) {
+        Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.service.BackupService.class);
+        intent.setAction(com.zygisk_enc.notivault.service.BackupService.ACTION_IMPORT);
+        intent.putExtra("uri", uri.toString());
+        intent.putExtra("password", password != null ? password : "");
+        androidx.core.content.ContextCompat.startForegroundService(requireContext(), intent);
+
+        Toast.makeText(requireContext(), 
+                R.string.toast_import_started, 
+                Toast.LENGTH_LONG).show();
+    }
 
     private void showExportOptionsDialog(Uri uri) {
         View view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_export_backup, null);
@@ -70,11 +94,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         dialog.setOnShowListener(d -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
-                if (password.isEmpty()) {
-                    Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
                 boolean includeMedia = switchIncludeMedia.isChecked();
 
                 android.content.Intent intent = new android.content.Intent(requireContext(), com.zygisk_enc.notivault.service.BackupService.class);
@@ -117,20 +136,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         dialog.setOnShowListener(d -> {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String password = tietPassword.getText() != null ? tietPassword.getText().toString().trim() : "";
-                if (password.isEmpty()) {
-                    Toast.makeText(requireContext(), R.string.toast_password_empty, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Intent intent = new Intent(requireContext(), com.zygisk_enc.notivault.service.BackupService.class);
-                intent.setAction(com.zygisk_enc.notivault.service.BackupService.ACTION_IMPORT);
-                intent.putExtra("uri", uri.toString());
-                intent.putExtra("password", password);
-                androidx.core.content.ContextCompat.startForegroundService(requireContext(), intent);
-
-                Toast.makeText(requireContext(), 
-                        R.string.toast_import_started, 
-                        Toast.LENGTH_LONG).show();
+                startImportService(uri, password);
                 dialog.dismiss();
             });
         });
@@ -158,6 +164,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
+        // Database & Encryption page preference
+        Preference encryptionPagePref = findPreference("encryption_page");
+        if (encryptionPagePref != null) {
+            encryptionPagePref.setOnPreferenceClickListener(pref -> {
+                startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.EncryptionSettingsActivity.class));
+                return true;
+            });
+        }
+
         // Notification Access preference
         Preference notifAccessPref = findPreference("notification_access");
         if (notifAccessPref != null) {
@@ -172,15 +187,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if (autoDeleteHistoryPref != null) {
             updateAutoDeleteSummary(autoDeleteHistoryPref);
             autoDeleteHistoryPref.setOnPreferenceClickListener(pref -> {
-                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        .getBoolean("biometric_lock", false);
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(() -> {
-                        startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.AutoDeleteRulesActivity.class));
-                    }, getString(R.string.auth_manage_auto_delete));
-                } else {
-                    startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.AutoDeleteRulesActivity.class));
-                }
+                startActivity(new Intent(requireContext(), com.zygisk_enc.notivault.AutoDeleteRulesActivity.class));
                 return true;
             });
         }
@@ -245,7 +252,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     widgetFilterAuthPref.setEnabled(isEnabling);
                 }
                 if (!isEnabling) {
-                    // Require identity verification to disable security lock
+                    // Require identity verification to disable master security lock
                     verifyBiometricsToProceed(() -> {
                         if (preference instanceof SwitchPreferenceCompat) {
                             ((SwitchPreferenceCompat) preference).setChecked(false);
@@ -260,93 +267,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
-        if (widgetFilterAuthPref != null) {
-            widgetFilterAuthPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean isEnabling = (boolean) newValue;
-                if (!isEnabling) {
-                    verifyBiometricsToProceed(() -> {
-                        if (preference instanceof SwitchPreferenceCompat) {
-                            ((SwitchPreferenceCompat) preference).setChecked(false);
-                        }
-                    }, getString(R.string.auth_confirm_unlock));
-                    return false;
+        // FLAG_SECURE switch live listener (Block screenshots & screen recording)
+        Preference flagSecurePref = findPreference("flag_secure");
+        if (flagSecurePref != null) {
+            flagSecurePref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabled = (boolean) newValue;
+                if (getActivity() != null) {
+                    if (enabled) {
+                        getActivity().getWindow().setFlags(
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE,
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE
+                        );
+                    } else {
+                        getActivity().getWindow().clearFlags(
+                                android.view.WindowManager.LayoutParams.FLAG_SECURE
+                        );
+                    }
                 }
                 return true;
             });
         }
 
-        // FLAG_SECURE switch live listener with biometric authentication
-        Preference flagSecurePref = findPreference("flag_secure");
-        if (flagSecurePref != null) {
-            flagSecurePref.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean enabled = (boolean) newValue;
-                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        .getBoolean("biometric_lock", false);
-
-                Runnable applyChange = () -> {
-                    if (preference instanceof SwitchPreferenceCompat) {
-                        ((SwitchPreferenceCompat) preference).setChecked(enabled);
-                    }
-                    PreferenceManager.getDefaultSharedPreferences(requireContext())
-                            .edit()
-                            .putBoolean("flag_secure", enabled)
-                            .apply();
-                    if (getActivity() != null) {
-                        if (enabled) {
-                            getActivity().getWindow().setFlags(
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE,
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
-                            );
-                        } else {
-                            getActivity().getWindow().clearFlags(
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
-                            );
-                        }
-                    }
-                };
-
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(applyChange, getString(R.string.auth_toggle_flag_secure));
-                    return false;
-                } else {
-                    if (getActivity() != null) {
-                        if (enabled) {
-                            getActivity().getWindow().setFlags(
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE,
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
-                            );
-                        } else {
-                            getActivity().getWindow().clearFlags(
-                                    android.view.WindowManager.LayoutParams.FLAG_SECURE
-                            );
-                        }
-                    }
-                    return true;
-                }
-            });
-        }
-
-        // Extended Metadata Capture switch with biometric authentication
+        // Extended Metadata Capture switch
         Preference metadataCapturePref = findPreference("capture_extended_metadata");
         if (metadataCapturePref != null) {
             metadataCapturePref.setOnPreferenceChangeListener((preference, newValue) -> {
                 boolean enabled = (boolean) newValue;
-                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        .getBoolean("biometric_lock", false);
-
-                Runnable applyChange = () -> {
-                    if (preference instanceof SwitchPreferenceCompat) {
-                        ((SwitchPreferenceCompat) preference).setChecked(enabled);
-                    }
-                    PreferenceUtil.setExtendedMetadataEnabled(requireContext(), enabled);
-                };
-
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(applyChange, getString(R.string.auth_toggle_metadata_capture));
-                    return false;
-                } else {
-                    return true;
-                }
+                PreferenceUtil.setExtendedMetadataEnabled(requireContext(), enabled);
+                return true;
             });
         }
 
@@ -373,17 +321,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Preference importPref = findPreference("import_backup");
         if (importPref != null) {
             importPref.setOnPreferenceClickListener(pref -> {
-                boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        .getBoolean("biometric_lock", false);
-                Runnable proceed = () -> {
-                    AppLockManager.setExpectingActivityResult(true);
-                    importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
-                };
-                if (isBiometricEnabled) {
-                    verifyBiometricsToProceed(proceed, getString(R.string.auth_import_backup));
-                } else {
-                    proceed.run();
-                }
+                AppLockManager.setExpectingActivityResult(true);
+                importBackupLauncher.launch(new String[]{"application/json", "application/octet-stream", "*/*"});
                 return true;
             });
         }
@@ -440,6 +379,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             });
         }
 
+        // Master Wipe Vault click listener
+        Preference masterWipePref = findPreference("master_wipe_vault");
+        if (masterWipePref != null) {
+            masterWipePref.setOnPreferenceClickListener(pref -> {
+                showMasterWipeDialog();
+                return true;
+            });
+        }
+
         // About preference click listener to open About Notification Vault dialog
         Preference aboutPref = findPreference("about");
         if (aboutPref != null) {
@@ -448,6 +396,84 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 return true;
             });
         }
+    }
+
+    private void showMasterWipeDialog() {
+        if (!isAdded()) return;
+
+        Context ctx = requireContext();
+        int errorColor = com.google.android.material.color.MaterialColors.getColor(
+                ctx, com.google.android.material.R.attr.colorError, 0xFFB00020);
+        android.graphics.drawable.Drawable warningDrawable =
+                androidx.core.content.ContextCompat.getDrawable(ctx, R.drawable.ic_warning);
+        if (warningDrawable != null) {
+            warningDrawable = warningDrawable.mutate();
+            warningDrawable.setTint(errorColor);
+        }
+
+        new MaterialAlertDialogBuilder(ctx)
+                .setIcon(warningDrawable)
+                .setTitle(R.string.master_wipe_confirm_title)
+                .setMessage(R.string.master_wipe_confirm_message)
+                .setPositiveButton(R.string.master_wipe_action_wipe, (d, w) -> {
+                    boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                            .getBoolean("biometric_lock", false);
+                    if (isBiometricEnabled) {
+                        verifyBiometricsToProceed(this::performMasterWipe, getString(R.string.master_wipe_confirm_title));
+                    } else {
+                        performMasterWipe();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void performMasterWipe() {
+        if (!isAdded()) return;
+
+        Context ctx = requireContext();
+        int errorColor = com.google.android.material.color.MaterialColors.getColor(
+                ctx, com.google.android.material.R.attr.colorError, 0xFFB00020);
+
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_migration, null);
+        android.widget.ImageView ivIcon = dialogView.findViewById(R.id.iv_migration_icon);
+        android.widget.TextView tvTitle = dialogView.findViewById(R.id.tv_migration_title);
+        android.widget.TextView tvMessage = dialogView.findViewById(R.id.tv_migration_message);
+        com.google.android.material.progressindicator.LinearProgressIndicator progressIndicator =
+                dialogView.findViewById(R.id.progress_migration);
+        android.widget.TextView tvProgressText = dialogView.findViewById(R.id.tv_migration_progress_text);
+
+        if (ivIcon != null) {
+            ivIcon.setImageResource(R.drawable.ic_warning);
+            ivIcon.setImageTintList(android.content.res.ColorStateList.valueOf(errorColor));
+        }
+        tvTitle.setText(R.string.master_wipe_confirm_title);
+        tvTitle.setTextColor(errorColor);
+        tvMessage.setText(R.string.master_wipe_progress);
+        progressIndicator.setIndeterminate(true);
+        progressIndicator.setIndicatorColor(errorColor);
+        tvProgressText.setVisibility(android.view.View.GONE);
+
+        androidx.appcompat.app.AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+        com.zygisk_enc.notivault.util.MasterWipeHelper.executeMasterWipe(requireContext(), () -> {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            if (isAdded()) {
+                Toast.makeText(requireContext(), R.string.master_wipe_success, Toast.LENGTH_LONG).show();
+                try {
+                    NotificationViewModel viewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
+                    viewModel.resetAllFilters();
+                    viewModel.refreshAppSummaries();
+                } catch (Exception ignored) {}
+            }
+        });
     }
 
     private void showAboutDialog() {

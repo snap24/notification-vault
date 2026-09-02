@@ -77,25 +77,35 @@ public class ToastHistoryActivity extends BaseActivity {
         viewModel.getToasts().observe(this, toasts -> updateUI());
         viewModel.getIsLoading().observe(this, loading -> updateUI());
 
+        final android.os.Handler progressHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable hideProgressRunnable = () -> {
+            if (binding != null && binding.cardToolbarDecryption != null) {
+                binding.cardToolbarDecryption.animate().cancel();
+                binding.cardToolbarDecryption.animate().alpha(0f).setDuration(180).withEndAction(() -> {
+                    if (binding != null) {
+                        binding.cardToolbarDecryption.setVisibility(View.GONE);
+                    }
+                }).start();
+            }
+        };
+
         viewModel.getLoadProgress().observe(this, progress -> {
-            boolean shouldShow = progress != null && progress >= 0 && progress < 100;
-            int newVisibility = shouldShow ? View.VISIBLE : View.GONE;
-            if (binding.cardToolbarDecryption.getVisibility() != newVisibility) {
-                if (shouldShow) {
+            boolean shouldShow = progress != null && progress >= 0;
+            if (shouldShow) {
+                progressHandler.removeCallbacks(hideProgressRunnable);
+                if (binding.cardToolbarDecryption.getVisibility() != View.VISIBLE) {
                     binding.cardToolbarDecryption.animate().cancel();
                     binding.cardToolbarDecryption.setAlpha(0f);
                     binding.cardToolbarDecryption.setVisibility(View.VISIBLE);
-                    binding.cardToolbarDecryption.animate().alpha(1f).setDuration(150).start();
-                } else {
-                    binding.cardToolbarDecryption.animate().cancel();
-                    binding.cardToolbarDecryption.animate().alpha(0f).setDuration(150).withEndAction(() -> {
-                        binding.cardToolbarDecryption.setVisibility(View.GONE);
-                    }).start();
+                    binding.cardToolbarDecryption.animate().alpha(1f).setDuration(120).start();
                 }
-            }
-            if (shouldShow) {
                 int p = Math.min(100, Math.max(0, progress));
                 binding.progressToolbarDecryption.setProgressCompat(p, true);
+                if (p == 100) {
+                    progressHandler.postDelayed(hideProgressRunnable, 220);
+                }
+            } else {
+                progressHandler.postDelayed(hideProgressRunnable, 220);
             }
         });
 
@@ -428,65 +438,24 @@ public class ToastHistoryActivity extends BaseActivity {
 
     private void setupClearAll() {
         binding.btnClearAll.setOnClickListener(v -> {
-            Runnable proceedToClear = () -> {
-                View dialogView = getLayoutInflater().inflate(R.layout.dialog_clear_toasts, null);
-                androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ToastHistoryActivity.this)
-                        .setView(dialogView)
-                        .create();
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_clear_toasts, null);
+            androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ToastHistoryActivity.this)
+                    .setView(dialogView)
+                    .create();
 
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                }
-
-                dialogView.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v1 -> dialog.dismiss());
-                dialogView.findViewById(R.id.btn_dialog_confirm_clear).setOnClickListener(v1 -> {
-                    dialog.dismiss();
-                    viewModel.clearAllToasts();
-                    Toast.makeText(ToastHistoryActivity.this, R.string.toast_history_cleared, Toast.LENGTH_SHORT).show();
-                });
-
-                dialog.show();
-            };
-
-            boolean isBiometricEnabled = PreferenceManager.getDefaultSharedPreferences(this)
-                    .getBoolean("biometric_lock", false);
-            if (isBiometricEnabled) {
-                verifyBiometricsToProceed(proceedToClear, getString(R.string.auth_clear_toasts));
-            } else {
-                proceedToClear.run();
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
             }
+
+            dialogView.findViewById(R.id.btn_dialog_cancel).setOnClickListener(v1 -> dialog.dismiss());
+            dialogView.findViewById(R.id.btn_dialog_confirm_clear).setOnClickListener(v1 -> {
+                dialog.dismiss();
+                viewModel.clearAllToasts();
+                Toast.makeText(ToastHistoryActivity.this, R.string.toast_history_cleared, Toast.LENGTH_SHORT).show();
+            });
+
+            dialog.show();
         });
-    }
-
-    private void verifyBiometricsToProceed(Runnable onSuccess, String subtitle) {
-        Executor executor = ContextCompat.getMainExecutor(this);
-        BiometricPrompt biometricPrompt = new BiometricPrompt(this,
-                executor, new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                super.onAuthenticationError(errorCode, errString);
-            }
-
-            @Override
-            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                runOnUiThread(onSuccess);
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                super.onAuthenticationFailed();
-            }
-        });
-
-        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.biometric_identity_verification))
-                .setSubtitle(subtitle)
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | 
-                                          BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                .build();
-
-        biometricPrompt.authenticate(promptInfo);
     }
 
     private boolean isAccessibilityServiceEnabled() {

@@ -59,13 +59,10 @@ public class ToastRecorderService extends AccessibilityService {
                 }
 
                 if (!isDuplicate) {
-                    // Encrypt the toast text using our local Keystore
-                    String encryptedText = EncryptionHelper.encrypt(text);
-
                     // Get app name from package name
                     String appName = getAppName(packageName);
 
-                    ToastEntity toast = new ToastEntity(packageName, appName, encryptedText, now);
+                    ToastEntity toast = new ToastEntity(packageName, appName, text, now);
                     toast.duplicateCount = 1;
                     db.toastDao().insert(toast);
                 }

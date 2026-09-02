@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp">
 
+    <!-- Description -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,11 +16,11 @@
         android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_marginBottom="16dp" />
 
-    <!-- Stepper Card -->
+    <!-- Stepper Hero Card -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeWidth="1dp"
         app:strokeColor="?attr/colorOutlineVariant"
@@ -28,59 +30,108 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:paddingVertical="18dp"
+            android:paddingHorizontal="16dp">
 
-            <!-- Minus Button -->
-            <ImageButton
-                android:id="@+id/btn_minus_days"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_button_square_ripple"
-                android:src="@drawable/ic_remove"
-                android:contentDescription="@string/desc_decrease_days"
-                app:tint="?attr/colorPrimary" />
-
-            <!-- Days Input Container -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginHorizontal="16dp">
+                android:orientation="horizontal"
+                android:gravity="center">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_custom_days"
-                    android:layout_width="match_parent"
+                <!-- Minus Button (Circle Elevated) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_minus_days"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/btn_minus_days"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_remove"
+                        app:tint="?attr/colorPrimary"
+                        android:importantForAccessibility="no" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Days Input Container -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:inputType="number"
-                    android:maxLength="4"
-                    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                    android:textColor="?attr/colorPrimary"
-                    android:textStyle="bold" />
+                    android:layout_marginHorizontal="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dialog_custom_days_unit"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_custom_days"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        tools:text="7"
+                        android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_days_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_custom_days_unit"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Plus Button (Circle Elevated) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_plus_days"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/btn_plus_days"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_add"
+                        app:tint="?attr/colorPrimary"
+                        android:importantForAccessibility="no" />
+
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
-            <!-- Plus Button -->
-            <ImageButton
-                android:id="@+id/btn_plus_days"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_button_square_ripple"
-                android:src="@drawable/ic_add"
-                android:contentDescription="@string/desc_increase_days"
-                app:tint="?attr/colorPrimary" />
+            <!-- Dynamic Explanatory Status Banner -->
+            <TextView
+                android:id="@+id/tv_retention_live_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Notifications older than 7 days will be deleted" />
 
         </LinearLayout>
 
@@ -105,6 +156,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/never"
+            app:chipCornerRadius="10dp"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1d (OTP)"
+            app:chipCornerRadius="10dp"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3d"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
         <com.google.android.material.chip.Chip
@@ -112,13 +180,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preset_7_days"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_preset_15"
+            android:id="@+id/chip_preset_14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/preset_15_days"
+            android:text="14d"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
         <com.google.android.material.chip.Chip
@@ -126,13 +196,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preset_30_days"
-            style="@style/Widget.Material3.Chip.Suggestion" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_preset_60"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/preset_60_days"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
         <com.google.android.material.chip.Chip
@@ -140,6 +204,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preset_90_days"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
         <com.google.android.material.chip.Chip
@@ -147,6 +212,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preset_180_days"
+            app:chipCornerRadius="10dp"
+            style="@style/Widget.Material3.Chip.Suggestion" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_preset_365"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="365d (1y)"
+            app:chipCornerRadius="10dp"
             style="@style/Widget.Material3.Chip.Suggestion" />
 
     </com.google.android.material.chip.ChipGroup>
