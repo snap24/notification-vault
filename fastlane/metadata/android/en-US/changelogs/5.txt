@@ -1,0 +1,8 @@
+- SQLCipher 256-bit Whole-Database Encryption
+- Sub-5ms Cryptographic Blind Indexing Search
+- Ultra-Fast Database Migration (< 150ms) & Sleep Bypass
+- Consecutive Notification Streak Bundling
+- Material 3 Visual Redesign & Pure AMOLED Theme
+- Streaming Backups & Optional Plaintext Exports
+- 100% Complete 14-Language Localization
+- Bug Fixes & Performance Improvements: Resolved startup ANRs, detached window dialog crashes, search feed race conditions, and synthetic group duplicate alerts.
