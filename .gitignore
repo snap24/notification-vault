@@ -25,6 +25,11 @@ local.properties
 *.ap_
 *.dex
 *.dm
+release/
+app/release/
+
+# Temporary / Scratch scripts
+scratch/
 
 # OS files
 .DS_Store
